@@ -1,50 +1,52 @@
 import { Stitch } from "../types/Stitch";
-import { verticalStitchDistance } from "../constants";
+import { Point } from "../types/Point";
 
 /**
- * How big the hat will be once it has settled, worked out before it has.
+ * How big the hat is, so the camera can be placed once and then left alone.
  *
- * The camera needs this up front. Framing from the hat's measured bounds meant
- * moving the camera when the shape changed, and any movement there reads badly:
- * either a jump, or an ease that fights you if you try to turn the hat while it
- * is still going.
+ * This used to be a prediction, and had to be: the hat's shape was the result
+ * of a simulation that had not run yet. It is not any more. Every stitch's
+ * position is known before anything is drawn - either from the settled file or
+ * from the geometry the pattern was built with - so this measures rather than
+ * guesses.
  *
- * Two of the three numbers are exact rather than predicted: the radius is the
- * cast-on circle, taken straight from the stitches, and the cast-on is pinned
- * in place and is the widest part of the hat; and the round count comes from
- * the pattern. Only the height is predicted, because how far the tube inflates
- * is the result of the simulation.
+ * Measuring also fixes what the prediction got wrong. It took the radius from
+ * the cast-on, on the reasoning that the brim is the widest part of a hat.
+ * That is true of a hat knitted straight, but both of these are ribbed at the
+ * brim and increased sharply above it - 130 stitches to 162 - so the body is a
+ * quarter wider than the brim, and framing to the brim cropped the crown.
  */
 
 export interface HatShape {
+  /** Distance from the axis to the widest round. */
   radius: number;
   /** Brim to crown, in the same units as the stitch positions. */
   height: number;
   rounds: number;
 }
 
-/**
- * Fitted against the same measurements the other two hat sites use: a tube of
- * this radius and this much fabric settles to roughly this height. It predicts
- * framing only, and never touches the physics.
- */
-const settledHeight = (radius: number, rounds: number): number => {
-  const fabric = rounds * verticalStitchDistance;
-  return Math.min(fabric, radius * 0.869 + fabric * 0.52);
-};
-
-export const predictHatShape = (
+export const hatShape = (
   stitches: Stitch[],
   rounds: number[][],
+  settled?: Point[],
 ): HatShape => {
-  const castOn = rounds[0]?.length ?? stitches.length;
-  const first = stitches.find((stitch) => stitch.id === 1) ?? stitches[0];
-  const radius = first
-    ? Math.hypot(first.position.x, first.position.z)
-    : castOn / (2 * Math.PI);
+  let radius = 0;
+  let low = Infinity;
+  let high = -Infinity;
+
+  for (const stitch of stitches) {
+    // Stitch 0 is the phantom start of the helix and is never drawn.
+    if (stitch.id === 0) continue;
+    const at = settled?.[stitch.id] ?? stitch.position;
+    if (!at) continue;
+    radius = Math.max(radius, Math.hypot(at.x, at.z));
+    low = Math.min(low, at.y);
+    high = Math.max(high, at.y);
+  }
+
   return {
-    radius,
-    height: settledHeight(radius, rounds.length),
+    radius: radius || 1,
+    height: Number.isFinite(high - low) ? Math.max(high - low, 1) : 1,
     rounds: rounds.length,
   };
 };

@@ -162,7 +162,7 @@ const ProjectView: React.FC<{
           <div className="project-layout">
             <div className="project-stage">
               <HatModel
-                shapeKey={hat.id}
+                hatId={hat.id}
                 stitches={stitches}
                 rounds={rounds}
                 palette={palette}

@@ -47,7 +47,17 @@ export default function Settler({ active, stitchRefs, onSettled }: SettlerProps)
     )
       return;
     if (!started.current) started.current = performance.now();
-    const deadline = performance.now() + settleStepBudgetMs;
+    /*
+     * How long to spend stepping before giving the frame back.
+     *
+     * The default keeps a browser responsive, but the settle only ever runs
+     * offline now, where responsiveness is worth nothing and finishing is
+     * worth everything - so the script raises it and the world runs flat out.
+     */
+    const budget =
+      (window as unknown as { __settleBudgetMs?: number }).__settleBudgetMs ??
+      settleStepBudgetMs;
+    const deadline = performance.now() + budget;
     for (let i = 0; i < settleSubsteps; i++) {
       step(settleTimeStep);
       count.current++;
@@ -57,6 +67,15 @@ export default function Settler({ active, stitchRefs, onSettled }: SettlerProps)
         motion += Math.abs(v.x) + Math.abs(v.y) + Math.abs(v.z);
       }
       const meanMotion = motion / stitchRefs.current.length;
+      /*
+       * Progress, for scripts/settle-hats.mjs, which is the only thing that
+       * ever runs this: a step over ten thousand bodies takes a second or two,
+       * so a run takes minutes and deserves to say how it is getting on.
+       */
+      (window as unknown as { __settleProgress?: unknown }).__settleProgress = {
+        steps: count.current,
+        motion: meanMotion,
+      };
       if (rest.current(meanMotion)) {
         complete.current = true;
         const positions = stitchRefs.current.map((r) =>

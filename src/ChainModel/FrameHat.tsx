@@ -48,7 +48,7 @@ const samplePoints = Array.from({ length: 9 }, () => new THREE.Vector3());
  * margin has to cover that: a hat a tenth taller than predicted still lands
  * inside the frame, and one a tenth shorter still fills most of it.
  */
-const fillFraction = 0.86;
+const fillFraction = 0.82;
 
 /** Where the middle of the silhouette should sit. 0 is the middle of the frame. */
 const framingBias = 0;

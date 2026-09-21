@@ -77,7 +77,19 @@ export default class Knitter {
     const rise = Math.sqrt(
       Math.max(verticalStitchDistance ** 2 - pulledIn ** 2, 0),
     );
-    return this.height + rise;
+    /*
+     * A crown can decrease faster than its fabric can reach.
+     *
+     * The Aal Ower Toorie takes 162 stitches to 9 over sixteen rounds, which
+     * asks the radius to shrink by about twice what a round of knitting is
+     * tall. Nothing flat can do that, and the arithmetic above gives up and
+     * returns no rise at all, which draws the crown as a flat lid and the hat
+     * as an open pot. Real wool does not do that either: the stitches at the
+     * crown compress and stand up rather than lying down, and the yarn drawn
+     * through the last nine of them gathers the top. So a round always rises
+     * a little, however hard it is pulling in.
+     */
+    return this.height + Math.max(rise, verticalStitchDistance * 0.35);
   }
 
   private place(index: number, count: number) {

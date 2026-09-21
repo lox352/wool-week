@@ -15,9 +15,7 @@ export interface StitchPhysicsProps {
   palette: Palette;
   /** Id of the last stitch worked; earlier stitches are shown in their wool. */
   progress: number;
-  /** Resting positions, once the hat has settled, so it is only settled once. */
-  settled?: Point[];
-  onSettled?: (positions: Point[], metrics: SettleMetrics) => void;
+  onSettled: (positions: Point[], metrics: SettleMetrics) => void;
   simulationActive: boolean;
   reducedMotion: boolean;
 }
@@ -42,7 +40,6 @@ export default function StitchPhysics({
   stitches,
   palette,
   progress,
-  settled,
   onSettled,
   simulationActive,
   reducedMotion,
@@ -54,6 +51,12 @@ export default function StitchPhysics({
 
   // Stitch 0 is the phantom start of the helix and is never drawn.
   const drawn = useMemo(() => stitches.filter((s) => s.id > 0), [stitches]);
+
+  const positionAt = useMemo(
+    () => (id: number) =>
+      stitchRefs.current[id]?.current?.translation() ?? stitches[id]?.position,
+    [stitches],
+  );
 
   const colours = useRef<Float32Array | null>(null);
   const worked = useRef<Float32Array | null>(null);
@@ -74,15 +77,12 @@ export default function StitchPhysics({
 
   return (
     <>
-      {!settled && onSettled && (
-        <Settler
+      <Settler
           active={simulationActive}
           stitchRefs={stitchRefs}
-          onSettled={onSettled}
-        />
-      )}
-      {!settled &&
-        stitches.map((stitch) => (
+        onSettled={onSettled}
+      />
+      {stitches.map((stitch) => (
           <StitchBody
             key={stitch.id}
             rigidBodyRef={stitchRefs.current[stitch.id]}
@@ -92,15 +92,13 @@ export default function StitchPhysics({
         ))}
       <StitchInstances
         stitches={stitches}
-        settled={settled}
-        moving={simulationActive && !settled}
-        stitchRefs={stitchRefs}
+        positionAt={positionAt}
+        moving={simulationActive}
         colours={colours}
         worked={worked}
         reducedMotion={reducedMotion}
       />
-      {!settled &&
-        stitches.flatMap((stitch) =>
+      {stitches.flatMap((stitch) =>
           stitch.links.map((link) => (
             <Link
               key={`${stitch.id}-${link}`}

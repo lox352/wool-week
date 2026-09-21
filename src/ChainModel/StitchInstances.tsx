@@ -1,17 +1,22 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import { RapierRigidBody } from "@react-three/rapier";
 import { Stitch } from "../types/Stitch";
 import { Point } from "../types/Point";
 import { createStitchGeometry } from "./stitch-geometry";
 
 interface StitchInstancesProps {
   stitches: Stitch[];
-  /** Resting positions, when the hat has already been settled. */
-  settled?: Point[];
+  /**
+   * Where a stitch is, right now.
+   *
+   * A hat that has already been settled hands back fixed positions; one that
+   * is still settling reads them off the physics bodies every frame. Keeping
+   * that behind a callback is what lets this file - and so the whole of the
+   * ordinary path through the site - know nothing about the physics engine.
+   */
+  positionAt: (id: number) => Point | undefined;
   moving: boolean;
-  stitchRefs: React.MutableRefObject<React.RefObject<RapierRigidBody>[]>;
   /** Target colours, three floats per drawn stitch. */
   colours: React.MutableRefObject<Float32Array | null>;
   /** 1 where a stitch has been worked, 0 where it has not. */
@@ -59,9 +64,8 @@ const fadeRate = 3.5;
  */
 const StitchInstances: React.FC<StitchInstancesProps> = ({
   stitches,
-  settled,
+  positionAt,
   moving,
-  stitchRefs,
   colours,
   worked,
   reducedMotion,
@@ -69,6 +73,10 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const geometry = useMemo(() => createStitchGeometry(), []);
   const eased = useRef<Float32Array>();
+  /** Matrices are written; nothing is moving, so they stay written. */
+  const placed = useRef(false);
+  /** Every stitch has reached its colour, so there is nothing left to ease. */
+  const faded = useRef(false);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -96,11 +104,18 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
     return { acrossOf, belowOf };
   }, [drawn]);
 
+  // A different hat has to be placed again, and a change to what is knitted
+  // has to be eased again.
+  useEffect(() => {
+    placed.current = false;
+  }, [drawn, positionAt]);
+  useEffect(() => {
+    faded.current = false;
+  });
+
   const readPosition = (id: number, into: THREE.Vector3): boolean => {
     if (id < 0) return false;
-    const resting = settled?.[id];
-    const body = settled ? undefined : stitchRefs.current[id]?.current;
-    const at = body?.translation() ?? resting ?? stitches[id]?.position;
+    const at = positionAt(id);
     if (!at) return false;
     into.set(at.x, at.y, at.z);
     return true;
@@ -119,10 +134,43 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
       if (done) eased.current.set(done);
     }
 
+    /*
+     * A settled hat's stitches never move again, so where they are is worked
+     * out once. Redoing it every frame is ten thousand iterations of vector
+     * arithmetic for an answer that cannot have changed, which on a phone is
+     * the difference between a still picture you can turn and a hot one you
+     * cannot.
+     */
+    const placing = moving || !placed.current;
+    const fading = target !== null && done !== null && !faded.current;
+    if (!placing && !fading) return;
+
     let settling = false;
     for (let index = 0; index < drawn.length; index++) {
       const stitch = drawn[index];
       if (!readPosition(stitch.id, position)) continue;
+      if (!placing) {
+        // Only the colour is still changing, so skip straight to it.
+        if (target && done) {
+          const wanted = done[index];
+          const current = eased.current[index];
+          const next = reducedMotion
+            ? wanted
+            : current + (wanted - current) * Math.min(delta * fadeRate, 1);
+          if (Math.abs(next - wanted) > 0.002) settling = true;
+          eased.current[index] = next;
+          colour
+            .setRGB(
+              target[index * 3],
+              target[index * 3 + 1],
+              target[index * 3 + 2],
+              THREE.SRGBColorSpace,
+            )
+            .lerpColors(unworked, colour, next);
+          mesh.setColorAt(index, colour);
+        }
+        continue;
+      }
 
       // Across the round, and down to the round below. Either may be missing
       // at the cast-on or at an increase, so fall back to something sane.
@@ -184,10 +232,12 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
       }
     }
 
-    mesh.instanceMatrix.needsUpdate = true;
+    if (placing) {
+      mesh.instanceMatrix.needsUpdate = true;
+      if (!moving) placed.current = true;
+    }
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    // Nothing is moving and nothing is fading, so there is nothing to redraw.
-    void (moving || settling);
+    faded.current = !settling;
   });
 
   return (

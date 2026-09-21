@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { Physics } from "@react-three/rapier";
 import { OrbitControls } from "@react-three/drei";
 import { settleTimeStep, solverIterations } from "../constants";
-import { predictHatShape } from "../helpers/hat-shape";
+import { hatShape } from "../helpers/hat-shape";
 import FrameHat, { OrbitLike } from "./FrameHat";
 import StitchPhysics, { StitchPhysicsProps } from "./StitchPhysics";
 
@@ -20,7 +20,7 @@ export type ChainModelProps = StitchPhysicsProps & { rounds: number[][] };
 export default function ChainModel({ rounds, ...props }: ChainModelProps) {
   const controls = useRef<OrbitLike | null>(null);
   const shape = useMemo(
-    () => predictHatShape(props.stitches, rounds),
+    () => hatShape(props.stitches, rounds),
     // Worked out once: the hat's size does not change while it is on screen.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],

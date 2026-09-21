@@ -82,7 +82,7 @@ const HatPage: React.FC<{
       <div className="hat-layout">
         <div className="hat-stage">
           <HatModel
-            shapeKey={hat.id}
+            hatId={hat.id}
             stitches={stitches}
             rounds={rounds}
             palette={palette}
