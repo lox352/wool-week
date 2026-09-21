@@ -13,20 +13,19 @@
 }
 
 .progress-ring-track {
-  stroke: var(--rule-strong);
+  stroke: var(--paper-sunk);
 }
 
 .progress-ring-fill {
-  stroke: var(--accent);
+  stroke: var(--crimson);
   stroke-linecap: round;
-  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--accent) 60%, transparent));
   transition: stroke-dashoffset 0.4s ease-out;
 }
 
 .progress-ring-label {
   position: absolute;
-  font-size: 0.66rem;
-  font-weight: 650;
+  font-size: 0.68rem;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--ink-soft);
 }

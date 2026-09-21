@@ -8,9 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 # One deploy at a time; a queued run supersedes an older one rather than
 # racing it, but a run already publishing is left to finish.
@@ -19,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,22 +39,11 @@ jobs:
 
       - run: npm run build
 
-      - uses: actions/configure-pages@v5
+      # Publishing to a branch rather than through the Pages API, as the
+      # sibling hat sites do: it needs only a push, so it works without the
+      # workflow token being able to administer the repository.
+      - name: Publish
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          # Turns Pages on the first time this runs, so the site does not need
-          # to be enabled by hand.
-          enablement: true
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          branch: gh-pages
+          folder: dist
