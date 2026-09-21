@@ -19,6 +19,8 @@ export interface StitchPhysicsProps {
   simulationActive: boolean;
   reducedMotion: boolean;
   tuning: Tuning;
+  /** How tall a round of this hat is; see roundHeightFor in the engine. */
+  roundHeight: number;
 }
 
 /**
@@ -45,6 +47,7 @@ export default function StitchPhysics({
   simulationActive,
   reducedMotion,
   tuning,
+  roundHeight,
 }: StitchPhysicsProps) {
   const stitchRefs = useRef<React.RefObject<RapierRigidBody>[]>([]);
   if (!stitchRefs.current.length) {
@@ -118,7 +121,12 @@ export default function StitchPhysics({
               key={`${stitch.id}-${link}`}
               bodyA={stitchRefs.current[stitch.id]}
               bodyB={stitchRefs.current[link]}
-              maxLength={ropeLength(tuning, stitch.id - link, startsAt)}
+              maxLength={ropeLength(
+                tuning,
+                stitch.id - link,
+                startsAt,
+                roundHeight,
+              )}
             />
           );
         }),

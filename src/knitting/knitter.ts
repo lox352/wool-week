@@ -24,6 +24,16 @@ import { adjacentStitchDistance, verticalStitchDistance } from "../constants";
  * backwards: it is held by its neighbours and by the round worked into it next.
  */
 export default class Knitter {
+  /**
+   * How tall a round is. A property of the pattern's tension rather than a
+   * constant - see roundHeightFor in engine.ts.
+   */
+  private readonly roundHeight: number;
+
+  constructor(roundHeight: number = verticalStitchDistance) {
+    this.roundHeight = roundHeight;
+  }
+
   readonly stitches: Stitch[] = [];
   /** Stitch ids in each round, in the order they are worked. */
   readonly rounds: number[][] = [];
@@ -74,9 +84,7 @@ export default class Knitter {
    */
   private riseTo(radius: number) {
     const pulledIn = this.radius - radius;
-    const rise = Math.sqrt(
-      Math.max(verticalStitchDistance ** 2 - pulledIn ** 2, 0),
-    );
+    const rise = Math.sqrt(Math.max(this.roundHeight ** 2 - pulledIn ** 2, 0));
     /*
      * A crown can decrease faster than its fabric can reach.
      *
@@ -89,7 +97,7 @@ export default class Knitter {
      * through the last nine of them gathers the top. So a round always rises
      * a little, however hard it is pulling in.
      */
-    return this.height + Math.max(rise, verticalStitchDistance * 0.35);
+    return this.height + Math.max(rise, this.roundHeight * 0.35);
   }
 
   private place(index: number, count: number) {

@@ -32,6 +32,8 @@ interface HatCanvasProps {
   rounds: number[][];
   palette: Palette;
   progress: number;
+  /** How tall a round of this hat is; see roundHeightFor in the engine. */
+  roundHeight: number;
   /** Resting positions, when they are known. */
   settled?: Point[];
   /** Settle the hat here and now. Only the offline settle script asks. */

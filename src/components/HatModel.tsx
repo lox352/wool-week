@@ -50,8 +50,11 @@ interface HatModelProps {
   hatId: string;
   stitches: Stitch[];
   rounds: number[][];
+  roundHeight: number;
   palette: Palette;
   progress: number;
+  /** What the pattern says the finished hat measures, for the bench. */
+  target?: { acrossCm: number; tallCm: number };
 }
 
 /** Positions already fetched this session, so switching pages does not refetch. */
@@ -61,8 +64,10 @@ const HatModel: React.FC<HatModelProps> = ({
   hatId,
   stitches,
   rounds,
+  roundHeight,
   palette,
   progress,
+  target,
 }) => {
   const [settled, setSettled] = useState<Point[] | undefined>(() =>
     known.get(hatId),
@@ -104,8 +109,8 @@ const HatModel: React.FC<HatModelProps> = ({
    */
   useEffect(() => {
     if (!settlingRequested()) return;
-    (window as unknown as { __hat?: unknown }).__hat = { stitches, rounds };
-  }, [stitches, rounds]);
+    (window as unknown as { __hat?: unknown }).__hat = { stitches, rounds, target };
+  }, [stitches, rounds, target]);
 
   const onSettled = useCallback(
     (positions: Point[]) => {
@@ -131,6 +136,7 @@ const HatModel: React.FC<HatModelProps> = ({
     <HatCanvas
       stitches={stitches}
       rounds={rounds}
+      roundHeight={roundHeight}
       palette={palette}
       progress={progress}
       settled={settled}

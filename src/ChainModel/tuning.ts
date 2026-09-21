@@ -108,8 +108,9 @@ export const ropeLength = (
   tuning: Tuning,
   span: number,
   startsAt: number,
+  roundHeight = verticalStitchDistance,
 ): number => {
-  const base = span === 1 ? adjacentStitchDistance : verticalStitchDistance;
+  const base = span === 1 ? adjacentStitchDistance : roundHeight;
   if (tuning.ropes === "fixed") return base * tuning.ropeSlack;
   return Math.max(base, startsAt) * tuning.ropeSlack;
 };

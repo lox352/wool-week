@@ -78,6 +78,16 @@ const runs = [
     tuning: { ropes: "derived", timeStep: 0.3 },
   },
   {
+    name: "no-gravity",
+    why: "the hat already starts the right shape; is gravity only distorting it?",
+    tuning: { gravity: 0 },
+  },
+  {
+    name: "light-gravity",
+    why: "enough to relax the fabric, not enough to stretch the tube",
+    tuning: { gravity: 1 },
+  },
+  {
     name: "more-damping",
     why: "take the energy out faster",
     tuning: { ropes: "derived", damping: 8 },
@@ -168,6 +178,39 @@ async function settle({ name, why, tuning }) {
     }
   }
 
+  /*
+   * What shape it came out. The settle can reach rest and still be wrong: rope
+   * joints only cap how far apart two stitches may be, so nothing stops a
+   * round closing up, and gravity will happily trade a hat's circumference for
+   * its height until it is a tall thin cone. So the run is judged on the shape
+   * as well as on whether it stopped moving.
+   */
+  const shape = settled
+    ? await page
+        .evaluate(() => {
+          const flat = window.__settledPositions;
+          const { stitches, target } = window.__hat ?? {};
+          const extent = (points, at) => {
+            let radius = 0;
+            let low = Infinity;
+            let high = -Infinity;
+            for (const p of points) {
+              const q = at(p);
+              radius = Math.max(radius, Math.hypot(q.x, q.z));
+              low = Math.min(low, q.y);
+              high = Math.max(high, q.y);
+            }
+            return { across: 2 * radius, tall: high - low };
+          };
+          return {
+            settled: extent(flat, (p) => p),
+            built: extent(stitches ?? [], (s) => s.position),
+            target,
+          };
+        })
+        .catch(() => null)
+    : null;
+
   await page.close();
 
   const steps = last?.steps ?? 0;
@@ -183,6 +226,7 @@ async function settle({ name, why, tuning }) {
     trend: curve.length > 3
       ? (curve.at(-1).motion - curve.at(-4).motion).toFixed(2)
       : "-",
+    shape,
     failures,
   };
 }
@@ -326,25 +370,32 @@ if (has("geometry")) {
   const chosen = only ? runs.filter((r) => r.name === only) : runs;
   console.log(`settling ${hat}, up to ${minutes} minutes each\n`);
   console.log(
-    "run                        settled  steps  s/step  motion  trend(30s)",
+    "run                        settled  steps  tall:wide  built  width kept",
   );
   console.log("-".repeat(74));
   for (const run of chosen) {
     const result = await settle(run);
+    const shape = result.shape;
+    const ratio = shape ? shape.settled.tall / shape.settled.across : null;
+    const built = shape ? shape.built.tall / shape.built.across : null;
+    const width = shape ? shape.settled.across / shape.built.across : null;
     console.log(
       result.name.padEnd(26) +
         String(result.settled === null ? "no" : `${result.settled}s`).padEnd(9) +
         String(result.steps).padEnd(7) +
-        String(result.perStep).padEnd(8) +
-        String(result.motion?.toFixed(2) ?? "-").padEnd(8) +
-        String(result.trend),
+        (ratio === null ? "-" : ratio.toFixed(2)).padEnd(11) +
+        (built === null ? "-" : built.toFixed(2)).padEnd(8) +
+        (width === null ? "-" : `${(100 * width).toFixed(0)}%`),
     );
     if (result.why) console.log(`  ${result.why}`);
     for (const failure of result.failures) console.log(`  ERROR: ${failure}`);
   }
   console.log(
     "\nsettled: how long until the hat came to rest, or 'no' if it never did.\n" +
-      "trend: change in motion over the last thirty seconds; near zero means stalled.",
+      "built: the proportions the pattern's own tension gives, before settling.\n" +
+      "width kept: how much of that width survived. Rope joints only cap how\n" +
+      "far apart stitches may be, so nothing stops a round closing up, and a\n" +
+      "settle that loses width has traded the hat's circumference for height.",
   );
 }
 

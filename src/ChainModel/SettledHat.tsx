@@ -9,6 +9,8 @@ import FrameHat, { OrbitLike } from "./FrameHat";
 import StitchInstances from "./StitchInstances";
 
 export interface SettledHatProps {
+  /** Unused here, but part of the shared stage's props. */
+  roundHeight?: number;
   stitches: Stitch[];
   rounds: number[][];
   palette: Palette;

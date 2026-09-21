@@ -131,7 +131,7 @@ const ProjectView: React.FC<{
   setShade,
 }) => {
   const hat = hatById(hatId)!;
-  const { stitches, rounds, roundLabels, index } = useHat(hat);
+  const { stitches, rounds, roundHeight, roundLabels, index } = useHat(hat);
 
   const colourway =
     hat.colourways.find((c) => c.id === project.colourwayId) ?? hat.colourways[0];
@@ -165,8 +165,13 @@ const ProjectView: React.FC<{
                 hatId={hat.id}
                 stitches={stitches}
                 rounds={rounds}
+                roundHeight={roundHeight}
                 palette={palette}
                 progress={project.progress}
+                target={{
+                  acrossCm: size.circumferenceCm / Math.PI,
+                  tallCm: size.lengthCm,
+                }}
               />
               <p className="quiet hat-stage-note">
                 The wool fills in as you knit. Drag to turn it.

@@ -52,7 +52,7 @@ const HatPage: React.FC<{
   navigate: ReturnType<typeof useNavigate>;
 }> = ({ hatId, sizeId, setSizeId, colourwayId, setColourwayId, navigate }) => {
   const hat = hatById(hatId)!;
-  const { stitches, rounds, roundLabels, index } = useHat(hat);
+  const { stitches, rounds, roundHeight, roundLabels, index } = useHat(hat);
 
   const size = hat.sizes.find((s) => s.id === sizeId) ?? hat.sizes[0];
   const colourway =
@@ -85,8 +85,13 @@ const HatPage: React.FC<{
             hatId={hat.id}
             stitches={stitches}
             rounds={rounds}
+            roundHeight={roundHeight}
             palette={palette}
             progress={stitches[stitches.length - 1]?.id ?? 0}
+            target={{
+              acrossCm: size.circumferenceCm / Math.PI,
+              tallCm: size.lengthCm,
+            }}
           />
           <p className="quiet hat-stage-note">
             Drag to turn it. {counts.total.toLocaleString()} stitches over{" "}

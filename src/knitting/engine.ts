@@ -1,4 +1,5 @@
 import Knitter from "./knitter";
+import { adjacentStitchDistance, verticalStitchDistance } from "../constants";
 import { Stitch } from "../types/Stitch";
 import { StitchType } from "../types/StitchType";
 import {
@@ -26,7 +27,29 @@ export interface HatStitches {
   rounds: number[][];
   /** A label per round, for the chart's margin: "Chart A, row 7". */
   roundLabels: string[];
+  /** How tall a round is, in the units the stitches are placed in. */
+  roundHeight: number;
 }
+
+/**
+ * How tall a round of this hat is, relative to how wide a stitch is.
+ *
+ * Knitted stitches are wider than they are tall, but by how much is a property
+ * of the pattern rather than a constant: it is the tension the designer wrote
+ * the hat for. The Aal Ower Toorie is 31 stitches and 34 rounds to 10cm, so a
+ * round is 31/34 of a stitch's width, and a hat built on the flat 0.8 this
+ * used to assume came out a fifteenth too squat.
+ *
+ * Taken from the middle size, because a hat is drawn once and every size of
+ * these patterns has the same stitch count - the size is in the needles.
+ */
+export const roundHeightFor = (pattern: HatPattern): number => {
+  const size = pattern.sizes[Math.floor(pattern.sizes.length / 2)];
+  if (!size?.stitchesPer10cm || !size?.roundsPer10cm) {
+    return verticalStitchDistance;
+  }
+  return adjacentStitchDistance * (size.stitchesPer10cm / size.roundsPer10cm);
+};
 
 /** The stitch a chart cell asks for. */
 const stitchFor = (cell: ChartCell): StitchType => {
@@ -124,7 +147,8 @@ const runRound = (
 };
 
 export const buildHat = (pattern: HatPattern): HatStitches => {
-  const knitter = new Knitter();
+  const roundHeight = roundHeightFor(pattern);
+  const knitter = new Knitter(roundHeight);
   const labels: string[] = [];
   let count = 0;
 
@@ -208,5 +232,5 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
   );
 
   const { stitches, rounds } = knitter.finish();
-  return { stitches, rounds, roundLabels: labels };
+  return { stitches, rounds, roundLabels: labels, roundHeight };
 };
