@@ -24,6 +24,23 @@ import { SlotId } from "../data/hats/types";
 /** Every nth line is drawn heavier, to make counting easier. */
 const emphasis = 5;
 
+/**
+ * Whether a rule falls on one of the chart's heavy lines.
+ *
+ * The heavy lines belong to the grid the chart is drawn on, not to the
+ * stitches of any one round: they mark off blocks of five columns and stay
+ * where they are, so that counting across the chart means the same thing at
+ * the rib as at the crown. Counting them off each round's own stitches
+ * instead would shuffle them sideways every time a round was shaped, which
+ * is the opposite of what they are for.
+ *
+ * A round the shaping has left on half columns has no edge lying on one of
+ * them, so it simply goes without: better a heavy line missing for a few
+ * rounds than one drawn through the middle of a stitch.
+ */
+const onGrid = (at: number) =>
+  at > 0 && Math.abs(at - Math.round(at)) < 1e-6 && Math.round(at) % emphasis === 0;
+
 export const cellAt = (
   layout: ChartLayout,
   round: number,
@@ -183,8 +200,8 @@ export const gridPaths = (
    * column that runs unbroken up the chart is a single line.
    */
   const lines = new Map<string, number[]>();
-  const edge = (x: number, isHeavy: boolean, round: number) => {
-    const key = `${x.toFixed(3)}|${isHeavy ? "h" : "l"}`;
+  const edge = (on: number, round: number) => {
+    const key = `${on.toFixed(3)}|${onGrid(on) ? "h" : "l"}`;
     const at = lines.get(key);
     if (at) at.push(round);
     else lines.set(key, [round]);
@@ -193,24 +210,15 @@ export const gridPaths = (
   runs.forEach((rounds, round) => {
     for (const run of rounds) {
       // The edge on the stitch-1 side of the run, then one per cell going left.
-      edge(
-        cellAt(layout, round, run[0].column, cell).x + cell,
-        (run[0].index - 1) % emphasis === 0 && run[0].index > 1,
-        round,
-      );
-      for (const at of run) {
-        edge(
-          cellAt(layout, round, at.column, cell).x,
-          at.index % emphasis === 0,
-          round,
-        );
-      }
+      edge(run[0].column - 1, round);
+      for (const at of run) edge(at.column, round);
     }
   });
 
   lines.forEach((rounds, key) => {
-    const [x, weight] = key.split("|");
+    const [at, weight] = key.split("|");
     const into = weight === "h" ? heavy : light;
+    const x = (layout.columns - Number(at)) * cell;
     rounds.sort((a, b) => a - b);
     let from = rounds[0];
     let last = rounds[0];

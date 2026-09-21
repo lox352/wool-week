@@ -110,8 +110,15 @@ export const drawChart = (
     ctx.fillStyle = yarn.hex;
     ctx.fillRect(x, y, cell, cell);
 
-    // Outlines. Heavier after every fifth stitch and every fifth round.
-    const majorCol = at.index % emphasis === 0;
+    /*
+     * Outlines. Heavier every fifth round, and on the chart's own fifth
+     * columns rather than on each round's own fifth stitch - the heavy lines
+     * belong to the grid the chart is drawn on, so that counting across it
+     * means the same thing at the rib as at the crown.
+     */
+    const majorCol =
+      Math.abs(at.column - Math.round(at.column)) < 1e-6 &&
+      Math.round(at.column) % emphasis === 0;
     const majorRow = at.round !== 1 && (at.round - 1) % emphasis === 0;
     ctx.beginPath();
     ctx.strokeStyle = majorCol ? gridStrong : grid;

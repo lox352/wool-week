@@ -26,7 +26,7 @@ describe("the chart hangs every stitch over what it was worked into", () => {
     });
   });
 
-  it("a decrease sits over the middle of what it took together", () => {
+  it("a decrease settles on whichever stitch it took is nearest the middle", () => {
     for (const hat of ["sww25-aal-ower-toorie", "sww24-islesburgh-toorie"]) {
       const { stitches, cells } = laid(hat);
       const decreases = stitches.filter(
@@ -39,31 +39,65 @@ describe("the chart hangs every stitch over what it was worked into", () => {
         const columns = taken.map((id) => cells.get(id)!.column);
         const middle =
           columns.reduce((total, at) => total + at, 0) / columns.length;
-        expect(cells.get(stitch.id)!.column).toBeCloseTo(middle, 9);
+        const at = cells.get(stitch.id)!.column;
+        // On one of them, and on the one nearest their middle.
+        expect(columns).toContain(at);
+        const wander = Math.abs(at - middle);
+        for (const other of columns) {
+          expect(wander).toBeLessThanOrEqual(Math.abs(other - middle) + 1e-9);
+        }
       }
     }
   });
 
-  it("a k2tog lands on a half column, and the crown carries it up", () => {
-    const { stitches, rounds, cells } = laid("sww24-islesburgh-toorie");
-    const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
-
-    // The round that takes 160 stitches to 144, on sixteen k2tog.
-    const shaped = rounds.find(
-      (round) => round.some((id) => byId.get(id)!.type === "k2tog"),
-    )!;
-    const taken = shaped.filter((id) => byId.get(id)!.type === "k2tog");
-    expect(taken.length).toBe(16);
-    for (const id of taken) {
-      expect(cells.get(id)!.column % 1).toBe(0.5);
+  it("a centred double decrease keeps the middle stitch of its three", () => {
+    for (const hat of ["sww25-aal-ower-toorie", "sww24-islesburgh-toorie"]) {
+      const { stitches, cells } = laid(hat);
+      const centred = stitches.filter((stitch) => stitch.type === "s2kp");
+      expect(centred.length).toBeGreaterThan(0);
+      for (const stitch of centred) {
+        expect(cells.get(stitch.id)!.column).toBe(
+          cells.get(stitch.links[1])!.column,
+        );
+      }
     }
+  });
 
-    // And the rounds above inherit it, rather than snapping back to whole
-    // columns and sliding the colourwork sideways.
-    const above = rounds[rounds.indexOf(shaped) + 1];
-    expect(
-      above.filter((id) => cells.get(id)!.column % 1 !== 0).length,
-    ).toBeGreaterThan(0);
+  it("a decrease line runs straight up the chart rather than wandering", () => {
+    // The crown closes on nine decrease lines on one hat and six on the
+    // other. Each is one column of the chart from the body to the very top:
+    // taking the middle of three stitches literally, rather than settling on
+    // the middle one, moved each decrease a fraction of a column per round
+    // and the line came out visibly wobbly.
+    for (const [hat, lines] of [
+      ["sww25-aal-ower-toorie", 9],
+      ["sww24-islesburgh-toorie", 6],
+    ] as const) {
+      const { stitches, cells } = laid(hat);
+      const columns = new Set(
+        stitches
+          .filter((stitch) => stitch.type === "s2kp")
+          .map((stitch) => cells.get(stitch.id)!.column),
+      );
+      expect(columns.size).toBe(lines);
+    }
+  });
+
+  it("keeps the body and the crown on the chart's own columns", () => {
+    // Everything from the round the increases land on upwards sits on a
+    // whole column, so the heavy every-fifth-column rules have an edge to be
+    // drawn on and stay put all the way to the crown.
+    for (const hat of ["sww25-aal-ower-toorie", "sww24-islesburgh-toorie"]) {
+      const { stitches, rounds, cells } = laid(hat);
+      const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
+      const grown = rounds.findIndex((round) =>
+        round.some((id) => byId.get(id)!.type === "m1"),
+      );
+      expect(grown).toBeGreaterThan(0);
+      for (const round of rounds.slice(grown)) {
+        for (const id of round) expect(cells.get(id)!.column % 1).toBe(0);
+      }
+    }
   });
 
   it("a stitch that becomes two sits between the two it becomes", () => {
