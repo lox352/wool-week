@@ -3,9 +3,9 @@ import { Point } from "../../../types/Point";
 /**
  * Where each hat comes to rest, worked out once and committed.
  *
- * Nothing ships any yet - see the note in README.md - so this always reports
- * that it has none and the hat is drawn from its built geometry instead. See
- * scripts/settle-hats.mjs for how they would be made. Fetched rather than
+ * See scripts/settle-hats.mjs for how these are made. A hat with no file here
+ * is drawn from the geometry the pattern was built with instead, which is a
+ * stiffer but perfectly good hat. Fetched rather than
  * bundled, so the file for a hat you are not looking at is never downloaded,
  * and positions are stored as one flat array of numbers because ten thousand
  * three-key objects is several times the bytes for the same thing.

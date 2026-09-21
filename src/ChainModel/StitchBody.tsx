@@ -15,10 +15,14 @@ export default function StitchBody({
   position,
   rigidBodyRef,
   fixed,
+  damping = settleDamping,
+  radius = 0.02,
 }: {
   position: Point;
   rigidBodyRef: React.RefObject<RapierRigidBody>;
   fixed: boolean;
+  damping?: number;
+  radius?: number;
 }) {
   return (
     <RigidBody
@@ -27,10 +31,10 @@ export default function StitchBody({
       collisionGroups={0b0010} // Assign to a specific group
       type={fixed ? "fixed" : "dynamic"}
       position={[position.x, position.y, position.z]}
-      linearDamping={settleDamping}
-      angularDamping={settleDamping}
+      linearDamping={damping}
+      angularDamping={damping}
     >
-      <BallCollider args={[0.02]} />
+      <BallCollider args={[radius]} />
     </RigidBody>
   );
 }

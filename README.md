@@ -70,25 +70,58 @@ npm run build
 
 ## A note on the physics
 
-The two sibling sites settle their hats under a physics simulation, and this
-one inherited the machinery. It does not use it: the code is only reachable
-from `scripts/settle-hats.mjs`, and nothing ships settled positions.
+The hat is settled under a physics simulation, as on the two sibling sites:
+every stitch is a rigid body and every link between stitches a rope joint, and
+the world is stepped until the tube relaxes into a hat. It is not done in
+anyone's browser, though. A hat's shape depends only on its pattern, and these
+patterns are fixed, so every knitter's copy of a given hat settles to the same
+shape: `scripts/settle-hats.mjs` works it out once and the answer is committed.
 
-At these stitch counts it does not work. Ten thousand stitches is ten thousand
-rigid bodies and twenty-five thousand rope joints, a single step of which takes
-a second or two, and coming to rest needs hundreds of steps. In the browser it
-cost 245MB of heap and ended Safari tabs on iOS without ever finishing; run
-offline with no time limit it had still not converged after forty minutes.
+Getting that to work at all took finding out why it did not. With the sibling
+sites' settings these hats never came to rest - not in a browser, where it cost
+245MB of heap and ended Safari tabs on iOS, and not offline either, where it
+was still going after forty minutes.
 
-So the hat is drawn from the geometry the pattern is built with: a tube of the
-right circumference, rising by a round's height each round, pulling in over the
-crown by as much as the fabric can reach. That is exact rather than
-approximate, it costs nothing, and it is what every picture of this site has
-ever actually shown.
+It is not the size. Earth's default hat is bigger than these - 12,342 stitches
+and 24,676 joints against 10,170 and 20,330 - and settles fine. Nor is it that
+our starting geometry has joints already longer than the yarn allows; it does,
+but earth's has more of them (12% of its joints against 5.6% of ours, worst
+case 4.99x against 6.43x) and settles anyway. An over-stretched joint is not a
+problem in itself, because the fabric can rearrange until it is satisfied.
 
-Relaxed fabric would need a different approach - settling a coarse proxy and
-interpolating, or relaxing the mesh analytically - rather than making this one
-faster. The physics path could reasonably be deleted.
+The difference is that these crowns are **unsatisfiable**, not merely
+stretched. The Aal Ower Toorie takes 162 stitches to 9 in sixteen rounds, which
+sends about 25 units of fabric to cover about 49 units of radius. No
+arrangement of inextensible yarn closes that, so the solver was not converging
+slowly - it could not converge at all, and motion plateaued around 2.3. Earth
+never meets this because its hemispherical decrease spreads the same shaping
+over about forty rows.
+
+Real knitting resolves it by stretching, and the pattern says as much: the
+crown is drawn together with a yarn tail and the hat is blocked over a bowl. So
+the model lets a joint be as long as the pattern's own geometry already makes
+it (`ropes: "derived"` in `src/ChainModel/tuning.ts`), which is what a stretched
+crown means, and reduces to the fixed length wherever the fabric does reach.
+The hat then settles in about ninety seconds, with each step running several
+times faster because the solver is no longer fighting an impossible constraint.
+
+## The bench
+
+`npm run bench` exists so none of the above has to be argued about.
+
+```sh
+npm run bench                       # the standard set of settle runs
+npm run bench -- --geometry         # can this hat settle at all?
+npm run bench -- --render           # frame times and memory
+npm run bench -- --set iterations=8 --set ropes=fixed
+```
+
+It drives the site's own physics in a real browser rather than reimplementing
+anything, with every dial in `tuning.ts` settable from the query string, so
+what it reports is what the site would do. One caveat on reading it: there is
+no GPU behind headless Chromium, so `--render` frame times are software
+rasterised. Use them to compare two builds, never as a guess at what a phone
+will do. The settle numbers are all CPU and are honest.
 
 ## Deploying
 

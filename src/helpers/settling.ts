@@ -1,9 +1,9 @@
-import {
-  minimumSettleFrames,
-  restMotionThreshold,
-  settleRestSeconds,
-  settleTimeStep,
-} from "../constants";
+interface RestSettings {
+  restThreshold: number;
+  restSeconds: number;
+  minimumFrames: number;
+  timeStep: number;
+}
 /**
  * Decides when the hat has come to rest.
  *
@@ -17,16 +17,17 @@ import {
  * easing into shape when the motion first drops, so stopping there froze the
  * hat a moment early.
  */
-export function createRestDetector() {
+export function createRestDetector(settings: RestSettings) {
   let steps = 0;
   let quiet = 0;
+  const needed = Math.ceil(settings.restSeconds / settings.timeStep);
   return (meanMotion: number) => {
     steps++;
     quiet =
-      meanMotion < restMotionThreshold && steps >= minimumSettleFrames
+      meanMotion < settings.restThreshold && steps >= settings.minimumFrames
         ? quiet + 1
         : 0;
-    return quiet >= Math.ceil(settleRestSeconds / settleTimeStep);
+    return quiet >= needed;
   };
 }
 /** What the settle took, for the diagnostics and the measurement suite. */

@@ -2,12 +2,14 @@ import { useMemo, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Physics } from "@react-three/rapier";
 import { OrbitControls } from "@react-three/drei";
-import { settleTimeStep, solverIterations } from "../constants";
+import { tuningFromUrl } from "./tuning";
 import { hatShape } from "../helpers/hat-shape";
 import FrameHat, { OrbitLike } from "./FrameHat";
 import StitchPhysics, { StitchPhysicsProps } from "./StitchPhysics";
 
-export type ChainModelProps = StitchPhysicsProps & { rounds: number[][] };
+export type ChainModelProps = Omit<StitchPhysicsProps, "tuning"> & {
+  rounds: number[][];
+};
 
 /**
  * The 3D stage: camera, controls, and the world the hat settles in.
@@ -19,6 +21,7 @@ export type ChainModelProps = StitchPhysicsProps & { rounds: number[][] };
  */
 export default function ChainModel({ rounds, ...props }: ChainModelProps) {
   const controls = useRef<OrbitLike | null>(null);
+  const tuning = useMemo(() => tuningFromUrl(), []);
   const shape = useMemo(
     () => hatShape(props.stitches, rounds),
     // Worked out once: the hat's size does not change while it is on screen.
@@ -42,12 +45,12 @@ export default function ChainModel({ rounds, ...props }: ChainModelProps) {
         makeDefault
       />
       <Physics
-        gravity={[0, 9.81, 0]}
-        timeStep={settleTimeStep}
-        numSolverIterations={solverIterations}
+        gravity={[0, tuning.gravity, 0]}
+        timeStep={tuning.timeStep}
+        numSolverIterations={tuning.iterations}
         paused
       >
-        <StitchPhysics {...props} />
+        <StitchPhysics {...props} tuning={tuning} />
       </Physics>
     </Canvas>
   );

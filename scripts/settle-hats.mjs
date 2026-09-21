@@ -1,14 +1,6 @@
 /**
  * Settle each hat once, and write down where it came to rest.
  *
- * NOTE: this does not work at the size these hats are, and nothing ships
- * settled positions. A step over ten thousand rigid bodies and twenty-five
- * thousand rope joints takes a second or two, rest needs hundreds of steps,
- * and left to run with no time limit it had not converged after forty minutes.
- * The site draws the hat from its built geometry instead - see the note in
- * README.md. This is kept against a workable approach, and is not part of any
- * build.
- *
  * A hat's shape depends only on its pattern, and these patterns are fixed, so
  * every knitter's copy of a given hat settles to the same shape. Working that
  * out in the browser meant ten thousand rigid bodies and twenty-five thousand
@@ -54,6 +46,20 @@ const settleTimeoutMs = 45 * 60_000;
  */
 const stepBudgetMs = 4_000;
 
+/**
+ * The settings the bench found; see scripts/bench.mjs.
+ *
+ * "derived" is the one that matters. These crowns decrease faster than
+ * inextensible yarn can reach - sixteen rounds of fabric asked to cover twice
+ * their own length in radius - so with joints fixed at one stitch's width and
+ * height, a twentieth of them start over-stretched and some at six times their
+ * limit. The solver opens by yanking four and a half thousand units of excess
+ * out of the hat, which is why it never came to rest. Letting a joint be as
+ * long as the pattern already makes it starts the hat in a state the solver
+ * can hold, and it settles in about ninety seconds.
+ */
+const tuning = { ropes: "derived" };
+
 const hatIds = [...readFileSync(join(root, "src/data/hats/index.ts"), "utf8")
   .matchAll(/from "\.\/([a-z0-9-]+)"/g)]
   .map((match) => match[1]);
@@ -88,7 +94,7 @@ for (let attempt = 0; ; attempt++) {
 }
 
 const browser = await chromium.launch({
-  executablePath: process.env.PLAYWRIGHT_CHROMIUM ?? undefined,
+  executablePath: process.env.PLAYWRIGHT_CHROMIUM || undefined,
 });
 
 for (const hatId of hatIds) {
@@ -102,13 +108,12 @@ for (const hatId of hatIds) {
    */
   await page.route("**/settled/*.json", (route) => route.abort());
 
-  await page.addInitScript((budget) => {
-    window.__settleBudgetMs = budget;
-  }, stepBudgetMs);
-
   // ?settle=1 is what asks the page for the physics stage rather than a hat
-  // drawn where it already came to rest.
-  await page.goto(`${base}#/hat/${hatId}?settle=1`, { waitUntil: "networkidle" });
+  // drawn where it already came to rest; the rest is the tuning above.
+  const query = Object.entries({ settle: 1, stepBudgetMs, ...tuning })
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+  await page.goto(`${base}#/hat/${hatId}?${query}`, { waitUntil: "networkidle" });
 
   const started = Date.now();
   let reported = 0;

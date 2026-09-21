@@ -2,7 +2,7 @@ import { createRef, useEffect, useMemo, useRef } from "react";
 import { RapierRigidBody } from "@react-three/rapier";
 import { Stitch } from "../types/Stitch";
 import { Palette, rgbOf, yarnFor } from "../knitting/palette";
-import { adjacentStitchDistance, verticalStitchDistance } from "../constants";
+import { Tuning, ropeLength } from "./tuning";
 import { SettleMetrics } from "../helpers/settling";
 import StitchBody from "./StitchBody";
 import StitchInstances from "./StitchInstances";
@@ -18,6 +18,7 @@ export interface StitchPhysicsProps {
   onSettled: (positions: Point[], metrics: SettleMetrics) => void;
   simulationActive: boolean;
   reducedMotion: boolean;
+  tuning: Tuning;
 }
 
 /**
@@ -43,6 +44,7 @@ export default function StitchPhysics({
   onSettled,
   simulationActive,
   reducedMotion,
+  tuning,
 }: StitchPhysicsProps) {
   const stitchRefs = useRef<React.RefObject<RapierRigidBody>[]>([]);
   if (!stitchRefs.current.length) {
@@ -78,18 +80,21 @@ export default function StitchPhysics({
   return (
     <>
       <Settler
-          active={simulationActive}
-          stitchRefs={stitchRefs}
+        active={simulationActive}
+        stitchRefs={stitchRefs}
         onSettled={onSettled}
+        tuning={tuning}
       />
       {stitches.map((stitch) => (
-          <StitchBody
-            key={stitch.id}
-            rigidBodyRef={stitchRefs.current[stitch.id]}
-            position={stitch.position}
-            fixed={stitch.fixed}
-          />
-        ))}
+        <StitchBody
+          key={stitch.id}
+          rigidBodyRef={stitchRefs.current[stitch.id]}
+          position={stitch.position}
+          fixed={stitch.fixed}
+          damping={tuning.damping}
+          radius={tuning.colliderRadius}
+        />
+      ))}
       <StitchInstances
         stitches={stitches}
         positionAt={positionAt}
@@ -99,19 +104,25 @@ export default function StitchPhysics({
         reducedMotion={reducedMotion}
       />
       {stitches.flatMap((stitch) =>
-          stitch.links.map((link) => (
+        stitch.links.map((link) => {
+          const other = stitches[link];
+          const startsAt = other
+            ? Math.hypot(
+                stitch.position.x - other.position.x,
+                stitch.position.y - other.position.y,
+                stitch.position.z - other.position.z,
+              )
+            : 0;
+          return (
             <Link
               key={`${stitch.id}-${link}`}
               bodyA={stitchRefs.current[stitch.id]}
               bodyB={stitchRefs.current[link]}
-              maxLength={
-                stitch.id - link === 1
-                  ? adjacentStitchDistance
-                  : verticalStitchDistance
-              }
+              maxLength={ropeLength(tuning, stitch.id - link, startsAt)}
             />
-          )),
-        )}
+          );
+        }),
+      )}
     </>
   );
 }

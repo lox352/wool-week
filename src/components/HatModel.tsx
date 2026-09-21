@@ -82,6 +82,15 @@ const HatModel: React.FC<HatModelProps> = ({
     };
   }, [hatId]);
 
+  /*
+   * The hat itself, for the bench's geometry report. Only on the settle path,
+   * which nothing but the scripts ever takes.
+   */
+  useEffect(() => {
+    if (!settlingRequested()) return;
+    (window as unknown as { __hat?: unknown }).__hat = { stitches, rounds };
+  }, [stitches, rounds]);
+
   const onSettled = useCallback(
     (positions: Point[]) => {
       known.set(hatId, positions);

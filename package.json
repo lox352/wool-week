@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "settle": "node scripts/settle-hats.mjs"
+    "settle": "node scripts/settle-hats.mjs",
+    "bench": "node scripts/bench.mjs"
   },
   "homepage": "https://lox352.github.io/wool-week/",
   "dependencies": {

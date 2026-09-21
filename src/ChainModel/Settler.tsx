@@ -1,15 +1,12 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { RapierRigidBody, useRapier } from "@react-three/rapier";
-import {
-  settleStepBudgetMs,
-  settleSubsteps,
-  settleTimeStep,
-} from "../constants";
 import { createRestDetector, SettleMetrics } from "../helpers/settling";
+import { Tuning } from "./tuning";
 import { Point } from "../types/Point";
 interface SettlerProps {
   active: boolean;
+  tuning: Tuning;
   stitchRefs: React.MutableRefObject<React.RefObject<RapierRigidBody>[]>;
   /** Called once, with every stitch's resting position, when the hat is still. */
   onSettled: (positions: Point[], metrics: SettleMetrics) => void;
@@ -32,9 +29,14 @@ interface SettlerProps {
  * step() comes from the Rapier context and does the world step and the mesh
  * sync together, so the stitches follow along as they move.
  */
-export default function Settler({ active, stitchRefs, onSettled }: SettlerProps) {
+export default function Settler({
+  active,
+  stitchRefs,
+  onSettled,
+  tuning,
+}: SettlerProps) {
   const { step } = useRapier();
-  const rest = useRef(createRestDetector());
+  const rest = useRef(createRestDetector(tuning));
   const complete = useRef(false);
   const count = useRef(0);
   const started = useRef(0);
@@ -47,19 +49,9 @@ export default function Settler({ active, stitchRefs, onSettled }: SettlerProps)
     )
       return;
     if (!started.current) started.current = performance.now();
-    /*
-     * How long to spend stepping before giving the frame back.
-     *
-     * The default keeps a browser responsive, but the settle only ever runs
-     * offline now, where responsiveness is worth nothing and finishing is
-     * worth everything - so the script raises it and the world runs flat out.
-     */
-    const budget =
-      (window as unknown as { __settleBudgetMs?: number }).__settleBudgetMs ??
-      settleStepBudgetMs;
-    const deadline = performance.now() + budget;
-    for (let i = 0; i < settleSubsteps; i++) {
-      step(settleTimeStep);
+    const deadline = performance.now() + tuning.stepBudgetMs;
+    for (let i = 0; i < tuning.substeps; i++) {
+      step(tuning.timeStep);
       count.current++;
       let motion = 0;
       for (const ref of stitchRefs.current) {
