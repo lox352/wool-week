@@ -1,6 +1,6 @@
 import { useMemo, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Physics } from "@react-three/rapier";
+import { BallCollider, Physics, RigidBody } from "@react-three/rapier";
 import { OrbitControls } from "@react-three/drei";
 import { tuningFromUrl } from "./tuning";
 import { hatShape } from "../helpers/hat-shape";
@@ -50,6 +50,23 @@ export default function ChainModel({ rounds, ...props }: ChainModelProps) {
         numSolverIterations={tuning.iterations}
         paused
       >
+        {tuning.headRadius > 0 && (
+          /*
+           * The head the hat is on.
+           *
+           * A hat's shape is mostly decided by what is inside it, and no
+           * model here says so: the others pin the cast-on and blow the hat
+           * outwards with an upside-down gravity, which is a stand-in for a
+           * head rather than a head. With one of these, gravity can point the
+           * way gravity points and the fabric can drape.
+           *
+           * Sunk so its widest part is at the cast-on, which is where a hat
+           * grips.
+           */
+          <RigidBody type="fixed" colliders={false} position={[0, tuning.headRadius, 0]}>
+            <BallCollider args={[tuning.headRadius]} />
+          </RigidBody>
+        )}
         <StitchPhysics {...props} tuning={tuning} />
       </Physics>
     </Canvas>

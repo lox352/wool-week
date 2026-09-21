@@ -35,3 +35,6 @@ __pycache__/
 # Progress log from the settle script.
 settle.log
 bench.log
+gauge-*.log
+gauge-*.json
+gauge-shots/

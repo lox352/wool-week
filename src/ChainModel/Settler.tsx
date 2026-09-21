@@ -29,6 +29,32 @@ interface SettlerProps {
  * step() comes from the Rapier context and does the world step and the mesh
  * sync together, so the stitches follow along as they move.
  */
+/**
+ * Push every stitch away from the hat's axis.
+ *
+ * Given as an acceleration, so it reads against gravity, and re-applied each
+ * step because Rapier keeps a force until it is cleared and because a stitch
+ * that has moved wants its push in a new direction.
+ *
+ * A stitch on the axis has no direction to be pushed in, which is only ever
+ * the last stitch of the crown, and it is left where it is.
+ */
+const inflate = (
+  refs: React.RefObject<RapierRigidBody>[],
+  pressure: number,
+) => {
+  for (const ref of refs) {
+    const body = ref.current;
+    if (!body || body.isFixed()) continue;
+    const at = body.translation();
+    const out = Math.hypot(at.x, at.z);
+    body.resetForces(false);
+    if (out < 1e-6) continue;
+    const force = pressure * body.mass();
+    body.addForce({ x: (at.x / out) * force, y: 0, z: (at.z / out) * force }, true);
+  }
+};
+
 export default function Settler({
   active,
   stitchRefs,
@@ -51,6 +77,7 @@ export default function Settler({
     if (!started.current) started.current = performance.now();
     const deadline = performance.now() + tuning.stepBudgetMs;
     for (let i = 0; i < tuning.substeps; i++) {
+      if (tuning.pressure !== 0) inflate(stitchRefs.current, tuning.pressure);
       step(tuning.timeStep);
       count.current++;
       let motion = 0;

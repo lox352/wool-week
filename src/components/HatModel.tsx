@@ -4,6 +4,8 @@ import { Stitch } from "../types/Stitch";
 import { Point } from "../types/Point";
 import { Palette } from "../knitting/palette";
 import { loadSettled } from "../data/hats/settled";
+import { measureGauge } from "../helpers/gauge";
+import { adjacentStitchDistance } from "../constants";
 
 /**
  * Should this page settle the hat rather than draw one already settled?
@@ -109,8 +111,22 @@ const HatModel: React.FC<HatModelProps> = ({
    */
   useEffect(() => {
     if (!settlingRequested()) return;
-    (window as unknown as { __hat?: unknown }).__hat = { stitches, rounds, target };
-  }, [stitches, rounds, target]);
+    (window as unknown as { __hat?: unknown }).__hat = {
+      stitches,
+      rounds,
+      target,
+      /*
+       * The tension the hat settled to, for scripts/gauge.mjs. Measured here
+       * rather than in the script so there is one implementation of it, and
+       * it is the one with tests against the hat as the pattern builds it.
+       *
+       * What the pattern asks for is rounds per centimetre over stitches per
+       * centimetre, which is exactly what the round height was derived from.
+       */
+      gauge: (at: Point[]) =>
+        measureGauge(stitches, rounds, at, adjacentStitchDistance / roundHeight),
+    };
+  }, [stitches, rounds, target, roundHeight]);
 
   const onSettled = useCallback(
     (positions: Point[]) => {

@@ -7,7 +7,7 @@ import { SettleMetrics } from "../helpers/settling";
 import StitchBody from "./StitchBody";
 import StitchInstances from "./StitchInstances";
 import Settler from "./Settler";
-import Link from "./Link";
+import { RopeLink, SpringLink } from "./Link";
 import { Point } from "../types/Point";
 
 export interface StitchPhysicsProps {
@@ -114,17 +114,15 @@ export default function StitchPhysics({
                 stitch.position.z - other.position.z,
               )
             : 0;
+          const Joint = tuning.joints === "spring" ? SpringLink : RopeLink;
           return (
-            <Link
+            <Joint
               key={`${stitch.id}-${link}`}
               bodyA={stitchRefs.current[stitch.id]}
               bodyB={stitchRefs.current[link]}
-              maxLength={ropeLength(
-                tuning,
-                stitch.id - link,
-                startsAt,
-                roundHeight,
-              )}
+              length={ropeLength(tuning, stitch.id - link, startsAt, roundHeight)}
+              stiffness={tuning.stiffness}
+              damping={tuning.springDamping}
             />
           );
         }),

@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "settle": "node scripts/settle-hats.mjs",
-    "bench": "node scripts/bench.mjs"
+    "bench": "node scripts/bench.mjs",
+    "gauge": "node scripts/gauge.mjs"
   },
   "homepage": "https://lox352.github.io/wool-week/",
   "dependencies": {

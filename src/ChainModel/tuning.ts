@@ -67,6 +67,57 @@ export interface Tuning {
    */
   ropes: "fixed" | "derived";
   ropeSlack: number;
+  /**
+   * How long a joint may be, span by span.
+   *
+   * A rope caps how far apart two stitches may be and does nothing at all to
+   * stop them closing up, so a hat built with every joint already taut - which
+   * is exactly what these are - can only ever settle smaller than it was
+   * built. Whichever way the force pulls, the other direction collapses: pull
+   * upwards and the rounds close in, and the fabric comes out taller and
+   * narrower than the tension says.
+   *
+   * Shortening the joints to the round below is the lever that puts that
+   * back, because the ratio of the two is what tension means. These are
+   * separate so the sweep can move one without the other.
+   */
+  roundSlack: number;
+  stitchSlack: number;
+  /**
+   * What holds a stitch to its neighbours.
+   *
+   * "rope" is yarn that cannot be stretched and offers nothing against being
+   * squashed. "spring" is yarn that pulls back either way: it has a length it
+   * wants to be, and resists being shortened as well as lengthened, which is
+   * the thing a rope cannot do and the reason a rope hat goes limp.
+   */
+  joints: "rope" | "spring";
+  stiffness: number;
+  springDamping: number;
+  /**
+   * The head the hat is on, as a sphere, or 0 for none.
+   *
+   * With one of these the hat can be hung the way a hat actually hangs -
+   * gravity downwards, draped over something - instead of being blown upwards
+   * from the inside by a gravity that points the wrong way.
+   */
+  headRadius: number;
+  /**
+   * An outward push from the axis, as an acceleration, so it is in the same
+   * units as gravity and can be read against it.
+   *
+   * The ropes across a round already know how wide that round should be: n
+   * stitches joined by ropes of length a can be no wider than a circle of
+   * circumference n*a, which is exactly the circumference the knitting has.
+   * Nothing ever pushes a round out to it, though, so every round settles
+   * narrower than it was knitted and the hat comes out small. This pushes.
+   *
+   * It is a cheap stand-in for a head - or for the hat being worn at all -
+   * and unlike a head it cannot be got around by the crown, because each
+   * round is still capped by its own stitch count. So the crown keeps its
+   * taper while the body fills out.
+   */
+  pressure: number;
 }
 
 export const defaultTuning: Tuning = {
@@ -82,6 +133,13 @@ export const defaultTuning: Tuning = {
   colliderRadius: 0.02,
   ropes: "fixed",
   ropeSlack: 1,
+  roundSlack: 1,
+  stitchSlack: 1,
+  joints: "rope",
+  stiffness: 200,
+  springDamping: 20,
+  headRadius: 0,
+  pressure: 0,
 };
 
 const numbers: (keyof Tuning)[] = [
@@ -96,6 +154,12 @@ const numbers: (keyof Tuning)[] = [
   "stepBudgetMs",
   "colliderRadius",
   "ropeSlack",
+  "roundSlack",
+  "stitchSlack",
+  "stiffness",
+  "springDamping",
+  "headRadius",
+  "pressure",
 ];
 
 /** Reads overrides out of the hash's query string, e.g. "#/hat/x?settle=1&iterations=8". */
@@ -111,6 +175,8 @@ export const tuningFromUrl = (): Tuning => {
   }
   const ropes = params.get("ropes");
   if (ropes === "fixed" || ropes === "derived") tuning.ropes = ropes;
+  const joints = params.get("joints");
+  if (joints === "rope" || joints === "spring") tuning.joints = joints;
   return tuning;
 };
 
@@ -129,7 +195,10 @@ export const ropeLength = (
   startsAt: number,
   roundHeight = verticalStitchDistance,
 ): number => {
-  const base = span === 1 ? adjacentStitchDistance : roundHeight;
-  if (tuning.ropes === "fixed") return base * tuning.ropeSlack;
-  return Math.max(base, startsAt) * tuning.ropeSlack;
+  const across = span === 1;
+  const base = across ? adjacentStitchDistance : roundHeight;
+  const slack =
+    tuning.ropeSlack * (across ? tuning.stitchSlack : tuning.roundSlack);
+  if (tuning.ropes === "fixed") return base * slack;
+  return Math.max(base, startsAt) * slack;
 };
