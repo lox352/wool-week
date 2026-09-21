@@ -140,6 +140,20 @@ const sweeps = {
     { name: "head 48, down", gravity: -earth, headRadius: 48 },
     { name: "head 48, down, spring", joints: "spring", gravity: -earth, headRadius: 48, stiffness: 200, springDamping: 20 },
   ],
+
+  /*
+   * The head the hat was knitted for.
+   *
+   * Not a guess: the body is 162 stitches round at two units each, so it
+   * fits a head of radius 162*2/(2*pi), near enough 52. A smaller one and
+   * the fabric gathers - head 40 came out with stitch gaps of 1.63 where the
+   * wool makes 2.00 - and a larger one it cannot reach.
+   */
+  "head-fitted": [
+    { name: "head 52, down", gravity: -earth, headRadius: 52 },
+    { name: "head 52, down, half gravity", gravity: -earth / 2, headRadius: 52 },
+    { name: "head 52, up", gravity: earth, headRadius: 52 },
+  ],
 };
 /*
  * The ones worth looking at side by side, on both hats.
