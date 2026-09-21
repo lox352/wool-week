@@ -164,13 +164,11 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
               {ahead.length > 0 && (
                 <>
                   , then{" "}
-                  {ahead.map((next) => (
-                    <Swatch
-                      key={next.startId}
-                      run={next}
-                      palette={palette}
-                      small
-                    />
+                  {ahead.map((next, position) => (
+                    <React.Fragment key={next.startId}>
+                      {position > 0 && ", "}
+                      <Swatch run={next} palette={palette} small />
+                    </React.Fragment>
                   ))}
                 </>
               )}

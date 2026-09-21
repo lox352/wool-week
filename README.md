@@ -68,4 +68,20 @@ npm run lint
 npm run build
 ```
 
-Pushing to `main` builds, tests and deploys to GitHub Pages.
+Pushing builds, tests and publishes the built site to the `gh-pages` branch.
+
+### Turning Pages on
+
+The workflow can publish the branch but cannot enable Pages itself, so the
+first time round that is one manual step: **Settings → Pages → Source:
+"Deploy from a branch" → `gh-pages` / `(root)`**. After that every push
+deploys on its own.
+
+### A custom domain
+
+The site is built with `base: "/wool-week/"` in `vite.config.ts`, which is
+what a project page at `lox352.github.io/wool-week/` needs. Serving it from a
+domain of its own means changing that to `"/"` and updating the three
+absolute paths that match it: the favicon and font links in `index.html`, the
+`src:` urls in `public/fonts/fonts.css`, and the redirect in
+`public/404.html`.
