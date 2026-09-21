@@ -156,6 +156,24 @@ sweeps.finalists = [
   { name: "earth, up, inflated", gravity: earth, pressure: 20 },
 ];
 
+/*
+ * The soft end of the spring sweep, given the time it actually needs.
+ *
+ * These were cut off at five minutes still moving, which is not the same as
+ * not settling: the motion was falling steadily throughout. Worth running out
+ * rather than reporting a timeout as a result.
+ */
+sweeps["springs-long"] = (() => {
+  const mass = (4 / 3) * Math.PI * 0.02 ** 3;
+  return [3e-3].map((stiffness) => ({
+    name: `spring k=${stiffness} (long)`,
+    joints: "spring",
+    gravity: earth,
+    stiffness,
+    springDamping: Number(Math.sqrt(stiffness * mass).toPrecision(3)),
+  }));
+})();
+
 sweeps.all = [...sweeps.ropes, ...sweeps.springs, ...sweeps.head];
 
 const runs = sweeps[which];
