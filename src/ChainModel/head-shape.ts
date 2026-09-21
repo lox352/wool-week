@@ -83,10 +83,38 @@ export const headShape = (
   return points;
 };
 
-/** How far above the cast-on the widest part of the head sits.
+/**
+ * How far above the cast-on the widest part of the head sits.
  *
  * A hat is held on by a rib knitted narrower than its body, so at the height
- * of the rib the head must be back down to about the rib's own width. For an
- * ellipsoid that is a fixed fraction of its height, which is what this is. */
+ * of the rib the head must be back down to about the rib's own width. For a
+ * shape of this squareness that is a fixed fraction of its height.
+ */
 export const headLift = (tall: number, brim: number, radius: number): number =>
   tall * (1 - Math.min(brim / radius, 1) ** squareness) ** (1 / squareness);
+
+/**
+ * How tall a head may be and still be inside this hat.
+ *
+ * A head whose crown stands above the hat's own is a head the knitting can
+ * never reach over, and the settle then never finishes: the fabric is held
+ * stretched and goes on creeping for as long as it is given. Which is a
+ * failure with no useful reading, so it is worth making unreachable rather
+ * than discovering it at seven minutes a time. Both attempts at it here were
+ * this - a crown at 105 and at 120 against a hat 103 tall.
+ *
+ * The room is the hat's own height less the lift, and the lift grows with
+ * the height, so the two are solved together. A little is kept back so that
+ * the crown of the hat is draped over the head rather than stretched across
+ * it.
+ */
+export const headFits = (
+  wanted: number,
+  hatHeight: number,
+  brim: number,
+  radius: number,
+  room = 0.85,
+): number => {
+  const share = headLift(1, brim, radius);
+  return Math.min(wanted, (hatHeight * room) / (1 + share));
+};

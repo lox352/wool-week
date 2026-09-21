@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { BallCollider, ConvexHullCollider, Physics, RigidBody } from "@react-three/rapier";
 import { OrbitControls } from "@react-three/drei";
 import { headCollisions, tuningFromUrl } from "./tuning";
-import { headLift, headShape } from "./head-shape";
+import { headFits, headLift, headShape } from "./head-shape";
 import { hatShape } from "../helpers/hat-shape";
 import { adjacentStitchDistance } from "../constants";
 import FrameHat, { OrbitLike } from "./FrameHat";
@@ -38,10 +38,14 @@ export default function ChainModel({ rounds, ...props }: ChainModelProps) {
    */
   const brim =
     ((rounds[0]?.length ?? 0) * adjacentStitchDistance) / (2 * Math.PI);
+  const tall =
+    tuning.head === "ball"
+      ? tuning.headRadius
+      : headFits(tuning.headTall, shape.height, brim, tuning.headRadius);
   const lift =
     tuning.head === "ball"
       ? tuning.headRadius
-      : headLift(tuning.headTall, brim, tuning.headRadius);
+      : headLift(tall, brim, tuning.headRadius);
 
   return (
     <Canvas
@@ -90,7 +94,7 @@ export default function ChainModel({ rounds, ...props }: ChainModelProps) {
               />
             ) : (
               <ConvexHullCollider
-                args={[headShape(tuning.headRadius, tuning.headTall)]}
+                args={[headShape(tuning.headRadius, tall)]}
                 collisionGroups={headCollisions}
               />
             )}

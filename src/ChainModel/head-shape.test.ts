@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { headShape, headLift } from "./head-shape";
+import { headShape, headLift, headFits } from "./head-shape";
 
 /** Ramanujan's approximation for the way round an ellipse. */
 const wayRound = (a: number, b: number) =>
@@ -71,6 +71,15 @@ describe("the head a hat is drawn on", () => {
     let top = -Infinity;
     for (let at = 1; at < points.length; at += 3) top = Math.max(top, points[at]);
     expect(top).toBeCloseTo(73, 6);
+  });
+
+  it("never stands taller than the hat it is inside", () => {
+    // The Aal Ower Toorie: 103 tall, 51.6 round the body, 41.4 round the rib.
+    const tall = headFits(60, 103, 41.4, 51.6);
+    const lift = headLift(tall, 41.4, 51.6);
+    expect(lift + tall).toBeLessThanOrEqual(103);
+    // A head that already fits is left as it is.
+    expect(headFits(30, 103, 41.4, 51.6)).toBe(30);
   });
 
   it("has narrowed to the rib's width by the time it reaches the rib", () => {
