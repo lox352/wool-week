@@ -100,3 +100,22 @@ describe("the counts the patterns print", () => {
     expect(crown.rows[crown.rows.length - 1].length).toBe(1);
   });
 });
+
+describe("the invariants the rest of the site leans on", () => {
+  hats.forEach((hat) => {
+    it(`${hat.id}: a stitch's id is its place in the list`, () => {
+      // currentRun looks a stitch up by indexing rather than by building a map
+      // of ten thousand entries, which it can only do while this holds.
+      const { stitches } = buildHat(hat);
+      stitches.forEach((stitch, index) => expect(stitch.id).toBe(index));
+    });
+
+    it(`${hat.id}: worked stitch ids ascend, so they can be binary searched`, () => {
+      const { rounds } = buildHat(hat);
+      const flat = rounds.flat();
+      flat.forEach((id, index) => {
+        if (index > 0) expect(id).toBeGreaterThan(flat[index - 1]);
+      });
+    });
+  });
+});

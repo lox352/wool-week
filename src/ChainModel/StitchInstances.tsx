@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Stitch } from "../types/Stitch";
 import { Point } from "../types/Point";
 import { createStitchGeometry } from "./stitch-geometry";
@@ -47,6 +47,9 @@ const colour = new THREE.Color();
 /** How fast a stitch fades in once it has been worked, per second. */
 const fadeRate = 3.5;
 
+/** How many stitches to place in one frame. See placedUpTo. */
+const placeChunk = 2500;
+
 /**
  * Draws every stitch as one instanced mesh.
  *
@@ -70,11 +73,19 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
   worked,
   reducedMotion,
 }) => {
+  const invalidate = useThree((state) => state.invalidate);
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const geometry = useMemo(() => createStitchGeometry(), []);
   const eased = useRef<Float32Array>();
-  /** Matrices are written; nothing is moving, so they stay written. */
-  const placed = useRef(false);
+  /**
+   * How many stitches have been put where they belong.
+   *
+   * Placing ten thousand of them is about half a second of vector arithmetic,
+   * which as a single frame is a visible lock-up, so it is done a few thousand
+   * at a time and the mesh only draws as many as are ready. The hat arrives
+   * over two or three frames instead of the page stopping dead for one.
+   */
+  const placedUpTo = useRef(0);
   /** Every stitch has reached its colour, so there is nothing left to ease. */
   const faded = useRef(false);
 
@@ -104,14 +115,19 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
     return { acrossOf, belowOf };
   }, [drawn]);
 
-  // A different hat has to be placed again, and a change to what is knitted
-  // has to be eased again.
+  /*
+   * A different hat has to be placed again, and a change to what is knitted
+   * has to be eased again. Both need frames to do it in, and the stage only
+   * draws when it is asked to, so both ask.
+   */
   useEffect(() => {
-    placed.current = false;
-  }, [drawn, positionAt]);
+    placedUpTo.current = 0;
+    invalidate();
+  }, [drawn, positionAt, invalidate]);
   useEffect(() => {
     faded.current = false;
-  });
+    invalidate();
+  }, [colours, worked, invalidate, moving]);
 
   const readPosition = (id: number, into: THREE.Vector3): boolean => {
     if (id < 0) return false;
@@ -141,12 +157,22 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
      * the difference between a still picture you can turn and a hot one you
      * cannot.
      */
-    const placing = moving || !placed.current;
+    const placing = moving || placedUpTo.current < drawn.length;
     const fading = target !== null && done !== null && !faded.current;
     if (!placing && !fading) return;
 
+    /*
+     * While settling, every stitch moves every frame and all of them have to
+     * be done. While placing a hat that is already still, they can be done a
+     * few thousand at a time.
+     */
+    const from = moving ? 0 : placedUpTo.current;
+    const to = moving
+      ? drawn.length
+      : Math.min(drawn.length, placedUpTo.current + placeChunk);
+
     let settling = false;
-    for (let index = 0; index < drawn.length; index++) {
+    for (let index = placing ? from : 0; index < (placing ? to : drawn.length); index++) {
       const stitch = drawn[index];
       if (!readPosition(stitch.id, position)) continue;
       if (!placing) {
@@ -234,10 +260,16 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
 
     if (placing) {
       mesh.instanceMatrix.needsUpdate = true;
-      if (!moving) placed.current = true;
+      placedUpTo.current = moving ? drawn.length : to;
+      // Draw only what is ready, so the unplaced ones are not all piled at the
+      // origin while they wait their turn.
+      mesh.count = placedUpTo.current;
+      if (placedUpTo.current < drawn.length) invalidate();
     }
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     faded.current = !settling;
+    // Still easing, so there is another frame's worth of work to do.
+    if (settling || moving) invalidate();
   });
 
   return (
@@ -246,7 +278,12 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
       args={[geometry, undefined, drawn.length]}
       frustumCulled={false}
     >
-      <meshBasicMaterial toneMapped={false} side={THREE.DoubleSide} />
+      {/*
+        A stitch is a closed tube, so its back faces are never the ones you
+        see. Drawing one side halves what the GPU has to rasterise, and with
+        ten thousand of them on screen that is worth having on a phone.
+      */}
+      <meshBasicMaterial toneMapped={false} side={THREE.FrontSide} />
     </instancedMesh>
   );
 };

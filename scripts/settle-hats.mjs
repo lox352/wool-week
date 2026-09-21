@@ -1,6 +1,14 @@
 /**
  * Settle each hat once, and write down where it came to rest.
  *
+ * NOTE: this does not work at the size these hats are, and nothing ships
+ * settled positions. A step over ten thousand rigid bodies and twenty-five
+ * thousand rope joints takes a second or two, rest needs hundreds of steps,
+ * and left to run with no time limit it had not converged after forty minutes.
+ * The site draws the hat from its built geometry instead - see the note in
+ * README.md. This is kept against a workable approach, and is not part of any
+ * build.
+ *
  * A hat's shape depends only on its pattern, and these patterns are fixed, so
  * every knitter's copy of a given hat settles to the same shape. Working that
  * out in the browser meant ten thousand rigid bodies and twenty-five thousand

@@ -18,6 +18,11 @@ import type { SettleMetrics } from "../helpers/settling";
  * page moves when it swaps in.
  */
 const SettledHat = lazy(() => import("./SettledHat"));
+
+/** A stable empty list, so a hat with no settled file does not look like a new
+ * hat on every render - which would have the stage recomputing ten thousand
+ * stitch positions each time the page so much as scrolled. */
+const nowhere: Point[] = [];
 const SettlingHat = lazy(() => import("./ChainModel"));
 
 export const hatCanvasHeight = 380;
@@ -46,7 +51,7 @@ const HatCanvas: React.FC<HatCanvasProps> = ({
       {settle ? (
         <SettlingHat {...rest} onSettled={onSettled} simulationActive />
       ) : (
-        <SettledHat {...rest} settled={settled ?? []} />
+        <SettledHat {...rest} settled={settled ?? nowhere} />
       )}
     </Suspense>
   </div>

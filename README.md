@@ -14,8 +14,8 @@ how to remove a year.
 
 - **A chart that knows where you are.** The whole round, not one repeat, with
   the stitch you are on marked and the chart scrolling to follow you.
-- **The hat in three dimensions**, settled under physics, with the wool filling
-  in as you work. What you have knitted is in colour; what is ahead is pale.
+- **The hat in three dimensions**, with the wool filling in as you work. What
+  you have knitted is in colour; what is ahead is pale.
 - **Colourways from the patterns themselves.** Each hat is stored once in yarn
   slots, and a colourway says which real shade goes in each - which is exactly
   how the patterns are written. Any shade can be overridden with the wool
@@ -67,6 +67,30 @@ npm test         # the reconciliation suite
 npm run lint
 npm run build
 ```
+
+## A note on the physics
+
+The two sibling sites settle their hats under a physics simulation, and this
+one inherited the machinery. It does not use it: the code is only reachable
+from `scripts/settle-hats.mjs`, and nothing ships settled positions.
+
+At these stitch counts it does not work. Ten thousand stitches is ten thousand
+rigid bodies and twenty-five thousand rope joints, a single step of which takes
+a second or two, and coming to rest needs hundreds of steps. In the browser it
+cost 245MB of heap and ended Safari tabs on iOS without ever finishing; run
+offline with no time limit it had still not converged after forty minutes.
+
+So the hat is drawn from the geometry the pattern is built with: a tube of the
+right circumference, rising by a round's height each round, pulling in over the
+crown by as much as the fabric can reach. That is exact rather than
+approximate, it costs nothing, and it is what every picture of this site has
+ever actually shown.
+
+Relaxed fabric would need a different approach - settling a coarse proxy and
+interpolating, or relaxing the mesh analytically - rather than making this one
+faster. The physics path could reasonably be deleted.
+
+## Deploying
 
 Pushing builds, tests and publishes the built site to the `gh-pages` branch.
 

@@ -46,15 +46,19 @@ const stitchCurve = (): THREE.CatmullRomCurve3 => {
 /**
  * One stitch, ready to be instanced.
  *
- * Segment counts are deliberately modest: this is drawn thousands of times, so
- * the triangle budget per stitch matters more than its silhouette.
+ * Segment counts are deliberately modest: these hats run to ten thousand
+ * stitches, so the triangle budget per stitch matters far more than any one
+ * stitch's silhouette. At the size a whole hat is shown, a stitch is a few
+ * pixels across, and the coarser tube here - sixty-four triangles rather than
+ * a hundred and sixty-eight - is indistinguishable from the finer one while
+ * costing a phone's GPU a third as much.
  */
 export const createStitchGeometry = (): THREE.BufferGeometry => {
   const geometry = new THREE.TubeGeometry(
     stitchCurve(),
-    14,
+    8,
     adjacentStitchDistance * 0.27,
-    6,
+    4,
     false,
   );
   geometry.computeVertexNormals();

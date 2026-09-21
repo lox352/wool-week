@@ -1,14 +1,12 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { Stitch } from "../types/Stitch";
-import { StitchType } from "../types/StitchType";
-import { layOut, chartedStitches } from "./layout";
-import { Palette, inkOn, yarnFor } from "./palette";
-import { markFor } from "../helpers/stitch-marks";
+import { layOut } from "./layout";
+import { Palette } from "./palette";
+import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import "./Chart.css";
 
 const cellSize = 13;
-/** Every nth line is drawn heavier, to make counting easier. */
-const emphasis = 5;
+
 /**
  * How far above the panel the stitch being worked should sit, in rounds.
  *
@@ -17,8 +15,33 @@ const emphasis = 5;
  */
 const clearance = 5;
 
+/**
+ * The largest canvas to ask a browser for, in pixels along either side.
+ *
+ * Safari on iOS will not allocate one much beyond this, and a canvas it
+ * refuses comes back blank rather than throwing, so the chart is drawn at
+ * whatever pixel ratio keeps it inside the limit.
+ */
+const maxCanvasSide = 2048;
+
 const reducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/**
+ * A colour from the stylesheet, so the canvas is painted in the same palette
+ * as everything round it. Read once and remembered: asking for it forces a
+ * style recalculation, and this is on the path of every stitch worked.
+ */
+const tokens = new Map<string, string>();
+const token = (name: string, fallback: string): string => {
+  const known = tokens.get(name);
+  if (known) return known;
+  const value =
+    getComputedStyle(document.documentElement).getPropertyValue(name).trim() ||
+    fallback;
+  tokens.set(name, value);
+  return value;
+};
 
 interface ChartProps {
   stitches: Stitch[];
@@ -27,80 +50,23 @@ interface ChartProps {
   progress: number;
   /** Mark the next stitch and keep it in view. */
   follow?: boolean;
-  /** Round labels from the pattern, for the margin. */
   labels?: string[];
 }
 
-const Cell: React.FC<{
-  stitch: Stitch;
-  row: number;
-  column: number;
-  totalRounds: number;
-  columns: number;
-  hex: string;
-  done: boolean;
-  isNext: boolean;
-  openTop: boolean;
-  openLeft: boolean;
-}> = React.memo(
-  ({ stitch, row, column, totalRounds, columns, hex, done, isNext, openTop, openLeft }) => {
-    const mark = markFor(stitch.type as StitchType, 0, 0, cellSize);
-    return (
-      <div
-        className={[
-          "chart-cell",
-          column !== 1 && (column - 1) % emphasis === 0 ? "chart-cell-major-col" : "",
-          row !== 1 && (row - 1) % emphasis === 0 ? "chart-cell-major-row" : "",
-          openTop ? "chart-cell-open-top" : "",
-          openLeft ? "chart-cell-open-left" : "",
-          done ? "chart-cell-done" : "",
-          isNext ? "chart-cell-next" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        data-stitch={stitch.id}
-        style={{
-          // The cast-on belongs at the bottom, so rounds count up the grid.
-          gridRow: totalRounds - row + 1,
-          gridColumn: columns - column + 1,
-          backgroundColor: hex,
-        }}
-      >
-        {mark && (
-          <svg
-            className="chart-mark"
-            viewBox={`0 0 ${cellSize} ${cellSize}`}
-            aria-hidden="true"
-            style={{ color: inkOn(hex) }}
-          >
-            {mark.path && (
-              <>
-                <path className="chart-mark-halo" d={mark.path} />
-                <path d={mark.path} />
-              </>
-            )}
-            {mark.dot && (
-              <circle
-                className="chart-mark-dot"
-                cx={mark.dot.cx}
-                cy={mark.dot.cy}
-                r={mark.dot.r}
-              />
-            )}
-          </svg>
-        )}
-      </div>
-    );
-  },
-);
-
 /**
- * The chart.
+ * The chart, drawn onto a canvas.
  *
- * One cell per stitch, laid into a grid from the rounds the pattern states.
- * Rounds that decrease are simply shorter, so a crown draws its own staircase
- * and there is nothing to work out; a cell with no neighbour above or to its
- * left closes its own outline, which is what makes the steps read as edges.
+ * It used to be a CSS grid holding one div per stitch. For a ten thousand
+ * stitch hat that was ten thousand elements to lay out, and ten thousand
+ * React components to reconcile every time a stitch was worked: about six
+ * hundred milliseconds a stitch on a phone, for a page whose whole job is
+ * counting stitches.
+ *
+ * Now the colours and marks are drawn once onto a canvas kept off screen,
+ * because nothing about them changes while you knit, and what does change -
+ * how much is done, and which stitch is next - is painted over the top. That
+ * costs one blit and one rectangle per round, so working a stitch takes the
+ * same time on a ten thousand stitch hat as on a small one.
  */
 const Chart: React.FC<ChartProps> = ({
   stitches,
@@ -110,64 +76,116 @@ const Chart: React.FC<ChartProps> = ({
   follow = false,
   labels,
 }) => {
-  const gridRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const baseRef = useRef<HTMLCanvasElement>(null);
+  const overlayRef = useRef<HTMLCanvasElement>(null);
   const nextId = follow ? progress + 1 : undefined;
 
-  const drawn = useMemo(() => chartedStitches(stitches), [stitches]);
-  const { cells, rounds: totalRounds, columns } = useMemo(
-    () => layOut(stitches, rounds),
-    [stitches, rounds],
+  const layout = useMemo(() => layOut(stitches, rounds), [stitches, rounds]);
+  const { width, height } = chartSize(layout, cellSize);
+
+  const ratio = useMemo(() => {
+    const wanted = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
+    const longest = Math.max(width, height);
+    return Math.max(1, Math.min(wanted, 2, maxCanvasSide / longest));
+  }, [width, height]);
+
+  const drawn = useMemo(
+    () => stitches.filter((stitch) => stitch.id !== 0),
+    [stitches],
   );
 
-  /*
-   * Which squares hold a stitch, so a cell can tell whether anything is going
-   * to draw the line above it or to its left.
+  /**
+   * Sizes a canvas for the chart, and says whether it had to be resized.
+   *
+   * Assigning to width or height reallocates the backing store and wipes it,
+   * so it is only done when the size has actually changed - otherwise every
+   * stitch worked would throw away two megapixels and make them again.
    */
-  const filled = useMemo(() => {
-    const squares = new Set<string>();
-    cells.forEach((cell) => squares.add(`${cell.round},${cell.column}`));
-    return squares;
-  }, [cells]);
+  const size = (canvas: HTMLCanvasElement) => {
+    const w = Math.round(width * ratio);
+    const h = Math.round(height * ratio);
+    if (canvas.width === w && canvas.height === h) return false;
+    canvas.width = w;
+    canvas.height = h;
+    return true;
+  };
+
+  // The chart itself, redrawn only when the knitting or the wool changes.
+  useLayoutEffect(() => {
+    const canvas = baseRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+    size(canvas);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    drawChart(ctx, drawn, layout, palette, cellSize, token("--ink-faint", "#a29a91"));
+    // Size is derived from the same values this already depends on.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drawn, layout, palette, width, height, ratio]);
 
   /*
-   * A chart is read from the bottom right, so that is where it should open.
-   * Only once: after that the knitter's own scrolling, and the follow below,
-   * decide where it sits.
+   * And the two things that change as you knit, on a sheet of their own over
+   * the top. Keeping them separate is what makes a stitch cheap: the chart
+   * underneath is never touched, so working one costs a clear and a rectangle
+   * per round rather than redrawing ten thousand stitches.
+   */
+  useLayoutEffect(() => {
+    const canvas = overlayRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+    if (!size(canvas)) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    drawProgress(
+      ctx,
+      layout,
+      rounds,
+      progress,
+      nextId,
+      cellSize,
+      token("--paper", "#eae7e4"),
+      token("--crimson", "#bb2c43"),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layout, rounds, progress, nextId, ratio, width, height]);
+
+  /*
+   * A chart is read from the bottom right, so that is where it opens. Only
+   * once: after that the knitter's own scrolling, and the follow below, decide
+   * where it sits.
    */
   const opened = useRef(false);
   useEffect(() => {
-    const grid = gridRef.current;
-    if (!grid || opened.current) return;
+    const scroller = scrollRef.current;
+    if (!scroller || opened.current) return;
     opened.current = true;
-    grid.scrollLeft = grid.scrollWidth;
+    scroller.scrollLeft = scroller.scrollWidth;
   }, []);
+
+  const at = nextId === undefined ? undefined : layout.cells.get(nextId);
 
   // Sideways: keep the stitch being worked in the middle, so the chart follows
   // the knitter rather than having to be hunted for.
   useEffect(() => {
-    if (nextId === undefined) return;
-    const grid = gridRef.current;
-    const cell = grid?.querySelector<HTMLElement>(`[data-stitch="${nextId}"]`);
-    if (!grid || !cell) return;
-    grid.scrollTo({
-      left: Math.max(cell.offsetLeft - grid.clientWidth / 2 + cell.offsetWidth / 2, 0),
+    const scroller = scrollRef.current;
+    if (!scroller || !at) return;
+    const { x } = cellAt(layout, at.round, at.column, cellSize);
+    scroller.scrollTo({
+      left: Math.max(x - scroller.clientWidth / 2 + cellSize / 2, 0),
       behavior: reducedMotion() ? "auto" : "smooth",
     });
-  }, [nextId]);
+  }, [at, layout]);
 
   /*
    * And down the page, but only when the round changes. Within a round the
    * stitch moves sideways, which the effect above handles, and scrolling the
    * page once per stitch would have the whole chart twitching.
    */
-  const focusRound = nextId === undefined ? undefined : cells.get(nextId)?.round;
-
+  const focusRound = at?.round;
   useEffect(() => {
-    if (focusRound === undefined || nextId === undefined) return;
-    const cell = gridRef.current?.querySelector<HTMLElement>(
-      `[data-stitch="${nextId}"]`,
-    );
-    if (!cell) return;
+    const canvas = baseRef.current;
+    if (!canvas || focusRound === undefined) return;
+    const { y } = cellAt(layout, focusRound, 1, cellSize);
     /*
      * The panel is stuck to the bottom of the screen while you work, so the
      * part of the page you can see ends at its top edge. Its height, not
@@ -176,68 +194,40 @@ const Chart: React.FC<ChartProps> = ({
      */
     const panel = document.querySelector<HTMLElement>(".knitting-panel");
     const floor = window.innerHeight - (panel?.offsetHeight ?? 0);
-    const delta = cell.getBoundingClientRect().bottom - (floor - clearance * cellSize);
+    const bottom = canvas.getBoundingClientRect().top + y + cellSize;
+    const delta = bottom - (floor - clearance * cellSize);
     if (Math.abs(delta) < 1) return;
     window.scrollBy({ top: delta, behavior: reducedMotion() ? "auto" : "smooth" });
-    // Re-aim only when the round changes; the id is in the closure for the query.
+    // Re-aim only when the round changes; the rest is in the closure.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusRound]);
 
-  if (totalRounds === 0) return <p>This pattern has no stitches to chart.</p>;
+  if (layout.rounds === 0) return <p>This pattern has no stitches to chart.</p>;
 
   return (
     <div className="chart-frame">
-      <div
-        id="printable-section"
-        className="chart"
-        ref={gridRef}
-        style={{
-          gridTemplateRows: `repeat(${totalRounds}, ${cellSize}px)`,
-          gridTemplateColumns: `repeat(${columns + 1}, ${cellSize}px)`,
-        }}
-      >
-        {drawn.map((stitch) => {
-          const cell = cells.get(stitch.id);
-          if (!cell) return null;
-          const hex = yarnFor(palette, stitch.slot).hex;
-          return (
-            <Cell
-              key={stitch.id}
-              stitch={stitch}
-              row={cell.round}
-              column={cell.column}
-              totalRounds={totalRounds}
-              columns={columns}
-              hex={hex}
-              done={stitch.id <= progress}
-              isNext={stitch.id === nextId}
-              openTop={!filled.has(`${cell.round + 1},${cell.column}`)}
-              openLeft={!filled.has(`${cell.round},${cell.column + 1}`)}
-            />
-          );
-        })}
-        {Array.from({ length: totalRounds }, (_, index) => {
-          const round = index + 1;
-          if (round % emphasis !== 0 && round !== 1 && round !== totalRounds) {
-            return null;
+      <div className="chart-scroll" ref={scrollRef}>
+        <div
+          className="chart-sheets"
+          style={{ width, height }}
+          role="img"
+          aria-label={
+            `The chart: ${layout.columns} stitches at its widest and ` +
+            `${layout.rounds} rounds.` +
+            (focusRound && labels?.[focusRound - 1]
+              ? ` You are on ${labels[focusRound - 1]}.`
+              : "")
           }
-          return (
-            <div
-              key={`round-${round}`}
-              className="chart-label chart-label-right"
-              style={{ gridRow: totalRounds - round + 1, gridColumn: columns + 1 }}
-              title={labels?.[round - 1]}
-            >
-              {round}
-            </div>
-          );
-        })}
+        >
+          <canvas ref={baseRef} style={{ width, height }} />
+          <canvas ref={overlayRef} style={{ width, height }} />
+        </div>
       </div>
       <p className="chart-caption">
-        {columns} stitches at its widest, {totalRounds} rounds. Read from the
-        bottom right, working right to left; scroll sideways to see a whole
-        round. Where a round is shorter than the one below it, stitches have
-        been decreased away.
+        {layout.columns} stitches at its widest, {layout.rounds} rounds. Read
+        from the bottom right, working right to left; scroll sideways to see a
+        whole round. Where a round is shorter than the one below it, stitches
+        have been decreased away.
       </p>
     </div>
   );

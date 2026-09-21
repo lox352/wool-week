@@ -71,7 +71,17 @@ export default function SettledHat({
   );
 
   return (
+    /*
+     * Drawn on demand rather than sixty times a second.
+     *
+     * Nothing here moves on its own: the hat is already settled, so a frame is
+     * only worth drawing when someone turns it, when the wool changes, or
+     * while a newly worked stitch is fading in. Left on the clock it redrew
+     * 1.7 million triangles every frame whether or not anything had changed,
+     * which on a phone made scrolling the page round it take seconds.
+     */
     <Canvas
+      frameloop="demand"
       camera={{ fov: 38, near: 0.5, far: 4000 }}
       gl={{ alpha: true, antialias: true }}
       dpr={[1, 2]}

@@ -1,0 +1,226 @@
+import { Stitch } from "../types/Stitch";
+import { ChartLayout } from "./layout";
+import { Palette, inkOn, yarnFor } from "./palette";
+import { markFor } from "../helpers/stitch-marks";
+
+/**
+ * Drawing the chart.
+ *
+ * It used to be a grid of divs, one per stitch, which for a hat of ten
+ * thousand stitches meant ten thousand elements laid out and ten thousand
+ * React components reconciled every time a stitch was worked. On a phone that
+ * was about six hundred milliseconds per stitch - unusable for the one thing
+ * this page is for.
+ *
+ * So it is a canvas. The colours and marks never change while you knit, so
+ * they are drawn once onto a second canvas kept off screen, and each stitch
+ * worked is then a blit plus one rectangle per round: the work stops depending
+ * on how many stitches there are.
+ */
+
+/** Every nth line is drawn heavier, to make counting easier. */
+const emphasis = 5;
+
+const grid = "rgba(0, 0, 0, 0.22)";
+const gridStrong = "rgba(0, 0, 0, 0.7)";
+
+/** Where a cell's top left corner is, in pixels. */
+export const cellAt = (
+  layout: ChartLayout,
+  round: number,
+  column: number,
+  cell: number,
+) => ({
+  // The cast-on belongs at the bottom, and stitch 1 at the right.
+  x: (layout.columns - column) * cell,
+  y: (layout.rounds - round) * cell,
+});
+
+/** Room to the right of the chart for the round numbers. */
+export const gutter = (cell: number) => Math.round(cell * 2.2);
+
+export const chartSize = (layout: ChartLayout, cell: number) => ({
+  width: layout.columns * cell + gutter(cell),
+  height: layout.rounds * cell,
+});
+
+/**
+ * The round numbers down the right-hand edge.
+ *
+ * Every fifth round, plus the first and the last, which are the two a knitter
+ * looks for: where to start and how far there is to go.
+ */
+const drawRoundNumbers = (
+  ctx: CanvasRenderingContext2D,
+  layout: ChartLayout,
+  cell: number,
+  ink: string,
+) => {
+  ctx.save();
+  ctx.fillStyle = ink;
+  ctx.font = `${Math.round(cell * 0.72)}px ui-monospace, "Source Sans 3", system-ui, sans-serif`;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  const x = layout.columns * cell + Math.round(cell * 0.45);
+  for (let round = 1; round <= layout.rounds; round++) {
+    if (round % emphasis !== 0 && round !== 1 && round !== layout.rounds) continue;
+    const { y } = cellAt(layout, round, 1, cell);
+    ctx.fillText(String(round), x, y + cell / 2);
+  }
+  ctx.restore();
+};
+
+/**
+ * The chart itself: colours, outlines and marks. Drawn once.
+ *
+ * A cell draws its own right and bottom edge, and its top or left as well when
+ * there is no neighbour there to draw it - which is what makes a crown's
+ * decreases read as an edge rather than as a smudge.
+ */
+export const drawChart = (
+  ctx: CanvasRenderingContext2D,
+  stitches: Stitch[],
+  layout: ChartLayout,
+  palette: Palette,
+  cell: number,
+  ink = "#a29a91",
+) => {
+  const { width, height } = chartSize(layout, cell);
+  ctx.clearRect(0, 0, width, height);
+
+  const filled = new Set<string>();
+  layout.cells.forEach((at) => filled.add(`${at.round},${at.column}`));
+
+  ctx.lineWidth = 1;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  for (const stitch of stitches) {
+    const at = layout.cells.get(stitch.id);
+    if (!at) continue;
+    const { x, y } = cellAt(layout, at.round, at.column, cell);
+    const yarn = yarnFor(palette, stitch.slot);
+
+    ctx.fillStyle = yarn.hex;
+    ctx.fillRect(x, y, cell, cell);
+
+    // Outlines. Heavier after every fifth stitch and every fifth round.
+    const majorCol = at.column !== 1 && (at.column - 1) % emphasis === 0;
+    const majorRow = at.round !== 1 && (at.round - 1) % emphasis === 0;
+    ctx.beginPath();
+    ctx.strokeStyle = majorCol ? gridStrong : grid;
+    ctx.moveTo(x + 0.5, y);
+    ctx.lineTo(x + 0.5, y + cell);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.strokeStyle = majorRow ? gridStrong : grid;
+    ctx.moveTo(x, y + cell - 0.5);
+    ctx.lineTo(x + cell, y + cell - 0.5);
+    ctx.stroke();
+
+    ctx.strokeStyle = grid;
+    if (!filled.has(`${at.round + 1},${at.column}`)) {
+      ctx.beginPath();
+      ctx.moveTo(x, y + 0.5);
+      ctx.lineTo(x + cell, y + 0.5);
+      ctx.stroke();
+    }
+    if (!filled.has(`${at.round},${at.column + 1}`)) {
+      ctx.beginPath();
+      ctx.moveTo(x + cell - 0.5, y);
+      ctx.lineTo(x + cell - 0.5, y + cell);
+      ctx.stroke();
+    }
+
+    const mark = markFor(stitch.type);
+    if (!mark) continue;
+    const ink = inkOn(yarn.hex);
+    if (mark.dot) {
+      ctx.fillStyle = ink;
+      ctx.beginPath();
+      ctx.arc(x + mark.dot.x * cell, y + mark.dot.y * cell, mark.dot.r * cell, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    for (const stroke of mark.strokes ?? []) {
+      // A halo, so a mark stays legible on a dark yarn as well as a light one.
+      for (const [colour, wide] of [
+        [ink === "#ffffff" ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.75)", 2.4],
+        [ink, 1.2],
+      ] as const) {
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = wide;
+        ctx.beginPath();
+        stroke.forEach(([px, py], index) => {
+          const point = [x + px * cell, y + py * cell] as const;
+          if (index === 0) ctx.moveTo(...point);
+          else ctx.lineTo(...point);
+        });
+        ctx.stroke();
+      }
+    }
+    ctx.lineWidth = 1;
+  }
+
+  drawRoundNumbers(ctx, layout, cell, ink);
+};
+
+/**
+ * How much of each round has been worked, as one span per round.
+ *
+ * Columns only ever increase across a round, so the stitches worked so far are
+ * a run rather than a scatter, and the whole of the finished knitting can be
+ * veiled with one rectangle per round instead of one per stitch.
+ */
+export const workedSpans = (
+  layout: ChartLayout,
+  rounds: number[][],
+  progress: number,
+): { round: number; from: number; to: number }[] => {
+  const spans: { round: number; from: number; to: number }[] = [];
+  for (let index = 0; index < rounds.length; index++) {
+    const ids = rounds[index];
+    if (ids.length === 0 || ids[0] > progress) break;
+    let last = ids.length - 1;
+    if (ids[last] > progress) {
+      while (last >= 0 && ids[last] > progress) last--;
+    }
+    if (last < 0) break;
+    const from = layout.cells.get(ids[0])?.column;
+    const to = layout.cells.get(ids[last])?.column;
+    if (from === undefined || to === undefined) continue;
+    spans.push({ round: index + 1, from, to });
+  }
+  return spans;
+};
+
+/** The veil over what is already knitted, and the ring round what is next. */
+export const drawProgress = (
+  ctx: CanvasRenderingContext2D,
+  layout: ChartLayout,
+  rounds: number[][],
+  progress: number,
+  nextStitchId: number | undefined,
+  cell: number,
+  paper: string,
+  accent: string,
+) => {
+  ctx.save();
+  ctx.fillStyle = paper;
+  ctx.globalAlpha = 0.62;
+  for (const span of workedSpans(layout, rounds, progress)) {
+    const start = cellAt(layout, span.round, span.to, cell);
+    const end = cellAt(layout, span.round, span.from, cell);
+    ctx.fillRect(start.x, start.y, end.x - start.x + cell, cell);
+  }
+  ctx.restore();
+
+  if (nextStitchId === undefined) return;
+  const at = layout.cells.get(nextStitchId);
+  if (!at) return;
+  const { x, y } = cellAt(layout, at.round, at.column, cell);
+  ctx.save();
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x - 1, y - 1, cell + 2, cell + 2);
+  ctx.restore();
+};

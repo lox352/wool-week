@@ -18,6 +18,14 @@ export interface RoundIndex {
   rounds: number[][];
   /** Round number, 1-based, for each stitch id. */
   roundOf: Map<number, number>;
+  /**
+   * Every worked stitch's id, ascending.
+   *
+   * Kept so that "how many have been worked" is a binary search rather than a
+   * walk of the whole hat. It used to be `rounds.flat().filter(...)`, which
+   * allocated two ten-thousand element arrays every time a stitch was worked.
+   */
+  worked: number[];
   labels: string[];
   totalRounds: number;
 }
@@ -27,10 +35,26 @@ export const indexRounds = (
   labels: string[] = [],
 ): RoundIndex => {
   const roundOf = new Map<number, number>();
+  const worked: number[] = [];
   rounds.forEach((round, index) =>
-    round.forEach((id) => roundOf.set(id, index + 1)),
+    round.forEach((id) => {
+      roundOf.set(id, index + 1);
+      worked.push(id);
+    }),
   );
-  return { rounds, roundOf, labels, totalRounds: rounds.length };
+  return { rounds, roundOf, worked, labels, totalRounds: rounds.length };
+};
+
+/** How many of an ascending list are at or below a value. */
+const countUpTo = (ascending: number[], value: number): number => {
+  let low = 0;
+  let high = ascending.length;
+  while (low < high) {
+    const middle = (low + high) >> 1;
+    if (ascending[middle] <= value) low = middle + 1;
+    else high = middle;
+  }
+  return low;
 };
 
 export interface Position {
@@ -84,15 +108,20 @@ export const currentRun = (
   progress: number,
   index: RoundIndex,
 ): ColourRun | undefined => {
-  const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
+  /*
+   * Stitches are made in order and never reordered, so a stitch's id is its
+   * place in the list and it can simply be looked up. This used to build a
+   * map of ten thousand entries to find one stitch, three times over per
+   * stitch worked, which was most of what made the knitting page slow.
+   */
   const startId = progress + 1;
-  const first = byId.get(startId);
+  const first = stitches[startId];
   if (!first) return undefined;
 
   const round = index.roundOf.get(startId);
   let endId = startId;
   for (let id = startId + 1; ; id++) {
-    const candidate = byId.get(id);
+    const candidate = stitches[id];
     if (!candidate) break;
     if (candidate.slot !== first.slot) break;
     if (index.roundOf.get(id) !== round) break;
@@ -127,13 +156,8 @@ export const totals = (
   index: RoundIndex,
   progress: number,
 ): { worked: number; total: number; remaining: number; percent: number } => {
-  const total = index.rounds.reduce((sum, round) => sum + round.length, 0);
-  const last = index.rounds[index.rounds.length - 1];
-  const lastId = last ? last[last.length - 1] : 0;
-  const worked = Math.min(Math.max(progress, 0), lastId);
-  const done = index.rounds
-    .flat()
-    .filter((id) => id <= worked).length;
+  const total = index.worked.length;
+  const done = countUpTo(index.worked, Math.max(progress, 0));
   return {
     worked: done,
     total,
