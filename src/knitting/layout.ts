@@ -27,8 +27,27 @@ export interface ChartLayout {
 const worksInto = (stitch: Stitch): number[] =>
   stitch.links.slice(0, consumption[stitch.type]);
 
-const mean = (values: number[]): number =>
-  values.reduce((total, value) => total + value, 0) / values.length;
+/**
+ * The middle of these columns, counted by stitch rather than by distance.
+ *
+ * With three stitches that is the middle one's column exactly, and with two
+ * it is the half column between them. Which is not the same as averaging
+ * their positions, and the difference is the whole of why a crown's decrease
+ * line runs straight: the stitches a decrease takes together stop being
+ * evenly spaced the moment the crown has opened a wedge beside them, so
+ * their average creeps a fraction of a column towards the wider side every
+ * round, and sixteen rounds of that is a decrease line you can see bending.
+ * Counting to the middle instead ignores how wide the gaps either side have
+ * grown, so a centred double decrease inherits the column of the stitch
+ * below it exactly, round after round, and never moves.
+ */
+const middleOf = (columns: number[]): number => {
+  const sorted = [...columns].sort((a, b) => a - b);
+  const half = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1
+    ? sorted[half]
+    : (sorted[half - 1] + sorted[half]) / 2;
+};
 
 /**
  * A group of stitches and the stitches of the round below they came out of.
@@ -84,14 +103,6 @@ const centre = (ids: number[], on: number, column: Map<number, number>) => {
   });
 };
 
-/**
- * The one of these columns nearest a wanted position, and the first of them
- * when two are equally near.
- */
-const nearest = (wanted: number, columns: number[]): number =>
-  columns.reduce((best, at) =>
-    Math.abs(at - wanted) < Math.abs(best - wanted) - 1e-9 ? at : best,
-  );
 
 const columnsOf = (ids: number[], column: Map<number, number>): number[] =>
   ids.map((id) => column.get(id)).filter((at): at is number => at !== undefined);
@@ -102,10 +113,9 @@ const columnsOf = (ids: number[], column: Map<number, number>): number[] =>
  * Every stitch sits over the middle of the stitches it was worked into, and
  * under the middle of the stitches worked into it. A plain knit inherits its
  * column exactly, so the colourwork stacks up in true vertical columns; a
- * decrease settles onto whichever of the stitches it took together is nearest
- * their middle, which for a centred double decrease is the middle stitch
- * itself. Read the other way, a stitch that becomes two sits half a column in
- * from each of them. The columns a decrease gave up are simply left empty,
+ * centred double decrease sits on the middle of the three it took together,
+ * and a k2tog on the half column between its two. Read the other way, a
+ * stitch that becomes two sits half a column in from each of them. The columns a decrease gave up are simply left empty,
  * which is what draws the crown as the wedges of absent fabric a printed
  * crown chart shows, and the columns an increase has yet to fill are left
  * empty too, so the rib shows where every new stitch is about to come in.
@@ -134,36 +144,19 @@ export const layOut = (stitches: Stitch[], rounds: number[][]): ChartLayout => {
     rounds[anchor].forEach((id, index) => column.set(id, index + 1));
   }
 
-  /*
-   * Upwards from the anchor: over the middle of what it was worked into,
-   * settled onto whichever of those stitches is nearest that middle.
-   *
-   * The settling is what keeps a decrease stack straight. Sixty rounds are
-   * piled on top of each other here, and the stitches a decrease takes
-   * together stop being evenly spaced as soon as the crown has opened a wedge
-   * beside them - so taking the middle of them literally moves the decrease a
-   * fraction of a column each round, and a crown's decrease line comes out
-   * visibly wobbly rather than running straight up the chart. Landing on a
-   * real column instead means every round inherits exactly, and nothing
-   * drifts however many rounds are stacked.
-   */
+  // Upwards from the anchor: over the middle of what it was worked into.
   for (let index = anchor + 1; index < rounds.length; index++) {
     for (const family of familiesOf(rounds[index], byId)) {
       const below = columnsOf(family.below, column);
-      if (below.length === 0) continue;
-      centre(family.above, nearest(mean(below), below), column);
+      if (below.length > 0) centre(family.above, middleOf(below), column);
     }
   }
 
-  /*
-   * And downwards: under the middle of whatever was worked into it, which is
-   * taken literally because there is nothing below the anchor for a drift to
-   * accumulate through - a single increase round, and rib that inherits it.
-   */
+  // And downwards: under the middle of whatever was worked into it.
   for (let index = anchor - 1; index >= 0; index--) {
     for (const family of familiesOf(rounds[index + 1], byId)) {
       const above = columnsOf(family.above, column);
-      if (above.length > 0) centre(family.below, mean(above), column);
+      if (above.length > 0) centre(family.below, middleOf(above), column);
     }
   }
 

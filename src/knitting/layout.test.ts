@@ -26,7 +26,7 @@ describe("the chart hangs every stitch over what it was worked into", () => {
     });
   });
 
-  it("a decrease settles on whichever stitch it took is nearest the middle", () => {
+  it("a decrease sits on the middle of the stitches it took together", () => {
     for (const hat of ["sww25-aal-ower-toorie", "sww24-islesburgh-toorie"]) {
       const { stitches, cells } = laid(hat);
       const decreases = stitches.filter(
@@ -35,17 +35,32 @@ describe("the chart hangs every stitch over what it was worked into", () => {
       expect(decreases.length).toBeGreaterThan(0);
 
       for (const stitch of decreases) {
-        const taken = stitch.links.slice(0, consumption[stitch.type]);
-        const columns = taken.map((id) => cells.get(id)!.column);
+        const columns = stitch.links
+          .slice(0, consumption[stitch.type])
+          .map((id) => cells.get(id)!.column)
+          .sort((a, b) => a - b);
+        const half = Math.floor(columns.length / 2);
+        // The middle counted by stitch: the middle one of an odd number of
+        // them, and half way between the two middle ones of an even number.
         const middle =
-          columns.reduce((total, at) => total + at, 0) / columns.length;
-        const at = cells.get(stitch.id)!.column;
-        // On one of them, and on the one nearest their middle.
-        expect(columns).toContain(at);
-        const wander = Math.abs(at - middle);
-        for (const other of columns) {
-          expect(wander).toBeLessThanOrEqual(Math.abs(other - middle) + 1e-9);
-        }
+          columns.length % 2 === 1
+            ? columns[half]
+            : (columns[half - 1] + columns[half]) / 2;
+        expect(cells.get(stitch.id)!.column).toBe(middle);
+      }
+    }
+  });
+
+  it("a k2tog sits half way between the two columns that produced it", () => {
+    for (const hat of ["sww25-aal-ower-toorie", "sww24-islesburgh-toorie"]) {
+      const { stitches, cells } = laid(hat);
+      const taken = stitches.filter((stitch) => stitch.type === "k2tog");
+      expect(taken.length).toBeGreaterThan(0);
+      for (const stitch of taken) {
+        const [left, right] = stitch.links
+          .slice(0, 2)
+          .map((id) => cells.get(id)!.column);
+        expect(cells.get(stitch.id)!.column).toBe((left + right) / 2);
       }
     }
   });
@@ -83,20 +98,14 @@ describe("the chart hangs every stitch over what it was worked into", () => {
     }
   });
 
-  it("keeps the body and the crown on the chart's own columns", () => {
-    // Everything from the round the increases land on upwards sits on a
-    // whole column, so the heavy every-fifth-column rules have an edge to be
-    // drawn on and stay put all the way to the crown.
+  it("keeps every stitch on the chart's columns or half way between two", () => {
+    // Nothing ever lands on an arbitrary fraction of a column: a stitch
+    // either inherits a column outright or splits the difference between two
+    // of them. That is what lets a stack run straight and gives the heavy
+    // every-fifth-column rules an edge to be drawn on.
     for (const hat of ["sww25-aal-ower-toorie", "sww24-islesburgh-toorie"]) {
-      const { stitches, rounds, cells } = laid(hat);
-      const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
-      const grown = rounds.findIndex((round) =>
-        round.some((id) => byId.get(id)!.type === "m1"),
-      );
-      expect(grown).toBeGreaterThan(0);
-      for (const round of rounds.slice(grown)) {
-        for (const id of round) expect(cells.get(id)!.column % 1).toBe(0);
-      }
+      const { cells } = laid(hat);
+      for (const cell of cells.values()) expect(cell.column % 0.5).toBe(0);
     }
   });
 
