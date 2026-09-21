@@ -1,10 +1,20 @@
 import { Stitch } from "../types/Stitch";
+import { consumption } from "../types/StitchType";
 
 export interface Cell {
   /** 1-based, counting up from the cast-on. */
   round: number;
-  /** 1-based, counting from the right-hand edge, where stitch 1 is. */
+  /**
+   * Where the stitch sits across the chart, counting from the right-hand edge
+   * where stitch 1 is.
+   *
+   * Fractional, because a stitch sits over the middle of what it was worked
+   * into: a k2tog takes two columns together and so lands on the half column
+   * between them, and every stitch above it inherits that half.
+   */
   column: number;
+  /** 1-based stitch number within its round, for counting and for the rules. */
+  index: number;
 }
 
 export interface ChartLayout {
@@ -13,43 +23,136 @@ export interface ChartLayout {
   columns: number;
 }
 
+/** The stitches of the round below that this one is worked into. */
+const worksInto = (stitch: Stitch): number[] =>
+  stitch.links.slice(0, consumption[stitch.type]);
+
+const mean = (values: number[]): number =>
+  values.reduce((total, value) => total + value, 0) / values.length;
+
+/**
+ * A group of stitches and the stitches of the round below they came out of.
+ *
+ * Usually one and one - a knit is worked into a single stitch and leaves a
+ * single stitch. A decrease has several below it and one above; an increase
+ * has one below and several above, because a make-one is worked into nothing
+ * at all and so belongs with the stitch beside it rather than on its own.
+ * Grouping them is what lets both be laid out by the same rule.
+ */
+interface Family {
+  below: number[];
+  above: number[];
+}
+
+const familiesOf = (above: number[], byId: Map<number, Stitch>): Family[] => {
+  const families: Family[] = [];
+  /** Increases seen before any stitch that has something below it. */
+  let orphans: number[] = [];
+
+  for (const id of above) {
+    const stitch = byId.get(id);
+    if (!stitch) continue;
+    const below = worksInto(stitch);
+    if (below.length === 0) {
+      const last = families[families.length - 1];
+      if (last) last.above.push(id);
+      else orphans.push(id);
+      continue;
+    }
+    families.push({ below, above: [id] });
+  }
+
+  if (orphans.length > 0 && families.length > 0) {
+    families[0].above.unshift(...orphans);
+    orphans = [];
+  }
+  return families;
+};
+
+/**
+ * Space a family's stitches out across the middle of the ones they answer to.
+ *
+ * One stitch worked into three lands on the middle of the three; three
+ * stitches worked into one straddle it, a column and a half either side. It
+ * is the same rule read in either direction, which is what makes a decrease
+ * and an increase mirror images of each other on the chart rather than two
+ * separate special cases.
+ */
+const centre = (ids: number[], on: number, column: Map<number, number>) => {
+  ids.forEach((id, index) => {
+    column.set(id, on + index - (ids.length - 1) / 2);
+  });
+};
+
+const columnsOf = (ids: number[], column: Map<number, number>): number[] =>
+  ids.map((id) => column.get(id)).filter((at): at is number => at !== undefined);
+
 /**
  * Lay the tube out flat as a chart.
  *
- * A stitch sits above the first stitch it was worked into, so a round lines up
- * with the round below it and the motif stays square. Where two or three
- * stitches were taken together the ones that went into the decrease leave a
- * gap, which is what draws the crown's decrease lines spiralling up the chart,
- * and where a stitch was made out of nothing everything after it shifts along
- * to make room.
+ * Every stitch sits over the middle of the stitches it was worked into, and
+ * under the middle of the stitches worked into it. A plain knit inherits its
+ * column exactly, so the colourwork stacks up in true vertical columns; a
+ * k2tog lands on the half column between the two it took together, and a
+ * centred double decrease on the middle of its three. Read the other way, a
+ * stitch that becomes two sits half a column in from each of them. The
+ * columns a decrease gave up are simply left empty, which is what draws the
+ * crown as the wedges of absent fabric a printed crown chart shows, and the
+ * columns an increase has yet to fill are left empty too, so the rib shows
+ * where every new stitch is about to come in.
  *
- * The cursor is what keeps those two rules from fighting: a stitch never lands
- * left of the one before it, so an increase pushes the rest of its round along
- * instead of landing on top of its neighbour.
+ * The widest round anchors the grid, at one column per stitch, and everything
+ * else is propagated away from it in both directions. That matters because
+ * these hats increase above the brim: the Aal Ower Toorie's rib is 130
+ * stitches under a 162 stitch body, and working upwards from the rib would
+ * have to squeeze 162 stitches into 130 columns. Working down from the body
+ * instead leaves the rib spanning the whole chart, which is both true and the
+ * thing you want to see coming.
+ *
+ * It used to hang each stitch above the first stitch it was worked into, with
+ * a cursor that only ever moved right. That pinned a short round against one
+ * edge - the rib bunched to the right of the chart with dead space beside it -
+ * and made the crown's decreases slide sideways rather than closing in evenly,
+ * because the gap a decrease leaves always opened on the same side of it.
  */
 export const layOut = (stitches: Stitch[], rounds: number[][]): ChartLayout => {
   const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
-  const columnOf = new Map<number, number>();
-  const cells = new Map<number, Cell>();
-  let columns = 0;
+  const widest = rounds.reduce((most, round) => Math.max(most, round.length), 0);
+  const anchor = rounds.findIndex((round) => round.length === widest);
+  const column = new Map<number, number>();
 
+  if (anchor >= 0) {
+    rounds[anchor].forEach((id, index) => column.set(id, index + 1));
+  }
+
+  // Upwards from the anchor: over the middle of what it was worked into.
+  for (let index = anchor + 1; index < rounds.length; index++) {
+    for (const family of familiesOf(rounds[index], byId)) {
+      const below = columnsOf(family.below, column);
+      if (below.length > 0) centre(family.above, mean(below), column);
+    }
+  }
+
+  // And downwards: under the middle of whatever was worked into it.
+  for (let index = anchor - 1; index >= 0; index--) {
+    for (const family of familiesOf(rounds[index + 1], byId)) {
+      const above = columnsOf(family.above, column);
+      if (above.length > 0) centre(family.below, mean(above), column);
+    }
+  }
+
+  const cells = new Map<number, Cell>();
   rounds.forEach((round, index) => {
-    let cursor = 0;
-    round.forEach((id) => {
-      const stitch = byId.get(id);
-      // Every link but the last is a stitch in the round below; the last is
-      // the stitch before this one in its own round.
-      const parent = stitch?.links.slice(0, -1)[0];
-      const wanted = parent === undefined ? cursor : columnOf.get(parent) ?? cursor;
-      const column = Math.max(wanted, cursor);
-      cursor = column + 1;
-      columnOf.set(id, column);
-      cells.set(id, { round: index + 1, column: column + 1 });
-      columns = Math.max(columns, column + 1);
+    round.forEach((id, position) => {
+      cells.set(id, {
+        round: index + 1,
+        column: column.get(id) ?? position + 1,
+        index: position + 1,
+      });
     });
   });
 
-  return { cells, rounds: rounds.length, columns };
+  return { cells, rounds: rounds.length, columns: widest };
 };
 
 /** The stitches to draw. Stitch 0 is the phantom start of the helix. */

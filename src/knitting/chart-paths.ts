@@ -1,6 +1,6 @@
 import { Stitch } from "../types/Stitch";
 import { StitchType } from "../types/StitchType";
-import { ChartLayout } from "./layout";
+import { Cell, ChartLayout } from "./layout";
 import { Palette, inkOn, yarnFor } from "./palette";
 import { markFor } from "../helpers/stitch-marks";
 import { SlotId } from "../data/hats/types";
@@ -47,6 +47,55 @@ const rect = (x: number, y: number, w: number, h: number) =>
   `M${x} ${y}h${w}v${h}h${-w}z`;
 
 /**
+ * Two stitches sit side by side when their columns are one apart.
+ *
+ * Columns are fractional - a k2tog lands between the two it took together -
+ * so this is a comparison with a tolerance rather than an equality, and the
+ * places where it comes out false are the real holes in the fabric: the
+ * columns a decrease gave up, and the ones an increase has yet to fill.
+ */
+const adjacent = (left: number, right: number) =>
+  Math.abs(right - left - 1) < 1e-6;
+
+/** A round's cells, in column order, split wherever the fabric breaks. */
+const runsOf = <T extends { column: number }>(
+  cells: T[],
+  same: (a: T, b: T) => boolean = () => true,
+): T[][] => {
+  const sorted = [...cells].sort((a, b) => a.column - b.column);
+  const runs: T[][] = [];
+  let run: T[] = [];
+  for (const cell of sorted) {
+    const last = run[run.length - 1];
+    if (last && (!adjacent(last.column, cell.column) || !same(last, cell))) {
+      runs.push(run);
+      run = [];
+    }
+    run.push(cell);
+  }
+  if (run.length > 0) runs.push(run);
+  return runs;
+};
+
+/** Where a run of cells starts and ends across the chart. */
+const extent = (layout: ChartLayout, run: { column: number }[], cell: number) => {
+  const left = cellAt(layout, 1, run[run.length - 1].column, cell).x;
+  const right = cellAt(layout, 1, run[0].column, cell).x + cell;
+  return { left, right };
+};
+
+/** The cells of each round, keyed by round number. */
+const byRound = (layout: ChartLayout): Map<number, Cell[]> => {
+  const rows = new Map<number, Cell[]>();
+  layout.cells.forEach((at) => {
+    const row = rows.get(at.round);
+    if (row) row.push(at);
+    else rows.set(at.round, [at]);
+  });
+  return rows;
+};
+
+/**
  * One filled path per yarn.
  *
  * Runs of a colour along a round become a single rectangle, which on Fair Isle
@@ -58,34 +107,22 @@ export const fillPaths = (
   layout: ChartLayout,
   cell: number,
 ): { slot: SlotId; d: string }[] => {
-  const byRound = new Map<number, { column: number; slot: SlotId }[]>();
+  const rows = new Map<number, { column: number; slot: SlotId }[]>();
   for (const stitch of stitches) {
     const at = layout.cells.get(stitch.id);
     if (!at) continue;
-    const row = byRound.get(at.round) ?? [];
+    const row = rows.get(at.round) ?? [];
     row.push({ column: at.column, slot: stitch.slot });
-    byRound.set(at.round, row);
+    rows.set(at.round, row);
   }
 
   const paths = new Map<SlotId, string[]>();
-  for (const [round, cells] of byRound) {
-    // Columns count from the right, so ascending column runs leftwards.
-    cells.sort((a, b) => a.column - b.column);
-    let start = 0;
-    for (let i = 1; i <= cells.length; i++) {
-      const ends =
-        i === cells.length ||
-        cells[i].slot !== cells[start].slot ||
-        cells[i].column !== cells[i - 1].column + 1;
-      if (!ends) continue;
-      const from = cells[start];
-      const to = cells[i - 1];
-      const left = cellAt(layout, round, to.column, cell);
-      const width = (to.column - from.column + 1) * cell;
-      const run = paths.get(from.slot) ?? [];
-      run.push(rect(left.x, left.y, width, cell));
-      paths.set(from.slot, run);
-      start = i;
+  for (const [round, cells] of rows) {
+    for (const run of runsOf(cells, (a, b) => a.slot === b.slot)) {
+      const { left, right } = extent(layout, run, cell);
+      const parts = paths.get(run[0].slot) ?? [];
+      parts.push(rect(left, cellAt(layout, round, 1, cell).y, right - left, cell));
+      paths.set(run[0].slot, parts);
     }
   }
 
@@ -96,6 +133,11 @@ export const fillPaths = (
  * The rules between cells, as two paths: the hairlines, and the heavier ones
  * that fall after every fifth stitch and every fifth round.
  *
+ * They follow the cells rather than a lattice laid over the whole chart,
+ * because a chart of a shaped tube is not a rectangle: the columns a decrease
+ * gives up are left empty, and the rules stop at the edge of the fabric so
+ * those gaps read as the wedges of absent stitches they are.
+ *
  * Collinear segments are merged, so a chart's worth of cell edges comes out as
  * a few hundred lines rather than one per cell.
  */
@@ -103,47 +145,90 @@ export const gridPaths = (
   layout: ChartLayout,
   cell: number,
 ): { light: string; heavy: string } => {
-  const filled = new Set<string>();
-  layout.cells.forEach((at) => filled.add(`${at.round},${at.column}`));
-  const has = (round: number, column: number) =>
-    filled.has(`${round},${column}`);
+  const rows = byRound(layout);
+  const runs = new Map<number, Cell[][]>();
+  rows.forEach((cells, round) => runs.set(round, runsOf(cells)));
 
   const light: string[] = [];
   const heavy: string[] = [];
 
-  // Horizontal rules: for each round boundary, the runs of columns that need one.
+  /*
+   * Horizontal rules: a boundary needs one wherever there is fabric on
+   * either side of it, so the spans of the two rounds it separates are
+   * merged before they are drawn.
+   */
+  const spans = (round: number) =>
+    (runs.get(round) ?? []).map((run) => extent(layout, run, cell));
+
   for (let round = 0; round <= layout.rounds; round++) {
-    let start: number | null = null;
-    for (let column = 1; column <= layout.columns + 1; column++) {
-      const needed =
-        column <= layout.columns && (has(round, column) || has(round + 1, column));
-      if (needed && start === null) start = column;
-      if (!needed && start !== null) {
-        const left = cellAt(layout, round, column - 1, cell);
-        const width = (column - 1 - start + 1) * cell;
-        const line = `M${left.x} ${left.y}h${width}`;
-        (round !== 0 && round % emphasis === 0 ? heavy : light).push(line);
-        start = null;
+    const all = [...spans(round), ...spans(round + 1)].sort(
+      (a, b) => a.left - b.left,
+    );
+    const y = (layout.rounds - round) * cell;
+    const into = round !== 0 && round % emphasis === 0 ? heavy : light;
+    let open: { left: number; right: number } | null = null;
+    for (const span of all) {
+      if (open && span.left <= open.right + 1e-6) {
+        open.right = Math.max(open.right, span.right);
+        continue;
       }
+      if (open) into.push(`M${open.left} ${y}h${open.right - open.left}`);
+      open = { ...span };
     }
+    if (open) into.push(`M${open.left} ${y}h${open.right - open.left}`);
   }
 
-  // And vertical rules, the same way down the columns.
-  for (let column = 0; column <= layout.columns; column++) {
-    let start: number | null = null;
-    for (let round = 1; round <= layout.rounds + 1; round++) {
-      const needed =
-        round <= layout.rounds && (has(round, column) || has(round, column + 1));
-      if (needed && start === null) start = round;
-      if (!needed && start !== null) {
-        const top = cellAt(layout, round - 1, column, cell);
-        const height = (round - 1 - start + 1) * cell;
-        const line = `M${top.x} ${top.y}v${height}`;
-        (column !== 0 && column % emphasis === 0 ? heavy : light).push(line);
-        start = null;
+  /*
+   * And vertical rules, one per cell edge, gathered by where they fall so a
+   * column that runs unbroken up the chart is a single line.
+   */
+  const lines = new Map<string, number[]>();
+  const edge = (x: number, isHeavy: boolean, round: number) => {
+    const key = `${x.toFixed(3)}|${isHeavy ? "h" : "l"}`;
+    const at = lines.get(key);
+    if (at) at.push(round);
+    else lines.set(key, [round]);
+  };
+
+  runs.forEach((rounds, round) => {
+    for (const run of rounds) {
+      // The edge on the stitch-1 side of the run, then one per cell going left.
+      edge(
+        cellAt(layout, round, run[0].column, cell).x + cell,
+        (run[0].index - 1) % emphasis === 0 && run[0].index > 1,
+        round,
+      );
+      for (const at of run) {
+        edge(
+          cellAt(layout, round, at.column, cell).x,
+          at.index % emphasis === 0,
+          round,
+        );
       }
     }
-  }
+  });
+
+  lines.forEach((rounds, key) => {
+    const [x, weight] = key.split("|");
+    const into = weight === "h" ? heavy : light;
+    rounds.sort((a, b) => a - b);
+    let from = rounds[0];
+    let last = rounds[0];
+    const flush = () => {
+      const top = (layout.rounds - last) * cell;
+      into.push(`M${x} ${top}v${(last - from + 1) * cell}`);
+    };
+    for (let i = 1; i < rounds.length; i++) {
+      if (rounds[i] === last + 1) {
+        last = rounds[i];
+        continue;
+      }
+      flush();
+      from = rounds[i];
+      last = rounds[i];
+    }
+    flush();
+  });
 
   return { light: light.join(""), heavy: heavy.join("") };
 };
@@ -205,12 +290,14 @@ export const markPaths = (
 };
 
 /**
- * One rectangle per round covering what has been knitted.
+ * The knitting done so far, as a rectangle per unbroken run of it.
  *
- * Columns only ever increase across a round, so the stitches worked so far are
- * a run rather than a scatter: the whole of the finished knitting veils with
- * one rectangle per round instead of one per stitch, which is what keeps a
- * stitch costing the same on a ten thousand stitch hat as on a small one.
+ * Columns only ever increase across a round, so the stitches worked so far
+ * are a run rather than a scatter, and a whole round of plain knitting veils
+ * with one rectangle. A round the crown has taken stitches out of breaks into
+ * a few, which is what keeps the veil off the empty columns between them -
+ * and either way the cost is per round rather than per stitch, so a stitch
+ * costs the same on a ten thousand stitch hat as on a small one.
  */
 export const progressPath = (
   layout: ChartLayout,
@@ -225,12 +312,16 @@ export const progressPath = (
     let last = ids.length - 1;
     while (last >= 0 && ids[last] > progress) last--;
     if (last < 0) break;
-    const from = layout.cells.get(ids[0])?.column;
-    const to = layout.cells.get(ids[last])?.column;
-    if (from === undefined || to === undefined) continue;
-    const left = cellAt(layout, index + 1, to, cell);
-    const right = cellAt(layout, index + 1, from, cell);
-    parts.push(rect(left.x, left.y, right.x - left.x + cell, cell));
+
+    const worked = ids
+      .slice(0, last + 1)
+      .map((id) => layout.cells.get(id))
+      .filter((at): at is Cell => at !== undefined);
+    const y = (layout.rounds - (index + 1)) * cell;
+    for (const run of runsOf(worked)) {
+      const { left, right } = extent(layout, run, cell);
+      parts.push(rect(left, y, right - left, cell));
+    }
   }
   return parts.join("");
 };

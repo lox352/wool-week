@@ -88,8 +88,14 @@ export const drawChart = (
   const { width, height } = chartSize(layout, cell);
   ctx.clearRect(0, 0, width, height);
 
+  /*
+   * Which cells exist, keyed to three decimals: columns are fractional, since
+   * a decrease sits between the stitches it took together, so "is there a
+   * neighbour here" is a lookup with a tolerance rather than an exact one.
+   */
+  const key = (round: number, column: number) => `${round},${column.toFixed(3)}`;
   const filled = new Set<string>();
-  layout.cells.forEach((at) => filled.add(`${at.round},${at.column}`));
+  layout.cells.forEach((at) => filled.add(key(at.round, at.column)));
 
   ctx.lineWidth = 1;
   ctx.lineCap = "round";
@@ -105,7 +111,7 @@ export const drawChart = (
     ctx.fillRect(x, y, cell, cell);
 
     // Outlines. Heavier after every fifth stitch and every fifth round.
-    const majorCol = at.column !== 1 && (at.column - 1) % emphasis === 0;
+    const majorCol = at.index % emphasis === 0;
     const majorRow = at.round !== 1 && (at.round - 1) % emphasis === 0;
     ctx.beginPath();
     ctx.strokeStyle = majorCol ? gridStrong : grid;
@@ -119,13 +125,13 @@ export const drawChart = (
     ctx.stroke();
 
     ctx.strokeStyle = grid;
-    if (!filled.has(`${at.round + 1},${at.column}`)) {
+    if (!filled.has(key(at.round + 1, at.column))) {
       ctx.beginPath();
       ctx.moveTo(x, y + 0.5);
       ctx.lineTo(x + cell, y + 0.5);
       ctx.stroke();
     }
-    if (!filled.has(`${at.round},${at.column + 1}`)) {
+    if (!filled.has(key(at.round, at.column + 1))) {
       ctx.beginPath();
       ctx.moveTo(x + cell - 0.5, y);
       ctx.lineTo(x + cell - 0.5, y + cell);
@@ -165,11 +171,13 @@ export const drawChart = (
 };
 
 /**
- * How much of each round has been worked, as one span per round.
+ * How much of each round has been worked, as spans of adjacent stitches.
  *
- * Columns only ever increase across a round, so the stitches worked so far are
- * a run rather than a scatter, and the whole of the finished knitting can be
- * veiled with one rectangle per round instead of one per stitch.
+ * Columns only ever increase across a round, so the stitches worked so far
+ * are a run rather than a scatter, and a whole round of plain knitting is one
+ * span. A round the crown has taken stitches out of breaks into a few, so the
+ * veil stays off the empty columns between them; either way the cost is per
+ * round rather than per stitch.
  */
 export const workedSpans = (
   layout: ChartLayout,
@@ -181,14 +189,30 @@ export const workedSpans = (
     const ids = rounds[index];
     if (ids.length === 0 || ids[0] > progress) break;
     let last = ids.length - 1;
-    if (ids[last] > progress) {
-      while (last >= 0 && ids[last] > progress) last--;
-    }
+    while (last >= 0 && ids[last] > progress) last--;
     if (last < 0) break;
-    const from = layout.cells.get(ids[0])?.column;
-    const to = layout.cells.get(ids[last])?.column;
-    if (from === undefined || to === undefined) continue;
-    spans.push({ round: index + 1, from, to });
+
+    let from: number | undefined;
+    let to: number | undefined;
+    for (let at = 0; at <= last; at++) {
+      const column = layout.cells.get(ids[at])?.column;
+      if (column === undefined) continue;
+      if (from === undefined || to === undefined) {
+        from = column;
+        to = column;
+        continue;
+      }
+      if (Math.abs(column - to - 1) < 1e-6) {
+        to = column;
+        continue;
+      }
+      spans.push({ round: index + 1, from, to });
+      from = column;
+      to = column;
+    }
+    if (from !== undefined && to !== undefined) {
+      spans.push({ round: index + 1, from, to });
+    }
   }
   return spans;
 };
