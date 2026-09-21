@@ -17,7 +17,7 @@
  */
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
-import { appendFileSync, writeFileSync, readFileSync } from "node:fs";
+import { appendFileSync, writeFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -44,6 +44,17 @@ const base = `http://127.0.0.1:${port}/wool-week/`;
 
 /** Positions are rounded: the hat is about a hundred units tall. */
 const places = 2;
+
+/**
+ * How long to wait for the page to show any sign of settling.
+ *
+ * A hat that is going to settle says so within a few seconds. One that never
+ * reports a step is not slow, it is wrong - the page is not running the
+ * physics at all - and waiting out the full timeout to discover that is how an
+ * afternoon disappears. So that case now fails immediately and says what it
+ * found.
+ */
+const firstProgressMs = 30_000;
 
 /**
  * Long enough for a ten-thousand stitch hat.
@@ -73,21 +84,50 @@ const stepBudgetMs = 4_000;
  */
 const tuning = {};
 
-const hatIds = [...readFileSync(join(root, "src/data/hats/index.ts"), "utf8")
-  .matchAll(/from "\.\/([a-z0-9-]+)"/g)]
-  .map((match) => match[1]);
+/*
+ * The hats, from their chart files.
+ *
+ * This used to read the imports out of index.ts, which also matched
+ * `import { HatPattern } from "./types"` - so the first thing it tried to
+ * settle was a hat called "types". That page says it does not know the hat,
+ * never starts the physics, and the script then sat waiting for a result that
+ * was never coming. Every chart file is named for exactly one hat, so there is
+ * nothing to parse.
+ */
+const hatIds = readdirSync(join(root, "src/data/hats"))
+  .filter((name) => name.endsWith(".charts.json"))
+  .map((name) => name.replace(".charts.json", ""))
+  .sort();
 
 if (hatIds.length === 0) {
-  console.error("found no hats in src/data/hats/index.ts");
+  say("found no hats: src/data/hats holds no *.charts.json");
   process.exit(1);
 }
+say(`settling ${hatIds.length} hats: ${hatIds.join(", ")}`);
 
+/*
+ * Its own preview server, in its own process group.
+ *
+ * npx spawns a shell which spawns vite, so killing what we started leaves the
+ * grandchild holding the port. Detaching puts the lot in one group that can be
+ * killed together; without this a few interrupted runs leave a row of orphaned
+ * servers behind, and the next run quietly talks to one of those instead.
+ */
 const server = spawn(
   "npx",
   ["vite", "preview", "--port", String(port), "--host", "127.0.0.1"],
-  { cwd: root, stdio: "ignore" },
+  { cwd: root, stdio: "ignore", detached: true },
 );
-const stop = () => server.kill();
+let stopped = false;
+const stop = () => {
+  if (stopped) return;
+  stopped = true;
+  try {
+    process.kill(-server.pid, "SIGTERM");
+  } catch {
+    server.kill();
+  }
+};
 process.on("exit", stop);
 process.on("SIGINT", () => { stop(); process.exit(1); });
 
@@ -142,6 +182,20 @@ for (const hatId of hatIds) {
         `${((Date.now() - started) / 1000).toFixed(0)}s`,
     );
   }, 5_000);
+
+  await page
+    .waitForFunction(() => window.__settleProgress, undefined, {
+      timeout: firstProgressMs,
+      polling: 500,
+    })
+    .catch(() => {
+      clearInterval(ticker);
+      say(
+        `${hatId}: the page never started settling. Is it a hat the site ` +
+          `knows, and did the build include it?`,
+      );
+      process.exit(1);
+    });
 
   const positions = await page
     .waitForFunction(() => window.__settledPositions, undefined, {

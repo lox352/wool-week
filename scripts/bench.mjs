@@ -84,12 +84,26 @@ const runs = [
   },
 ];
 
+/*
+ * Its own preview server, in its own process group: npx spawns a shell which
+ * spawns vite, so killing what we started would leave the grandchild holding
+ * the port for the next run to talk to by mistake.
+ */
 const server = spawn(
   "npx",
   ["vite", "preview", "--port", String(port), "--host", "127.0.0.1"],
-  { cwd: root, stdio: "ignore" },
+  { cwd: root, stdio: "ignore", detached: true },
 );
-const stop = () => server.kill();
+let stopped = false;
+const stop = () => {
+  if (stopped) return;
+  stopped = true;
+  try {
+    process.kill(-server.pid, "SIGTERM");
+  } catch {
+    server.kill();
+  }
+};
 process.on("exit", stop);
 process.on("SIGINT", () => { stop(); process.exit(1); });
 
