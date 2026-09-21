@@ -28,6 +28,18 @@ const wide = 0.86;
 const occiput = 1.06;
 const forehead = 0.94;
 
+/**
+ * How square the head is in profile.
+ *
+ * An ellipsoid narrows as the square root as it rises, which takes a skull in
+ * far too fast: measured against the hat, the top of the body band sat at
+ * under six tenths of the head's width and pulled the knitting in with it. A
+ * real skull is fuller at the shoulders of the crown and flatter on the
+ * vertex than an ellipse, and this is that shape - a superellipse, which at
+ * two would be the ellipse and above it stands squarer.
+ */
+const squareness = 2.7;
+
 export interface Head {
   /** A convex hull's worth of points, as x, y, z triples. */
   points: Float32Array;
@@ -56,7 +68,7 @@ export const headShape = (
   for (let index = 0; index < count; index++) {
     // Evenly spaced in height, and turned by the golden angle each step.
     const y = 1 - (2 * index) / (count - 1);
-    const ring = Math.sqrt(Math.max(1 - y * y, 0));
+    const ring = (1 - Math.min(Math.abs(y), 1) ** squareness) ** (1 / squareness);
     const angle = golden * index;
 
     const across = Math.cos(angle) * ring;
@@ -77,4 +89,4 @@ export const headShape = (
  * of the rib the head must be back down to about the rib's own width. For an
  * ellipsoid that is a fixed fraction of its height, which is what this is. */
 export const headLift = (tall: number, brim: number, radius: number): number =>
-  tall * Math.sqrt(Math.max(1 - (brim / radius) ** 2, 0));
+  tall * (1 - Math.min(brim / radius, 1) ** squareness) ** (1 / squareness);

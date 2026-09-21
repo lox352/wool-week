@@ -173,6 +173,12 @@ const sweeps = {
  * over something that stops it closing in, which is a different machine for
  * the same job.
  */
+sweeps.skulls = [
+  { name: "skull 52, down", gravity: -earth, headRadius: 52, head: "head", headTall: 60 },
+  { name: "skull 52, up (bag)", gravity: earth, headRadius: 52, head: "head", headTall: 60 },
+  { name: "skull 52, tall 70, up (bag)", gravity: earth, headRadius: 52, head: "head", headTall: 70 },
+];
+
 sweeps.heads = [
   { name: "ball 52, down", gravity: -earth, headRadius: 52 },
   { name: "head 52, down", gravity: -earth, headRadius: 52, head: "head", headTall: 60 },
