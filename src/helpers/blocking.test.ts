@@ -28,16 +28,6 @@ const rippled = (hat: string, depth = 0.3, waves = 8) => {
   return { stitches, rounds, at };
 };
 
-const wayRound = (ring: { x: number; y: number; z: number }[]) => {
-  let total = 0;
-  for (let index = 0; index < ring.length; index++) {
-    const here = ring[index];
-    const next = ring[(index + 1) % ring.length];
-    total += Math.hypot(here.x - next.x, here.y - next.y, here.z - next.z);
-  }
-  return total;
-};
-
 describe("blocking a hat out to its measurements", () => {
   it("puts each round on the circle its own stitches make", () => {
     const { rounds, at } = rippled("sww25-aal-ower-toorie");
