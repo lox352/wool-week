@@ -5,6 +5,7 @@ import { Point } from "../types/Point";
 import { Palette } from "../knitting/palette";
 import { loadSettled } from "../data/hats/settled";
 import { measureGauge } from "../helpers/gauge";
+import { blockHat } from "../helpers/blocking";
 import { adjacentStitchDistance } from "../constants";
 
 /**
@@ -125,6 +126,14 @@ const HatModel: React.FC<HatModelProps> = ({
        */
       gauge: (at: Point[]) =>
         measureGauge(stitches, rounds, at, adjacentStitchDistance / roundHeight),
+      /** The same hat pulled out to its measurements first. */
+      blocked: (at: Point[], amount = 1) =>
+        measureGauge(
+          stitches,
+          rounds,
+          blockHat(rounds, at, amount),
+          adjacentStitchDistance / roundHeight,
+        ),
     };
   }, [stitches, rounds, target, roundHeight]);
 

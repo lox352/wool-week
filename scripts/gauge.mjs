@@ -243,7 +243,21 @@ for (const hatId of hats) {
             high = Math.max(high, point.y);
             widest = Math.max(widest, Math.hypot(point.x, point.z));
           }
-          return { ...measured, tall: high - low, widest };
+          /*
+           * And what the same hat measures once it is blocked - pulled out to
+           * the circle each round's own stitches make, as a knitter blocks a
+           * finished hat over a board. The settle is unchanged; this only
+           * says what blocking it would be worth.
+           */
+          const blocked = window.__hat.blocked(at, 1);
+          return {
+            ...measured,
+            tall: high - low,
+            widest,
+            blockedRatio: blocked.ratio,
+            blockedRadius: blocked.radius,
+            blockedFrill: blocked.frill,
+          };
         }),
       )
       .catch((error) => ({ failed: String(error).split("\n")[0] }));
@@ -256,7 +270,9 @@ for (const hatId of hats) {
      */
     if (!gauge.failed) {
       const slug = `${hatId}-${name.replace(/[^a-z0-9]+/gi, "-")}`;
-      await page
+      // The stage itself, not the page around it.
+      const stage = await page.$("canvas");
+      await (stage ?? page)
         .screenshot({ path: join(shots, `${slug}.png`) })
         .catch(() => undefined);
     }
@@ -280,7 +296,7 @@ for (const hatId of hats) {
 
 /** Built radius, so "how much of its width did it keep" has something to be against. */
 const table = [
-  "hat                        configuration            ratio   wants    err   across     up  radius   frill    tall  spread   settle",
+  "hat                        configuration            ratio   wants    err   across     up  radius   frill    tall  blk-rat  blk-rad  settle",
   ...rows.map((r) =>
     r.failed
       ? `${r.hatId.padEnd(26)} ${r.name.padEnd(24)} failed after ${r.seconds.toFixed(0)}s`
@@ -295,7 +311,8 @@ const table = [
           r.radius.toFixed(1).padStart(7),
           r.frill.toFixed(2).padStart(7),
           r.tall.toFixed(0).padStart(7),
-          `${(100 * r.acrossSpread).toFixed(0)}%`.padStart(7),
+          (r.blockedRatio ?? 0).toFixed(3).padStart(8),
+          (r.blockedRadius ?? 0).toFixed(1).padStart(8),
           `${r.seconds.toFixed(0)}s`.padStart(8),
         ].join(" "),
   ),
