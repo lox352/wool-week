@@ -14,10 +14,21 @@ import { loadSettled } from "../data/hats/settled";
  * minutes and about 245MB of heap to come to rest - more than a phone will
  * give a tab, and Safari on iOS ends the tab rather than waiting.
  */
-const settlingRequested = () =>
-  typeof window !== "undefined" &&
-  new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("settle") ===
-    "1";
+const options = () =>
+  new URLSearchParams(
+    typeof window === "undefined" ? "" : (window.location.hash.split("?")[1] ?? ""),
+  );
+
+const settlingRequested = () => options().get("settle") === "1";
+
+/**
+ * "?settled=0" draws the hat where the pattern puts it rather than where it
+ * came to rest, which is the only way to see what the settling is actually
+ * worth. Blocking the file instead does not work: Vite compiles a JSON import
+ * into a JS chunk, so there is no .json request to block, and a comparison
+ * made that way quietly compares a thing against itself.
+ */
+const settledWanted = () => options().get("settled") !== "0";
 
 /**
  * The hat on screen.
@@ -61,6 +72,11 @@ const HatModel: React.FC<HatModelProps> = ({
 
   useEffect(() => {
     let live = true;
+    if (!settledWanted()) {
+      setSettled(undefined);
+      setLooked(true);
+      return;
+    }
     const cached = known.get(hatId);
     if (cached) {
       setSettled(cached);
