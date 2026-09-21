@@ -17,12 +17,28 @@
  */
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
-import { writeFileSync, readFileSync } from "node:fs";
+import { appendFileSync, writeFileSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
+
+/**
+ * Say how it is going, durably.
+ *
+ * This takes about a minute a hat, so it needs to report progress - and Node
+ * block-buffers stdout when it is not a terminal, which means a run piped to a
+ * file looks completely silent until it exits. That silence is exactly what I
+ * first mistook for the settle never finishing. So every line goes to a log as
+ * well, where it can be watched with `tail -f settle.log`.
+ */
+const logPath = join(root, "settle.log");
+writeFileSync(logPath, "");
+const say = (line) => {
+  process.stdout.write(line + "\n");
+  appendFileSync(logPath, `${new Date().toISOString()} ${line}\n`);
+};
 const port = 4319;
 const base = `http://127.0.0.1:${port}/wool-week/`;
 
@@ -47,18 +63,15 @@ const settleTimeoutMs = 45 * 60_000;
 const stepBudgetMs = 4_000;
 
 /**
- * The settings the bench found; see scripts/bench.mjs.
+ * The settings to settle with.
  *
- * "derived" is the one that matters. These crowns decrease faster than
- * inextensible yarn can reach - sixteen rounds of fabric asked to cover twice
- * their own length in radius - so with joints fixed at one stitch's width and
- * height, a twentieth of them start over-stretched and some at six times their
- * limit. The solver opens by yanking four and a half thousand units of excess
- * out of the hat, which is why it never came to rest. Letting a joint be as
- * long as the pattern already makes it starts the hat in a state the solver
- * can hold, and it settles in about ninety seconds.
+ * The sibling sites' defaults, unchanged: measured against the alternatives in
+ * scripts/bench.mjs, nothing beat them by enough to be worth diverging for on
+ * a job that runs once per hat and takes about a minute. Larger steps finish
+ * sooner but take a coarser path to get there, which is a poor trade when the
+ * answer is committed and looked at for years.
  */
-const tuning = { ropes: "derived" };
+const tuning = {};
 
 const hatIds = [...readFileSync(join(root, "src/data/hats/index.ts"), "utf8")
   .matchAll(/from "\.\/([a-z0-9-]+)"/g)]
@@ -87,7 +100,7 @@ for (let attempt = 0; ; attempt++) {
     // Not up yet.
   }
   if (attempt > 60) {
-    console.error("the preview server never came up");
+    say("the preview server never came up; is the site built?");
     process.exit(1);
   }
   await new Promise((resolve) => setTimeout(resolve, 250));
@@ -99,7 +112,7 @@ const browser = await chromium.launch({
 
 for (const hatId of hatIds) {
   const page = await browser.newPage({ viewport: { width: 900, height: 700 } });
-  page.on("pageerror", (error) => console.error(`  ${hatId}: ${error.message}`));
+  page.on("pageerror", (error) => say(`  ${hatId}: ERROR ${error.message}`));
 
   /*
    * The site prefers a settled file over settling, so a rerun would find the
@@ -123,10 +136,10 @@ for (const hatId of hatIds) {
       .catch(() => undefined);
     if (!progress || progress.steps === reported) return;
     reported = progress.steps;
-    process.stdout.write(
-      `\r  ${hatId}: ${progress.steps} steps, motion ` +
+    say(
+      `  ${hatId}: ${progress.steps} steps, motion ` +
         `${progress.motion.toFixed(3)} (resting under 0.15), ` +
-        `${((Date.now() - started) / 1000).toFixed(0)}s   `,
+        `${((Date.now() - started) / 1000).toFixed(0)}s`,
     );
   }, 5_000);
 
@@ -136,10 +149,7 @@ for (const hatId of hatIds) {
       polling: 1_000,
     })
     .then((handle) => handle.jsonValue())
-    .finally(() => {
-      clearInterval(ticker);
-      process.stdout.write("\n");
-    });
+    .finally(() => clearInterval(ticker));
 
   const flat = [];
   for (const point of positions) {
@@ -153,7 +163,7 @@ for (const hatId of hatIds) {
   const out = join(root, "src/data/hats/settled", `${hatId}.json`);
   writeFileSync(out, JSON.stringify(flat) + "\n");
   const kb = Math.round(JSON.stringify(flat).length / 1024);
-  console.log(
+  say(
     `${hatId}: ${positions.length} stitches settled in ` +
       `${((Date.now() - started) / 1000).toFixed(1)}s -> ${kb}kB`,
   );

@@ -75,35 +75,32 @@ every stitch is a rigid body and every link between stitches a rope joint, and
 the world is stepped until the tube relaxes into a hat. It is not done in
 anyone's browser, though. A hat's shape depends only on its pattern, and these
 patterns are fixed, so every knitter's copy of a given hat settles to the same
-shape: `scripts/settle-hats.mjs` works it out once and the answer is committed.
+shape: `scripts/settle-hats.mjs` works it out once, offline, and the answer is
+committed. Doing it in the browser cost 245MB of heap and ended Safari tabs on
+iOS, for a result that is the same for everybody.
 
-Getting that to work at all took finding out why it did not. With the sibling
-sites' settings these hats never came to rest - not in a browser, where it cost
-245MB of heap and ended Safari tabs on iOS, and not offline either, where it
-was still going after forty minutes.
+The settings are the sibling sites' defaults, unchanged. Measured against the
+alternatives in `scripts/bench.mjs`, nothing beat them by enough to be worth
+diverging for on a job that runs once per hat and takes about a minute.
 
-It is not the size. Earth's default hat is bigger than these - 12,342 stitches
-and 24,676 joints against 10,170 and 20,330 - and settles fine. Nor is it that
-our starting geometry has joints already longer than the yarn allows; it does,
-but earth's has more of them (12% of its joints against 5.6% of ours, worst
-case 4.99x against 6.43x) and settles anyway. An over-stretched joint is not a
-problem in itself, because the fabric can rearrange until it is satisfied.
+### What "settled" means here
 
-The difference is that these crowns are **unsatisfiable**, not merely
-stretched. The Aal Ower Toorie takes 162 stitches to 9 in sixteen rounds, which
-sends about 25 units of fabric to cover about 49 units of radius. No
-arrangement of inextensible yarn closes that, so the solver was not converging
-slowly - it could not converge at all, and motion plateaued around 2.3. Earth
-never meets this because its hemispherical decrease spreads the same shaping
-over about forty rows.
+Worth knowing, because it is not quite what the word implies. These crowns
+decrease far faster than the sibling sites' generated ones - the Aal Ower
+Toorie takes 162 stitches to 9 in sixteen rounds, which sends about 26 units of
+fabric to cover about 49 units of radius. `npm run bench -- --geometry` reports
+that as short by 1.9x, and it is: no arrangement of inextensible yarn closes
+that crown.
 
-Real knitting resolves it by stretching, and the pattern says as much: the
-crown is drawn together with a yarn tail and the hat is blocked over a bowl. So
-the model lets a joint be as long as the pattern's own geometry already makes
-it (`ropes: "derived"` in `src/ChainModel/tuning.ts`), which is what a stretched
-crown means, and reduces to the fixed length wherever the fabric does reach.
-The hat then settles in about ninety seconds, with each step running several
-times faster because the solver is no longer fighting an impossible constraint.
+Real knitting resolves it by stretching - the pattern draws the crown together
+with a yarn tail and has you block the hat over a bowl - and the solver
+resolves it by reaching a standstill with some of that stretch unresolved. So
+the hat comes to rest, but a handful of joints at the crown stay longer than a
+stitch is supposed to be. That is the right answer for this shape; it is just
+not the same as every constraint being satisfied. `ropes: "derived"` in
+`src/ChainModel/tuning.ts` is the alternative, which lets those joints start at
+whatever length the pattern already gives them; it settles too, a little
+slower, and is there to be compared against.
 
 ## The bench
 

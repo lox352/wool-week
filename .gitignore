@@ -31,3 +31,6 @@ dist-ssr
 # Python bytecode from the chart extractor.
 __pycache__/
 *.pyc
+
+# Progress log from the settle script.
+settle.log
