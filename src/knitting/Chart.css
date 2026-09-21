@@ -29,6 +29,52 @@
   inset: 0;
 }
 
+.chart-svg {
+  display: block;
+}
+
+.chart-rule {
+  fill: none;
+  stroke: rgb(0 0 0 / 0.22);
+  stroke-width: 1;
+}
+
+.chart-rule-heavy {
+  stroke: rgb(0 0 0 / 0.7);
+}
+
+.chart-mark {
+  fill: none;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-mark-halo {
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Worked stitches are veiled, so what is left to do is what stands out. */
+.chart-done {
+  fill: var(--paper);
+  opacity: 0.62;
+}
+
+.chart-next {
+  fill: none;
+  stroke: var(--crimson);
+  stroke-width: 2;
+}
+
+.chart-numbers text {
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  fill: var(--ink-faint);
+}
+
 .chart-caption {
   margin: 0.75rem 0 0;
   font-size: 0.9rem;

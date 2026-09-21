@@ -11,6 +11,7 @@
  *   npm run bench -- --only derived        one named run
  *   npm run bench -- --render              frame times instead of settling
  *   npm run bench -- --geometry            can this hat settle at all?
+ *   npm run bench -- --chart               chart renderers, speed and sharpness
  *   npm run bench -- --set iterations=8 --set ropes=derived --minutes 3
  *
  * A word on reading the numbers. Frame times from this machine are software
@@ -383,7 +384,146 @@ async function geometry() {
   await page.close();
 }
 
-if (has("geometry")) {
+/**
+ * The chart: how fast is it, and how sharp?
+ *
+ * Both matter and they pull against each other. A chart of ten thousand cells
+ * as ten thousand elements is crisp and unusable - six hundred milliseconds a
+ * stitch. A canvas is quick but has a size limit, and capping it to stay
+ * inside that drew at a third of native resolution on a phone. So the bench
+ * reports the two together, and runs whichever renderers are asked for.
+ */
+async function chart(which) {
+  const throttle = Number(flag("throttle", 6));
+  say(`\nchart: ${hat}, 390x844 at dpr 3, CPU throttled ${throttle}x`);
+  say("");
+  say("renderer  first paint  one stitch  scroll(med/worst)  px per cell  nodes");
+  say("-".repeat(78));
+
+  for (const name of which) {
+    const page = await browser.newPage({
+      viewport: { width: 390, height: 844 },
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: throttle });
+    const failures = [];
+    page.on("pageerror", (error) => failures.push(error.message));
+
+    await page.goto(base, { waitUntil: "networkidle" });
+    const id = await page.evaluate((hatId) => {
+      const now = Date.now();
+      localStorage.setItem(
+        `project-${now}`,
+        JSON.stringify({
+          version: 1,
+          id: `project-${now}`,
+          hatId,
+          sizeId: "medium",
+          colourwayId: "vintage",
+          progress: 3000,
+          startedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }),
+      );
+      return now;
+    }, hat);
+
+    const started = Date.now();
+    await page.goto(`${base}#/project/${id}?knitting=1&chart=${name}`, {
+      waitUntil: "load",
+    });
+    await page.waitForSelector(".chart-sheets", { timeout: 120_000 });
+    await page.evaluate(
+      () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
+    );
+    const firstPaint = Date.now() - started;
+    await page.waitForTimeout(3_000);
+
+    /* How long from asking for a stitch to seeing it. */
+    const stitches = [];
+    for (let i = 0; i < 8; i++) {
+      stitches.push(
+        await page.evaluate(async () => {
+          const button = [...document.querySelectorAll(".knitting-actions .btn")].find(
+            (el) => el.textContent.trim() === "One stitch",
+          );
+          const start = performance.now();
+          button.click();
+          await new Promise((r) =>
+            requestAnimationFrame(() => requestAnimationFrame(r)),
+          );
+          return performance.now() - start;
+        }),
+      );
+    }
+    stitches.sort((a, b) => a - b);
+
+    const scroll = await page.evaluate(async () => {
+      const times = [];
+      let last = performance.now();
+      let going = true;
+      const tick = () => {
+        const now = performance.now();
+        times.push(now - last);
+        last = now;
+        if (going) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+      for (let i = 0; i < 25; i++) {
+        window.scrollBy(0, 60);
+        await new Promise((r) => setTimeout(r, 40));
+      }
+      going = false;
+      times.sort((a, b) => a - b);
+      return {
+        median: Math.round(times[Math.floor(times.length / 2)]),
+        worst: Math.round(times.at(-1)),
+      };
+    });
+
+    /*
+     * Sharpness: device pixels across one cell as actually drawn. A canvas
+     * gets whatever backing store it was given; vectors get the screen.
+     */
+    const detail = await page.evaluate(() => {
+      const cellCss = 13;
+      const canvas = document.querySelector(".chart-sheets canvas");
+      const ratio = canvas
+        ? canvas.width / parseFloat(getComputedStyle(canvas).width)
+        : window.devicePixelRatio;
+      return {
+        perCell: cellCss * ratio,
+        native: cellCss * window.devicePixelRatio,
+        nodes: document.getElementsByTagName("*").length,
+        heapMB: Math.round(performance.memory.usedJSHeapSize / 1048576),
+      };
+    });
+
+    say(
+      name.padEnd(10) +
+        `${firstPaint}ms`.padEnd(13) +
+        `${Math.round(stitches[Math.floor(stitches.length / 2)])}ms`.padEnd(12) +
+        `${scroll.median}/${scroll.worst}ms`.padEnd(19) +
+        `${detail.perCell.toFixed(0)} of ${detail.native}`.padEnd(13) +
+        String(detail.nodes),
+    );
+    for (const failure of failures) say(`  ERROR: ${failure}`);
+    await page.close();
+  }
+
+  say(
+    "\npx per cell: how many device pixels one chart cell is drawn with,\n" +
+      "against how many the screen could show. Short of it is pixelation.",
+  );
+}
+
+if (has("chart")) {
+  const only = flag("only", null);
+  await chart(only ? [only] : ["svg", "canvas"]);
+} else if (has("geometry")) {
   await geometry();
 } else if (has("render")) {
   await render();

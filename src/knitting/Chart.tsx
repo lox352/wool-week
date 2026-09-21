@@ -3,6 +3,7 @@ import { Stitch } from "../types/Stitch";
 import { layOut } from "./layout";
 import { Palette } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
+import ChartSvg from "./ChartSvg";
 import "./Chart.css";
 
 const cellSize = 13;
@@ -26,6 +27,20 @@ const maxCanvasSide = 2048;
 
 const reducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/**
+ * Which renderer to draw the chart with.
+ *
+ * Vectors, unless "?chart=canvas" asks otherwise. The canvas one is kept so
+ * the bench can hold the two against each other - `npm run bench -- --chart`
+ * runs both - rather than either being replaced on an argument.
+ */
+const renderer = (): "svg" | "canvas" =>
+  new URLSearchParams(
+    typeof window === "undefined" ? "" : (window.location.hash.split("?")[1] ?? ""),
+  ).get("chart") === "canvas"
+    ? "canvas"
+    : "svg";
 
 /**
  * A colour from the stylesheet, so the canvas is painted in the same palette
@@ -80,6 +95,7 @@ const Chart: React.FC<ChartProps> = ({
   const baseRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLCanvasElement>(null);
   const nextId = follow ? progress + 1 : undefined;
+  const drawWith = useMemo(() => renderer(), []);
 
   const layout = useMemo(() => layOut(stitches, rounds), [stitches, rounds]);
   const { width, height } = chartSize(layout, cellSize);
@@ -113,6 +129,7 @@ const Chart: React.FC<ChartProps> = ({
 
   // The chart itself, redrawn only when the knitting or the wool changes.
   useLayoutEffect(() => {
+    if (drawWith !== "canvas") return;
     const canvas = baseRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
@@ -130,6 +147,7 @@ const Chart: React.FC<ChartProps> = ({
    * per round rather than redrawing ten thousand stitches.
    */
   useLayoutEffect(() => {
+    if (drawWith !== "canvas") return;
     const canvas = overlayRef.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
@@ -183,8 +201,8 @@ const Chart: React.FC<ChartProps> = ({
    */
   const focusRound = at?.round;
   useEffect(() => {
-    const canvas = baseRef.current;
-    if (!canvas || focusRound === undefined) return;
+    const sheets = scrollRef.current?.querySelector(".chart-sheets");
+    if (!sheets || focusRound === undefined) return;
     const { y } = cellAt(layout, focusRound, 1, cellSize);
     /*
      * The panel is stuck to the bottom of the screen while you work, so the
@@ -194,7 +212,7 @@ const Chart: React.FC<ChartProps> = ({
      */
     const panel = document.querySelector<HTMLElement>(".knitting-panel");
     const floor = window.innerHeight - (panel?.offsetHeight ?? 0);
-    const bottom = canvas.getBoundingClientRect().top + y + cellSize;
+    const bottom = sheets.getBoundingClientRect().top + y + cellSize;
     const delta = bottom - (floor - clearance * cellSize);
     if (Math.abs(delta) < 1) return;
     window.scrollBy({ top: delta, behavior: reducedMotion() ? "auto" : "smooth" });
@@ -219,8 +237,22 @@ const Chart: React.FC<ChartProps> = ({
               : "")
           }
         >
-          <canvas ref={baseRef} style={{ width, height }} />
-          <canvas ref={overlayRef} style={{ width, height }} />
+          {drawWith === "svg" ? (
+            <ChartSvg
+              stitches={drawn}
+              rounds={rounds}
+              layout={layout}
+              palette={palette}
+              progress={progress}
+              nextStitchId={nextId}
+              cell={cellSize}
+            />
+          ) : (
+            <>
+              <canvas ref={baseRef} style={{ width, height }} />
+              <canvas ref={overlayRef} style={{ width, height }} />
+            </>
+          )}
         </div>
       </div>
       <p className="chart-caption">
