@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import HatCanvas, { hatCanvasHeight } from "../ChainModel/HatCanvas";
 import { Stitch } from "../types/Stitch";
 import { Point } from "../types/Point";
@@ -32,6 +32,16 @@ const settlingRequested = () => options().get("settle") === "1";
  * made that way quietly compares a thing against itself.
  */
 const settledWanted = () => options().get("settled") !== "0";
+
+/**
+ * "?blocked=1" draws the settled hat blocked: each round eased out onto the
+ * circle its own stitches make, level, as a knitter blocks a finished hat
+ * over a board. See helpers/blocking.ts for why a settled hat wants it.
+ */
+const blockedWanted = () => {
+  const amount = options().get("blocked");
+  return amount === null ? 0 : Math.max(0, Math.min(1, Number(amount) || 0));
+};
 
 /**
  * The hat on screen.
@@ -149,6 +159,12 @@ const HatModel: React.FC<HatModelProps> = ({
     [hatId],
   );
 
+  const blocking = blockedWanted();
+  const shown = useMemo(
+    () => (settled && blocking > 0 ? blockHat(rounds, settled, blocking) : settled),
+    [settled, rounds, blocking],
+  );
+
   const reducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -164,7 +180,7 @@ const HatModel: React.FC<HatModelProps> = ({
       roundHeight={roundHeight}
       palette={palette}
       progress={progress}
-      settled={settled}
+      settled={shown}
       settle={settlingRequested()}
       onSettled={onSettled}
       reducedMotion={reducedMotion}
