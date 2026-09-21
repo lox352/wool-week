@@ -20,10 +20,26 @@
  */
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
+import { appendFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+/**
+ * Say it out loud, and write it down.
+ *
+ * A sweep is minutes of work per run, so it has to report as it goes - and
+ * Node block-buffers stdout when it is not a terminal, so a run piped to a
+ * file or captured by a tool says nothing at all until it exits. Watching
+ * bench.log with `tail -f` shows the runs as they finish.
+ */
+const logPath = join(root, "bench.log");
+writeFileSync(logPath, "");
+const say = (line = "") => {
+  process.stdout.write(line + "\n");
+  appendFileSync(logPath, line + "\n");
+};
 const port = 4321;
 const base = `http://127.0.0.1:${port}/wool-week/`;
 
@@ -124,7 +140,7 @@ for (let attempt = 0; ; attempt++) {
     /* not up yet */
   }
   if (attempt > 80) {
-    console.error("the preview server never came up; is the site built?");
+    say("the preview server never came up; is the site built?");
     process.exit(1);
   }
   await new Promise((resolve) => setTimeout(resolve, 250));
@@ -270,10 +286,10 @@ async function render() {
     nodes: document.getElementsByTagName("*").length,
   }));
 
-  console.log(`\n${hat}, 390x844 at 6x CPU throttling`);
-  console.log(`  scroll frames: median ${frames.median}ms, worst ${frames.worst}ms`);
-  console.log(`  heap ${page2.heapMB}MB, ${page2.nodes} DOM nodes`);
-  console.log("  (software rasterised here - compare builds, not devices)");
+  say(`\n${hat}, 390x844 at 6x CPU throttling`);
+  say(`  scroll frames: median ${frames.median}ms, worst ${frames.worst}ms`);
+  say(`  heap ${page2.heapMB}MB, ${page2.nodes} DOM nodes`);
+  say("  (software rasterised here - compare builds, not devices)");
   await page.close();
 }
 
@@ -345,15 +361,15 @@ async function geometry() {
   });
 
   const pct = ((100 * report.over) / report.joints).toFixed(1);
-  console.log(`\n${hat}`);
-  console.log(`  ${report.stitches} stitches, ${report.joints} joints`);
-  console.log(`  over-long at the start: ${report.over} (${pct}%), ` +
+  say(`\n${hat}`);
+  say(`  ${report.stitches} stitches, ${report.joints} joints`);
+  say(`  over-long at the start: ${report.over} (${pct}%), ` +
     `worst ${report.worst.toFixed(2)}x, ${report.excess.toFixed(0)} units of excess`);
-  console.log(`  crown: ${report.crownRounds} rounds, ` +
+  say(`  crown: ${report.crownRounds} rounds, ` +
     `${report.fabricAvailable.toFixed(0)} units of fabric ` +
     `to cover ${report.radiusToCover.toFixed(0)} units of radius`);
   const ratio = report.radiusToCover / report.fabricAvailable;
-  console.log(
+  say(
     ratio > 1
       ? `  -> short by ${ratio.toFixed(2)}x: no arrangement of inextensible ` +
         `yarn closes this crown, so joints must be allowed to start stretched`
@@ -368,18 +384,18 @@ if (has("geometry")) {
   await render();
 } else {
   const chosen = only ? runs.filter((r) => r.name === only) : runs;
-  console.log(`settling ${hat}, up to ${minutes} minutes each\n`);
-  console.log(
+  say(`settling ${hat}, up to ${minutes} minutes each\n`);
+  say(
     "run                        settled  steps  tall:wide  built  width kept",
   );
-  console.log("-".repeat(74));
+  say("-".repeat(74));
   for (const run of chosen) {
     const result = await settle(run);
     const shape = result.shape;
     const ratio = shape ? shape.settled.tall / shape.settled.across : null;
     const built = shape ? shape.built.tall / shape.built.across : null;
     const width = shape ? shape.settled.across / shape.built.across : null;
-    console.log(
+    say(
       result.name.padEnd(26) +
         String(result.settled === null ? "no" : `${result.settled}s`).padEnd(9) +
         String(result.steps).padEnd(7) +
@@ -387,10 +403,10 @@ if (has("geometry")) {
         (built === null ? "-" : built.toFixed(2)).padEnd(8) +
         (width === null ? "-" : `${(100 * width).toFixed(0)}%`),
     );
-    if (result.why) console.log(`  ${result.why}`);
-    for (const failure of result.failures) console.log(`  ERROR: ${failure}`);
+    if (result.why) say(`  ${result.why}`);
+    for (const failure of result.failures) say(`  ERROR: ${failure}`);
   }
-  console.log(
+  say(
     "\nsettled: how long until the hat came to rest, or 'no' if it never did.\n" +
       "built: the proportions the pattern's own tension gives, before settling.\n" +
       "width kept: how much of that width survived. Rope joints only cap how\n" +
