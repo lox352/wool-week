@@ -141,6 +141,21 @@ const sweeps = {
     { name: "head 48, down, spring", joints: "spring", gravity: -earth, headRadius: 48, stiffness: 200, springDamping: 20 },
   ],
 };
+/*
+ * The ones worth looking at side by side, on both hats.
+ *
+ * Two routes to the pattern's tension, and they want opposite rope lengths:
+ * shortening the round joints to 0.96 gets the tension right and leaves the
+ * hat narrow, and leaving them at full length gets it right by way of
+ * blocking, which fixes the width too.
+ */
+sweeps.finalists = [
+  { name: "as it ships", gravity: 1 },
+  { name: "earth, up", gravity: earth },
+  { name: "earth, up, round 0.96", gravity: earth, roundSlack: 0.96 },
+  { name: "earth, up, inflated", gravity: earth, pressure: 20 },
+];
+
 sweeps.all = [...sweeps.ropes, ...sweeps.springs, ...sweeps.head];
 
 const runs = sweeps[which];
