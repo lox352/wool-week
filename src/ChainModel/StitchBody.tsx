@@ -2,6 +2,7 @@ import { BallCollider, RapierRigidBody, RigidBody } from "@react-three/rapier";
 import { Point } from "../types/Point";
 import React from "react";
 import { settleDamping } from "../constants";
+import { stitchCollisions } from "./tuning";
 
 /**
  * One stitch as a physical body, and nothing else.
@@ -28,7 +29,7 @@ export default function StitchBody({
     <RigidBody
       ref={rigidBodyRef}
       colliders={false}
-      collisionGroups={0b0010} // Assign to a specific group
+      collisionGroups={stitchCollisions}
       type={fixed ? "fixed" : "dynamic"}
       position={[position.x, position.y, position.z]}
       linearDamping={damping}

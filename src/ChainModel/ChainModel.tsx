@@ -2,7 +2,7 @@ import { useMemo, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { BallCollider, Physics, RigidBody } from "@react-three/rapier";
 import { OrbitControls } from "@react-three/drei";
-import { tuningFromUrl } from "./tuning";
+import { headCollisions, tuningFromUrl } from "./tuning";
 import { hatShape } from "../helpers/hat-shape";
 import FrameHat, { OrbitLike } from "./FrameHat";
 import StitchPhysics, { StitchPhysicsProps } from "./StitchPhysics";
@@ -64,7 +64,7 @@ export default function ChainModel({ rounds, ...props }: ChainModelProps) {
            * grips.
            */
           <RigidBody type="fixed" colliders={false} position={[0, tuning.headRadius, 0]}>
-            <BallCollider args={[tuning.headRadius]} />
+            <BallCollider args={[tuning.headRadius]} collisionGroups={headCollisions} />
           </RigidBody>
         )}
         <StitchPhysics {...props} tuning={tuning} />

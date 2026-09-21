@@ -22,6 +22,26 @@ import {
   verticalStitchDistance,
 } from "../constants";
 
+/*
+ * Who collides with whom.
+ *
+ * Rapier packs this into one number: the top sixteen bits are the groups a
+ * body is in, the bottom sixteen the groups it will collide with. The
+ * stitches used to be given 0b0010, which reads as no groups at all and a
+ * filter of group two - so they belonged to nothing and collided with
+ * nothing, and a head put inside the hat was passed straight through. Worth
+ * knowing before reading any result that depended on it.
+ *
+ * Stitches are group one and collide only with group two, which is the head.
+ * Not with each other: ten thousand of them, and a stitch is a ball of radius
+ * 0.02 in a fabric whose stitches are two apart, so they would never touch
+ * anyway and the broad phase would be paying for the privilege.
+ */
+export const stitchGroup = 0b0001;
+export const headGroup = 0b0010;
+export const stitchCollisions = (stitchGroup << 16) | headGroup;
+export const headCollisions = (headGroup << 16) | stitchGroup;
+
 export interface Tuning {
   timeStep: number;
   iterations: number;
