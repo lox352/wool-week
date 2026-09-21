@@ -1,9 +1,11 @@
 import { useMemo, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { BallCollider, Physics, RigidBody } from "@react-three/rapier";
+import { BallCollider, ConvexHullCollider, Physics, RigidBody } from "@react-three/rapier";
 import { OrbitControls } from "@react-three/drei";
 import { headCollisions, tuningFromUrl } from "./tuning";
+import { headLift, headShape } from "./head-shape";
 import { hatShape } from "../helpers/hat-shape";
+import { adjacentStitchDistance } from "../constants";
 import FrameHat, { OrbitLike } from "./FrameHat";
 import StitchPhysics, { StitchPhysicsProps } from "./StitchPhysics";
 
@@ -28,6 +30,18 @@ export default function ChainModel({ rounds, ...props }: ChainModelProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+
+  /*
+   * Where the widest part of the head sits. A ball has nothing to taper, so
+   * it is sunk by its own radius and its equator is at the cast-on; a head
+   * narrows, so it can sit higher and still let the rib grip.
+   */
+  const brim =
+    ((rounds[0]?.length ?? 0) * adjacentStitchDistance) / (2 * Math.PI);
+  const lift =
+    tuning.head === "ball"
+      ? tuning.headRadius
+      : headLift(tuning.headTall, brim, tuning.headRadius);
 
   return (
     <Canvas
@@ -55,16 +69,31 @@ export default function ChainModel({ rounds, ...props }: ChainModelProps) {
            * The head the hat is on.
            *
            * A hat's shape is mostly decided by what is inside it, and no
-           * model here says so: the others pin the cast-on and blow the hat
+           * other model here says so: they pin the cast-on and blow the hat
            * outwards with an upside-down gravity, which is a stand-in for a
-           * head rather than a head. With one of these, gravity can point the
-           * way gravity points and the fabric can drape.
+           * head rather than a head.
            *
-           * Sunk so its widest part is at the cast-on, which is where a hat
-           * grips.
+           * It is sunk so that it has narrowed back to the rib's own width by
+           * the time it reaches the rib, because that is how a hat is held
+           * on: the rib is knitted smaller than the body and grips below the
+           * widest part of the skull.
            */
-          <RigidBody type="fixed" colliders={false} position={[0, tuning.headRadius, 0]}>
-            <BallCollider args={[tuning.headRadius]} collisionGroups={headCollisions} />
+          <RigidBody
+            type="fixed"
+            colliders={false}
+            position={[0, lift, 0]}
+          >
+            {tuning.head === "ball" ? (
+              <BallCollider
+                args={[tuning.headRadius]}
+                collisionGroups={headCollisions}
+              />
+            ) : (
+              <ConvexHullCollider
+                args={[headShape(tuning.headRadius, tuning.headTall)]}
+                collisionGroups={headCollisions}
+              />
+            )}
           </RigidBody>
         )}
         <StitchPhysics {...props} tuning={tuning} />

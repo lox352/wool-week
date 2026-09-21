@@ -115,13 +115,24 @@ export interface Tuning {
   stiffness: number;
   springDamping: number;
   /**
-   * The head the hat is on, as a sphere, or 0 for none.
+   * The head the hat is on, or 0 for none.
    *
    * With one of these the hat can be hung the way a hat actually hangs -
    * gravity downwards, draped over something - instead of being blown upwards
-   * from the inside by a gravity that points the wrong way.
+   * from the inside by a gravity that points the wrong way. Or, with gravity
+   * still pointing up, it is a ball in an upside-down bag: the hat is held at
+   * the cast-on and blown out over something that stops it closing in.
+   *
+   * The radius is not really a choice. A hat's body goes round at one
+   * stitch's width per stitch, so the head that fits it has that
+   * circumference - for the Aal Ower Toorie, 162 stitches two units wide,
+   * which is a radius of 51.6.
    */
   headRadius: number;
+  /** "ball", or a head: longer front to back, fuller behind, domed on top. */
+  head: "ball" | "head";
+  /** How far the crown of the head stands above its widest part. */
+  headTall: number;
   /**
    * An outward push from the axis, as an acceleration, so it is in the same
    * units as gravity and can be read against it.
@@ -159,6 +170,8 @@ export const defaultTuning: Tuning = {
   stiffness: 200,
   springDamping: 20,
   headRadius: 0,
+  head: "ball",
+  headTall: 60,
   pressure: 0,
 };
 
@@ -179,6 +192,7 @@ const numbers: (keyof Tuning)[] = [
   "stiffness",
   "springDamping",
   "headRadius",
+  "headTall",
   "pressure",
 ];
 
@@ -197,6 +211,8 @@ export const tuningFromUrl = (): Tuning => {
   if (ropes === "fixed" || ropes === "derived") tuning.ropes = ropes;
   const joints = params.get("joints");
   if (joints === "rope" || joints === "spring") tuning.joints = joints;
+  const head = params.get("head");
+  if (head === "ball" || head === "head") tuning.head = head;
   return tuning;
 };
 

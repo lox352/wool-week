@@ -163,6 +163,25 @@ const sweeps = {
  * hat narrow, and leaving them at full length gets it right by way of
  * blocking, which fixes the width too.
  */
+/*
+ * A head rather than a ball, and a ball in an upside-down bag.
+ *
+ * The first asks what changes when the thing inside the hat is head-shaped -
+ * longer front to back, fuller behind - rather than perfectly round, which no
+ * head is and no hat drawn on one looks like. The second keeps the ball but
+ * turns gravity back over: the hat hangs from its cast-on and is blown out
+ * over something that stops it closing in, which is a different machine for
+ * the same job.
+ */
+sweeps.heads = [
+  { name: "ball 52, down", gravity: -earth, headRadius: 52 },
+  { name: "head 52, down", gravity: -earth, headRadius: 52, head: "head", headTall: 60 },
+  { name: "head 52, tall 75, down", gravity: -earth, headRadius: 52, head: "head", headTall: 75 },
+  { name: "ball 52, up (bag)", gravity: earth, headRadius: 52 },
+  { name: "head 52, up (bag)", gravity: earth, headRadius: 52, head: "head", headTall: 60 },
+  { name: "inflate 5, earth up", gravity: earth, pressure: 5 },
+];
+
 sweeps.finalists = [
   { name: "as it ships", gravity: 1 },
   { name: "earth, up", gravity: earth },
