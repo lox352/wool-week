@@ -1,0 +1,4 @@
+# An unofficial companion to patterns that are sold to fund Shetland Wool Week.
+# Not for indexing or circulation.
+User-agent: *
+Disallow: /

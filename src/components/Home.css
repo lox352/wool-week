@@ -1,0 +1,123 @@
+.section {
+  margin: 2.5rem 0;
+}
+
+.project-list,
+.hat-list {
+  list-style: none;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.hat-list {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.project-card {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.project-card-body {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.project-card-body:hover {
+  background: var(--paper-sunk);
+}
+
+.project-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.project-card-text strong {
+  font-size: 1.1rem;
+}
+
+.project-card-text .quiet {
+  font-size: 0.87rem;
+}
+
+.project-card-yarns {
+  display: flex;
+  gap: 2px;
+  flex: none;
+}
+
+.project-card-yarns .swatch,
+.swatch {
+  width: 14px;
+  height: 22px;
+  border: 1px solid rgb(0 0 0 / 0.28);
+  border-radius: 1px;
+  display: inline-block;
+}
+
+.project-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0 1rem 1rem;
+}
+
+.hat-card {
+  display: block;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.hat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.1);
+}
+
+.chart-motif {
+  display: block;
+  width: 100%;
+  height: 128px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.hat-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  padding: 0.85rem 1rem 1rem;
+}
+
+.hat-card-text strong {
+  font-family: var(--display);
+  text-transform: uppercase;
+  font-size: 1.32rem;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+
+.hat-card-text .quiet {
+  font-size: 0.85rem;
+}
+
+@media (max-width: 620px) {
+  .project-card-body {
+    flex-wrap: wrap;
+  }
+}

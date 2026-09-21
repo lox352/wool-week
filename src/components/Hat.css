@@ -1,0 +1,6 @@
+/* The hat page shares its layout with a project; see Project.css. */
+@import "./Project.css";
+
+.hat-about p:last-child {
+  margin-bottom: 0;
+}

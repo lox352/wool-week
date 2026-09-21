@@ -1,0 +1,214 @@
+import React, { useCallback, useEffect } from "react";
+import { Stitch } from "../types/Stitch";
+import {
+  ColourRun,
+  RoundIndex,
+  currentRun,
+  endOfRound,
+  positionOf,
+  totals,
+  upcomingRuns,
+} from "../knitting/progress";
+import { Palette, inkOn, yarnFor } from "../knitting/palette";
+import Button from "./ui/Button";
+import "./KnittingPanel.css";
+
+interface KnittingPanelProps {
+  stitches: Stitch[];
+  index: RoundIndex;
+  palette: Palette;
+  progress: number;
+  setProgress: (progress: number) => void;
+  onStop: () => void;
+  canUndo: boolean;
+  onUndo: () => void;
+}
+
+const Swatch: React.FC<{ run: ColourRun; palette: Palette; small?: boolean }> = ({
+  run,
+  palette,
+  small,
+}) => {
+  const yarn = yarnFor(palette, run.slot);
+  return (
+    <span
+      className={`run-swatch${small ? " run-swatch-small" : ""}`}
+      style={{ background: yarn.hex, color: inkOn(yarn.hex) }}
+    >
+      {run.length}
+    </span>
+  );
+};
+
+/**
+ * The view you use while actually knitting.
+ *
+ * Written for someone holding needles. The things in large type are the round,
+ * the stitch within it, and how many of this colour to work before changing -
+ * which in Fair Isle is the only instruction that matters. A percentage is not
+ * something you can act on, so it is demoted to a bar.
+ *
+ * The two big buttons are the two things you actually do: work one more
+ * stitch, or work to the end of the current run of colour.
+ */
+const KnittingPanel: React.FC<KnittingPanelProps> = ({
+  stitches,
+  index,
+  palette,
+  progress,
+  setProgress,
+  onStop,
+  canUndo,
+  onUndo,
+}) => {
+  const position = positionOf(stitches, progress, index);
+  const run = currentRun(stitches, progress, index);
+  const ahead = upcomingRuns(stitches, run?.endId ?? progress, index, 2);
+  const counts = totals(index, progress);
+
+  const step = useCallback(
+    (delta: number) => setProgress(progress + delta),
+    [progress, setProgress],
+  );
+
+  const finishRun = useCallback(() => {
+    if (run) setProgress(run.endId);
+  }, [run, setProgress]);
+
+  const finishRound = useCallback(() => {
+    const end = endOfRound(progress, index);
+    if (end !== undefined) setProgress(end);
+  }, [progress, index, setProgress]);
+
+  // Your hands are busy, so the common actions need to be reachable without
+  // aiming at anything.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (
+        target &&
+        (["INPUT", "BUTTON", "SELECT", "A", "TEXTAREA"].includes(target.tagName) ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
+        event.preventDefault();
+        onUndo();
+        return;
+      }
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+      switch (event.key) {
+        case " ":
+        case "ArrowRight":
+          event.preventDefault();
+          step(1);
+          break;
+        case "ArrowLeft":
+          event.preventDefault();
+          step(-1);
+          break;
+        case "Enter":
+          event.preventDefault();
+          finishRun();
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          finishRound();
+          break;
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [step, finishRun, finishRound, onUndo]);
+
+  if (position.finished) {
+    return (
+      <div className="knitting-panel knitting-panel-done">
+        <div className="knitting-done">
+          <strong>That is the last stitch.</strong>
+          <span className="quiet">
+            Break the yarn, thread it through the remaining stitches and draw
+            up the crown.
+          </span>
+        </div>
+        <div className="knitting-actions">
+          <Button variant="quiet" onClick={onUndo} disabled={!canUndo}>
+            Undo
+          </Button>
+          <Button variant="primary" onClick={onStop}>
+            Done
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="knitting-panel">
+      <div className="knitting-readout">
+        <span className="knitting-figure">
+          <em>{position.round}</em>
+          <span className="quiet">of {position.totalRounds} rounds</span>
+        </span>
+        <span className="knitting-figure">
+          <em>{position.stitchInRound}</em>
+          <span className="quiet">of {position.stitchesInRound} stitches</span>
+        </span>
+        {run && (
+          <span className="knitting-figure knitting-run">
+            <Swatch run={run} palette={palette} />
+            <span className="quiet">
+              in {yarnFor(palette, run.slot).name}
+              {ahead.length > 0 && (
+                <>
+                  , then{" "}
+                  {ahead.map((next) => (
+                    <Swatch
+                      key={next.startId}
+                      run={next}
+                      palette={palette}
+                      small
+                    />
+                  ))}
+                </>
+              )}
+            </span>
+          </span>
+        )}
+      </div>
+
+      {position.label && (
+        <p className="knitting-where quiet">{position.label}</p>
+      )}
+
+      <div className="knitting-bar" aria-hidden="true">
+        <span style={{ width: `${counts.percent}%` }} />
+      </div>
+
+      <div className="knitting-actions">
+        <Button variant="quiet" onClick={() => step(-1)} disabled={progress <= 0}>
+          Back
+        </Button>
+        <Button variant="quiet" onClick={onUndo} disabled={!canUndo}>
+          Undo
+        </Button>
+        <Button variant="secondary" size="lg" onClick={() => step(1)}>
+          One stitch
+        </Button>
+        <Button variant="primary" size="lg" onClick={finishRun}>
+          {run ? `Work ${run.length} in ${yarnFor(palette, run.slot).name}` : "Work on"}
+        </Button>
+        <Button variant="quiet" onClick={finishRound}>
+          End of round
+        </Button>
+        <Button variant="quiet" onClick={onStop}>
+          Stop
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default KnittingPanel;
