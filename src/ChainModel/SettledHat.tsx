@@ -50,8 +50,7 @@ export default function SettledHat({
 
   const drawn = useMemo(() => stitches.filter((s) => s.id > 0), [stitches]);
 
-  const colours = useRef<Float32Array | null>(null);
-  colours.current = useMemo(
+  const colours = useMemo(
     () =>
       new Float32Array(
         drawn.flatMap((stitch) =>
@@ -61,8 +60,7 @@ export default function SettledHat({
     [drawn, palette],
   );
 
-  const worked = useRef<Float32Array | null>(null);
-  worked.current = useMemo(
+  const worked = useMemo(
     () => new Float32Array(drawn.map((stitch) => (stitch.id <= progress ? 1 : 0))),
     [drawn, progress],
   );

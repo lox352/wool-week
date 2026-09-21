@@ -1,4 +1,4 @@
-import { createRef, useEffect, useMemo, useRef } from "react";
+import { createRef, useMemo, useRef } from "react";
 import { RapierRigidBody } from "@react-three/rapier";
 import { Stitch } from "../types/Stitch";
 import { Palette, rgbOf, yarnFor } from "../knitting/palette";
@@ -63,22 +63,20 @@ export default function StitchPhysics({
     [stitches],
   );
 
-  const colours = useRef<Float32Array | null>(null);
-  const worked = useRef<Float32Array | null>(null);
-
-  useEffect(() => {
-    colours.current = new Float32Array(
-      drawn.flatMap((stitch) =>
-        rgbOf(yarnFor(palette, stitch.slot).hex).map((c) => c / 255),
+  const colours = useMemo(
+    () =>
+      new Float32Array(
+        drawn.flatMap((stitch) =>
+          rgbOf(yarnFor(palette, stitch.slot).hex).map((c) => c / 255),
+        ),
       ),
-    );
-  }, [drawn, palette]);
+    [drawn, palette],
+  );
 
-  useEffect(() => {
-    worked.current = new Float32Array(
-      drawn.map((stitch) => (stitch.id <= progress ? 1 : 0)),
-    );
-  }, [drawn, progress]);
+  const worked = useMemo(
+    () => new Float32Array(drawn.map((stitch) => (stitch.id <= progress ? 1 : 0))),
+    [drawn, progress],
+  );
 
   return (
     <>

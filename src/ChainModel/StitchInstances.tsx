@@ -17,10 +17,19 @@ interface StitchInstancesProps {
    */
   positionAt: (id: number) => Point | undefined;
   moving: boolean;
-  /** Target colours, three floats per drawn stitch. */
-  colours: React.MutableRefObject<Float32Array | null>;
+  /**
+   * Target colours, three floats per drawn stitch.
+   *
+   * A value rather than a ref. These used to be refs, on the reasoning that a
+   * dye sweep should not re-render React sixty times a second - but nothing
+   * sweeps any more, and a ref's identity never changes, so React could not
+   * see a new palette arrive. The stage only draws when asked, so nothing
+   * asked, and picking a different colourway left the hat as it was while the
+   * chart beside it changed.
+   */
+  colours: Float32Array | null;
   /** 1 where a stitch has been worked, 0 where it has not. */
-  worked: React.MutableRefObject<Float32Array | null>;
+  worked: Float32Array | null;
   reducedMotion: boolean;
 }
 
@@ -88,6 +97,8 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
   const placedUpTo = useRef(0);
   /** Every stitch has reached its colour, so there is nothing left to ease. */
   const faded = useRef(false);
+  /** The wool changed; every stitch needs its colour written again. */
+  const repaint = useRef(true);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -116,18 +127,28 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
   }, [drawn]);
 
   /*
-   * A different hat has to be placed again, and a change to what is knitted
-   * has to be eased again. Both need frames to do it in, and the stage only
-   * draws when it is asked to, so both ask.
+   * A different hat has to be placed again. The stage only draws when it is
+   * asked to, so it asks.
    */
   useEffect(() => {
     placedUpTo.current = 0;
     invalidate();
   }, [drawn, positionAt, invalidate]);
+
+  /*
+   * A stitch newly worked fades into its wool, so that needs frames to do it
+   * in; a change of colourway is not something that happened to the knitting
+   * and simply arrives, at whatever the stitches have already faded to.
+   */
   useEffect(() => {
     faded.current = false;
     invalidate();
-  }, [colours, worked, invalidate, moving]);
+  }, [worked, moving, invalidate]);
+
+  useEffect(() => {
+    repaint.current = true;
+    invalidate();
+  }, [colours, invalidate]);
 
   const readPosition = (id: number, into: THREE.Vector3): boolean => {
     if (id < 0) return false;
@@ -141,8 +162,8 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
     const mesh = meshRef.current;
     if (!mesh) return;
 
-    const target = colours.current;
-    const done = worked.current;
+    const target = colours;
+    const done = worked;
     if (!eased.current || eased.current.length !== drawn.length) {
       eased.current = new Float32Array(drawn.length);
       // A hat opened with progress already on it starts there, rather than
@@ -158,8 +179,9 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
      * cannot.
      */
     const placing = moving || placedUpTo.current < drawn.length;
-    const fading = target !== null && done !== null && !faded.current;
-    if (!placing && !fading) return;
+    const colouring =
+      target !== null && done !== null && (!faded.current || repaint.current);
+    if (!placing && !colouring) return;
 
     /*
      * While settling, every stitch moves every frame and all of them have to
@@ -176,7 +198,7 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
       const stitch = drawn[index];
       if (!readPosition(stitch.id, position)) continue;
       if (!placing) {
-        // Only the colour is still changing, so skip straight to it.
+        // Only the colour is changing, so skip straight to it.
         if (target && done) {
           const wanted = done[index];
           const current = eased.current[index];
@@ -268,6 +290,7 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
     }
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     faded.current = !settling;
+    repaint.current = false;
     // Still easing, so there is another frame's worth of work to do.
     if (settling || moving) invalidate();
   });
