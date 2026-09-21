@@ -69,6 +69,11 @@ const only = flag("only", null);
 const runs = [
   { name: "baseline", tuning: {} },
   {
+    name: "sibling-gravity",
+    why: "what earth and space use; here it costs a fifth of the circumference",
+    tuning: { gravity: 9.81 },
+  },
+  {
     name: "derived",
     why: "let a joint be as long as the pattern already makes it",
     tuning: { ropes: "derived" },

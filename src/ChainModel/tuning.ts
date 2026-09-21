@@ -31,7 +31,26 @@ export interface Tuning {
   restThreshold: number;
   restSeconds: number;
   minimumFrames: number;
-  /** Upward, as the other two hat sites have it: the hat inflates. */
+  /**
+   * Upward, so the hat inflates rather than falling in a heap.
+   *
+   * Much gentler here than on the sibling sites, and the bench says why. They
+   * start from a plain cylinder and need real force to blow it out into a
+   * dome. These hats already start as the shape the pattern describes, so
+   * gravity has nothing to add and only pulls them out of shape: a rope joint
+   * caps how far apart two stitches may be but nothing stops a round closing
+   * up, so a hard pull upwards is paid for out of the hat's circumference.
+   *
+   *   gravity  settles  tall:wide  width kept   (Aal Ower Toorie, built 1.16)
+   *         0      19s       0.92         97%
+   *         1      37s       0.98         95%
+   *         2     110s       1.36         81%
+   *      9.81      62s       1.42         80%
+   *
+   * Somewhere between 1 and 2 it starts trading width for height and finishes
+   * as a tall thin cone whose widest point is the one round that is pinned.
+   * Below that it keeps the circumference the knitting actually has.
+   */
   gravity: number;
   stepBudgetMs: number;
   colliderRadius: number;
@@ -58,7 +77,7 @@ export const defaultTuning: Tuning = {
   restThreshold: restMotionThreshold,
   restSeconds: settleRestSeconds,
   minimumFrames: minimumSettleFrames,
-  gravity: 9.81,
+  gravity: 1,
   stepBudgetMs: settleStepBudgetMs,
   colliderRadius: 0.02,
   ropes: "fixed",
