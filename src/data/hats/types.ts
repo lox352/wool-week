@@ -15,7 +15,7 @@
 export type SlotId = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H";
 
 /** A mark printed in a cell, on top of its colour. */
-export type ChartSymbol = "purl" | "k1tbl" | "k2tog" | "s2kp";
+export type ChartSymbol = "purl" | "k1tbl" | "k2tog" | "s2kp" | "sk2p";
 
 export interface ChartCell {
   slot: SlotId;
@@ -114,6 +114,7 @@ export type ShapingOp =
   | { work: "m1" }
   | { work: "k2tog" }
   | { work: "s2kp" }
+  | { work: "sk2p" }
   /** "[m1, k4] to last 5 sts" - repeat until that many are left unworked. */
   | { repeat: ShapingOp[]; untilRemaining: number }
   /** "[m1, k4] x 29" - repeat a fixed number of times. */
@@ -168,7 +169,11 @@ export interface HatPattern {
 
 /** Stitches a cell consumes from the round below. */
 export const consumes = (cell: ChartCell): number =>
-  cell.symbol === "s2kp" ? 3 : cell.symbol === "k2tog" ? 2 : 1;
+  cell.symbol === "s2kp" || cell.symbol === "sk2p"
+    ? 3
+    : cell.symbol === "k2tog"
+      ? 2
+      : 1;
 
 export const ballsFor = (
   colourway: Colourway,

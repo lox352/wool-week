@@ -62,6 +62,8 @@ const stitchFor = (cell: ChartCell): StitchType => {
       return "k2tog";
     case "s2kp":
       return "s2kp";
+    case "sk2p":
+      return "sk2p";
     default:
       return "k1";
   }
@@ -83,7 +85,7 @@ const cost = (op: ShapingOp): number => {
   if ("repeat" in op) return op.repeat.reduce((total, o) => total + cost(o), 0);
   if (op.work === "m1") return 0;
   if (op.work === "k2tog") return 2;
-  if (op.work === "s2kp") return 3;
+  if (op.work === "s2kp" || op.work === "sk2p") return 3;
   return op.times;
 };
 
@@ -107,7 +109,7 @@ const expand = (ops: ShapingOp[], available: number): StitchType[] => {
       out.push("m1");
       return;
     }
-    if (op.work === "k2tog" || op.work === "s2kp") {
+    if (op.work === "k2tog" || op.work === "s2kp" || op.work === "sk2p") {
       out.push(op.work);
       used += cost(op);
       return;

@@ -92,6 +92,40 @@ describe("the counts the patterns print", () => {
     expect(sizes.length).toBe(1 + 10 + 1 + 45 + 16);
   });
 
+  it("Bonnie Isle Hat: 140 sts, 156 after the increase, 128, 8 at the crown", () => {
+    const hat = hatById("sww22-bonnie-isle-hat")!;
+    const { rounds } = buildHat(hat);
+    const sizes = rounds.map((round) => round.length);
+
+    expect(sizes[0]).toBe(140);
+    // The cast-on and all thirteen rows of chart A, still 140.
+    expect(sizes.slice(0, 14).every((n) => n === 140)).toBe(true);
+    // "Inc round: K9, kfb, [k7, kfb] to last 10 sts, k to end. 156 sts"
+    expect(sizes[14]).toBe(156);
+    // Charts B, C and D - fourteen rows, thirteen, fourteen - all over 156.
+    expect(sizes.slice(14, 14 + 1 + 14 + 13 + 14).every((n) => n === 156)).toBe(true);
+    // "Dec round: [K4, k2tog, k3, k2tog] to last 2 sts, k2. 128 sts"
+    expect(sizes[14 + 1 + 14 + 13 + 14]).toBe(128);
+    // Chart E takes it to eight, two stitches for each of its eight repeats
+    // to be drawn through twice.
+    expect(sizes[sizes.length - 1]).toBe(8);
+    expect(sizes.length).toBe(1 + 13 + 1 + 14 + 13 + 14 + 1 + 19);
+  });
+
+  it("Bonnie Isle Hat: its crown decrease leans rather than standing straight", () => {
+    const hat = hatById("sww22-bonnie-isle-hat")!;
+    const crown = hat.charts.find((chart) => chart.id === "E")!;
+    const symbols = crown.rows.flat().map((cell) => cell.symbol).filter(Boolean);
+    // Seven sk2p up the spine and a k2tog to finish, and no centred decrease:
+    // this is the one year that uses the leaning one.
+    expect(symbols.filter((s) => s === "sk2p")).toHaveLength(7);
+    expect(symbols.filter((s) => s === "k2tog")).toHaveLength(1);
+    expect(symbols.filter((s) => s === "s2kp")).toHaveLength(0);
+    // Sixteen stitches to one, eight times over: the 128 the pattern prints.
+    expect(crown.rows[0].reduce((t, c) => t + consumes(c), 0)).toBe(16);
+    expect(crown.rows[crown.rows.length - 1].length).toBe(1);
+  });
+
   it("a chart repeat multiplied out matches the round it is worked over", () => {
     const hat = hatById("sww25-aal-ower-toorie")!;
     const crown = hat.charts.find((chart) => chart.id === "B")!;

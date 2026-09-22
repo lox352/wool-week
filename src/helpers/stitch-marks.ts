@@ -4,8 +4,10 @@ import { StitchType } from "../types/StitchType";
  * The marks a chart prints in a cell, as geometry rather than as a picture.
  *
  * The symbols are the ones these patterns use: a dot for a purl, a leaning
- * stroke for a decrease that leans, and a three-legged chevron for the centred
- * double decrease, whose middle leg says the middle stitch finishes on top.
+ * stroke for a decrease that leans, a three-legged chevron for the centred
+ * double decrease, whose middle leg says the middle stitch finishes on top,
+ * and the same chevron without that leg for the double decrease that has no
+ * middle stitch on top and leans instead.
  * Every mark is symmetric about the middle of its cell, so it lands square
  * whatever size the cell is drawn at.
  *
@@ -63,6 +65,21 @@ const marks: Partial<Record<StitchType, Mark>> = {
       ],
     ],
   },
+  /*
+   * The other double decrease, which leans rather than standing straight:
+   * slip one, knit two together, pass the slipped stitch over. Drawn as the
+   * chevron without its middle leg, because there is no middle stitch
+   * finishing on top - the lean is the whole difference.
+   */
+  sk2p: {
+    strokes: [
+      [
+        [near, far],
+        [mid, near],
+        [far, far],
+      ],
+    ],
+  },
   // An increase makes a stitch out of nothing: the bar it is made from.
   m1: {
     strokes: [
@@ -81,5 +98,6 @@ export const markLabels: Partial<Record<StitchType, string>> = {
   k1tbl: "knit through the back loop",
   k2tog: "knit two together",
   s2kp: "slip 2, knit 1, pass slipped stitches over",
+  sk2p: "slip 1, knit 2 together, pass slipped stitch over",
   m1: "make one",
 };

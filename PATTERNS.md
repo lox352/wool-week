@@ -26,12 +26,34 @@ should come out. That is what the two-file rule is for.
 `scripts/extract_chart.py` does it, run by hand once per pattern. Its output is
 reviewed and committed.
 
+The command that produced each file, so any of them can be checked against
+its source:
+
 ```sh
-python3 scripts/extract_chart.py pattern.pdf \
-    --page 5 --vector 0 \
-    --charts A:18x16 B:16x16 \
-    --out src/data/hats/sww25-aal-ower-toorie.charts.json
+# SWW25, Aal Ower Toorie - the key names itself on the page.
+python3 scripts/extract_chart.py SWW25.pdf --page 5 --vector 0 \
+    --charts A:18x16 B:16x16 --out src/data/hats/sww25-aal-ower-toorie.charts.json
+
+# SWW24, Islesburgh Toorie - two chart pages, one key, named by hand.
+python3 scripts/extract_chart.py SWW24.pdf --page 6 --vector 0 \
+    --key knit purl s2kp A B C D E \
+    --charts A:4x9 B:8x11 D:8x12 --out .../sww24-v0.json
+python3 scripts/extract_chart.py SWW24.pdf --page 7 --vector 1 \
+    --key-page 6 --key-vector 0 --key knit purl s2kp A B C D E \
+    --charts C:20x15 E:24x23 --out .../sww24-v1.json
+
+# SWW22, Bonnie Isle Hat - two chart pages with a different key on each.
+python3 scripts/extract_chart.py SWW22.pdf --page 6 --vector 0 \
+    --key knit purl A B C D E \
+    --charts A:10x13 B:12x14 C:13x13 --out .../p6.json
+python3 scripts/extract_chart.py SWW22.pdf --page 7 --vector 1 \
+    --key knit k2tog sk2p A B C D E \
+    --charts D:12x14 E:16x19 --out .../p7.json
 ```
+
+Where a pattern's charts are split across pages, the pieces are merged into
+one file by hand; `--key-page` and `--key-vector` point at the key when it is
+not on the same page as the charts.
 
 It reads a page two ways and makes them agree:
 
@@ -62,6 +84,8 @@ count the published pattern prints out loud:
   the decrease round, 12 at the crown.
 - **Aal Ower Toorie** — cast on 130, 162 after the increase round, 9 at the
   crown.
+- **Bonnie Isle Hat** — cast on 140, 156 after the increase round, 128 after
+  the decrease round, 8 at the crown.
 
 A chart misread by a single cell breaks one of those, so it fails the build.
 
