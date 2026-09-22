@@ -94,10 +94,21 @@ const tuning = {};
  * was never coming. Every chart file is named for exactly one hat, so there is
  * nothing to parse.
  */
-const hatIds = readdirSync(join(root, "src/data/hats"))
+const known = readdirSync(join(root, "src/data/hats"))
   .filter((name) => name.endsWith(".charts.json"))
   .map((name) => name.replace(".charts.json", ""))
   .sort();
+
+// Named on the command line, or all of them. Settling one hat takes a couple
+// of minutes and gives an answer that is very slightly its own each time, so
+// adding a year should be able to leave the years already settled alone.
+const wanted = process.argv.slice(2);
+const missing = wanted.filter((id) => !known.includes(id));
+if (missing.length > 0) {
+  say(`no such hat: ${missing.join(", ")}; this repository has ${known.join(", ")}`);
+  process.exit(1);
+}
+const hatIds = wanted.length > 0 ? wanted : known;
 
 if (hatIds.length === 0) {
   say("found no hats: src/data/hats holds no *.charts.json");
@@ -183,9 +194,9 @@ for (const hatId of hatIds) {
     if (!progress || progress.steps === reported) return;
     reported = progress.steps;
     say(
-      `  ${hatId}: ${progress.steps} steps, moved ` +
-        `${progress.moved.toFixed(5)} of a stitch (rests under ` +
-        `${restMovement}), ${((Date.now() - started) / 1000).toFixed(0)}s`,
+      `  ${hatId}: ${progress.steps} steps, the average stitch moving ` +
+        `${progress.moved.toFixed(5)} of its own width a step, ` +
+        `${((Date.now() - started) / 1000).toFixed(0)}s`,
     );
   }, 5_000);
 
