@@ -16,7 +16,8 @@ import PageLayout from "./ui/PageLayout";
 import Button from "./ui/Button";
 import HatModel from "./HatModel";
 import Chart from "../knitting/Chart";
-import YarnPicker, { type Chosen } from "./YarnPicker";
+import YarnEditor from "./YarnEditor";
+import { type Chosen } from "./YarnPicker";
 import "./Hat.css";
 
 /**
@@ -101,8 +102,8 @@ const HatPage: React.FC<{
   const anyApproximate = shades.some((entry) => entry.yarn.approximate);
   const yours = Object.keys(own).length > 0;
 
-  /** Which yarn's wool is being chosen, if any. */
-  const [picking, setPicking] = useState<SlotId | undefined>();
+  /** Whether the yarn-by-yarn editor is showing. */
+  const [choosing, setChoosing] = useState(false);
   const choose = useCallback(
     (slot: SlotId, chosen: Chosen | undefined) =>
       setOwn((current) => {
@@ -204,18 +205,24 @@ const HatPage: React.FC<{
           */}
           <button
             type="button"
-            className={`colourway-option${yours ? " is-chosen" : ""}`}
-            aria-pressed={yours}
-            onClick={() => setPicking(hat.slots[0])}
+            className={`colourway-option${choosing || yours ? " is-chosen" : ""}`}
+            aria-pressed={choosing || yours}
+            // Nothing changed yet, so tapping it again just puts it away.
+            onClick={() => setChoosing((open) => yours || !open)}
           >
             <span className="colourway-swatches" aria-hidden="true">
-              {hat.slots.map((slot) => (
-                <span key={slot} style={{ background: yarnFor(palette, slot).hex }} />
+              {colourway.shades.map((shade) => (
+                <span
+                  key={shade.slot}
+                  style={{ background: yarnFor(palette, shade.slot).hex }}
+                />
               ))}
             </span>
             <strong>Your own colours</strong>
             <span className="quiet">
-              {yours ? `${Object.keys(own).length} changed` : "Pick your wool"}
+              {yours
+                ? `${Object.keys(own).length} of your own`
+                : "Yarn by yarn"}
             </span>
           </button>
         </div>
@@ -224,18 +231,15 @@ const HatPage: React.FC<{
         <ul className="shade-list">
           {shades.map((entry) => (
             <li key={`${entry.yarn.name}-${entry.slots.join()}`}>
-              <button
-                type="button"
-                className="shade-chip shade-chip-button"
+              <span
+                className="shade-chip"
                 style={{
                   background: entry.yarn.hex,
                   color: inkOn(entry.yarn.hex),
                 }}
-                title={`Choose the wool for yarn ${entry.slots.join(" and ")}`}
-                onClick={() => setPicking(entry.slots[0])}
               >
                 {entry.slots.join(" + ")}
-              </button>
+              </span>
               <span>
                 <strong>{entry.yarn.name}</strong>
                 {entry.yarn.code ? ` (${entry.yarn.code})` : ""} ·{" "}
@@ -272,32 +276,39 @@ const HatPage: React.FC<{
         </p>
         <p className="quiet">
           The colours come from the spinners' own photographs of the wool, so
-          they are close rather than exact, and run a little dark. Tap a
-          yarn's letter to put the ball actually in your hands in its place.
+          they are close rather than exact, and run a little dark.
           {anyApproximate
             ? " Two of these spinners do not sell online in a form that can be" +
               " read, so their shades are considered stand-ins."
             : ""}
         </p>
-        {yours && (
-          <p>
-            <Button variant="quiet" onClick={() => setOwn({})}>
-              Back to {colourway.name} throughout
-            </Button>
-          </p>
+
+        {(choosing || yours) && (
+          <>
+            <h3>Your wool</h3>
+            <p className="quiet">
+              Any of these can be the ball actually in your hands - out of the
+              whole Shetland library, or any colour you like.
+            </p>
+            <YarnEditor
+              slots={colourway.shades.map((shade) => shade.slot)}
+              palette={palette}
+              overrides={own}
+              onChange={choose}
+              suggest={colourway.wool}
+            />
+            {yours && (
+              <p>
+                <Button variant="quiet" onClick={() => setOwn({})}>
+                  Back to {colourway.name} throughout
+                </Button>
+              </p>
+            )}
+          </>
         )}
       </section>
 
-      {picking && (
-        <YarnPicker
-          open
-          slot={picking}
-          current={yarnFor(palette, picking)}
-          suggest={colourway.wool}
-          onChoose={(chosen) => choose(picking, chosen)}
-          onClose={() => setPicking(undefined)}
-        />
-      )}
+
 
       <section className="section">
         <h2>Size</h2>

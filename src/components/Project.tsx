@@ -3,7 +3,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
-import { paletteOf, inkOn, yarnFor } from "../knitting/palette";
+import { paletteOf, yarnFor } from "../knitting/palette";
 import { totals, positionOf } from "../knitting/progress";
 import {
   Project as SavedProject,
@@ -17,7 +17,8 @@ import ProgressRing from "./ProgressRing";
 import HatModel from "./HatModel";
 import Chart from "../knitting/Chart";
 import KnittingPanel from "./KnittingPanel";
-import YarnPicker, { type Chosen } from "./YarnPicker";
+import YarnEditor from "./YarnEditor";
+import { type Chosen } from "./YarnPicker";
 import "./Project.css";
 
 /**
@@ -147,9 +148,6 @@ const ProjectView: React.FC<{
   const counts = totals(index, project.progress);
   const position = positionOf(stitches, project.progress, index);
 
-  /** Which yarn's wool is being chosen, if any. */
-  const [picking, setPicking] = useState<SlotId | undefined>();
-
   return (
     <PageLayout
       title={project.name ?? hat.name}
@@ -218,38 +216,13 @@ const ProjectView: React.FC<{
               whole Shetland library, or any colour you like - and the chart
               and the hat will follow.
             </p>
-            <ul className="yarn-editor">
-              {hat.slots.map((slot) => {
-                const yarn = yarnFor(palette, slot);
-                return (
-                  <li key={slot}>
-                    <button
-                      type="button"
-                      className="yarn-editor-row"
-                      onClick={() => setPicking(slot)}
-                    >
-                      <span
-                        className="shade-chip"
-                        style={{ background: yarn.hex, color: inkOn(yarn.hex) }}
-                      >
-                        {slot}
-                      </span>
-                      <span className="yarn-editor-name">
-                        {yarn.name}
-                        {yarn.code ? ` (${yarn.code})` : ""}
-                        {yarn.approximate && (
-                          <span className="quiet"> · approximate</span>
-                        )}
-                        {project.shades?.[slot] && (
-                          <span className="quiet"> · yours</span>
-                        )}
-                      </span>
-                      <span className="quiet">Change</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
+            <YarnEditor
+              slots={colourway.shades.map((shade) => shade.slot)}
+              palette={palette}
+              overrides={project.shades ?? {}}
+              onChange={setShade}
+              suggest={colourway.wool}
+            />
             <div className="chooser">
               {hat.colourways.map((option) => (
                 <button
@@ -266,17 +239,6 @@ const ProjectView: React.FC<{
             </div>
           </section>
         </>
-      )}
-
-      {picking && (
-        <YarnPicker
-          open
-          slot={picking}
-          current={yarnFor(palette, picking)}
-          suggest={colourway.wool}
-          onChoose={(chosen) => setShade(picking, chosen)}
-          onClose={() => setPicking(undefined)}
-        />
       )}
 
       <section className="section">
