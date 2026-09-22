@@ -1,4 +1,5 @@
 import { Stitch } from "../types/Stitch";
+import { adjacentStitchDistance, fabricThickness } from "../constants";
 
 /**
  * Lay a hat out the way it is worn rather than the way it is knitted.
@@ -28,6 +29,19 @@ import { Stitch } from "../types/Stitch";
  * and the round the body sets off from. Those are the rounds that carry it,
  * and the doubled part hangs between them under the same push that fills the
  * rest of the hat out.
+ *
+ * The one thing a reflection will not give is which layer is inside. Doubled
+ * back on itself, the fabric comes to rest at the radius its own stitches
+ * make, and where the pattern has arranged for both layers to make the same
+ * one - 2026 increases 128 stitches to 160 at a change of fabric precisely so
+ * that its outer brim is the same way round as its inner - the two land on
+ * top of each other. Wool does not: a fold has a thickness, and the part
+ * behind one sits a fabric's worth in. So each layer is drawn in by a
+ * thickness for every earlier layer still above it, which gives the fold its
+ * bight and puts the small ledge at the top of the brim where the photograph
+ * has one - the body coming out from behind the brim's cast-on edge. It stops
+ * where the doubling stops: nothing is inside anything above the brim, so
+ * nothing there is moved.
  */
 export const foldAt = (
   stitches: Stitch[],
@@ -61,16 +75,59 @@ export const foldAt = (
   });
 
   const floor = Math.min(...laid);
-  const place = new Map<number, number>();
-  rounds.forEach((round, index) =>
-    round.forEach((id) => place.set(id, laid[index] - floor)),
-  );
+
+  /*
+   * Which layer each round is in, and how high each layer reaches: a round is
+   * one layer further in for every turn before it, and it is behind an
+   * earlier layer only for as long as that layer is still above it.
+   */
+  const layerOf: number[] = [];
+  const reach: number[] = [];
+  let layer = 0;
+  rounds.forEach((_, index) => {
+    layerOf.push(layer);
+    reach[layer] = Math.max(reach[layer] ?? -Infinity, laid[index]);
+    if (at.has(index)) layer += 1;
+  });
+  const inside = (index: number) =>
+    reach.filter(
+      (top, which) => which < layerOf[index] && top >= laid[index] - 1e-9,
+    ).length;
+
+  const place = new Map<number, { y: number; scale: number }>();
+  rounds.forEach((round, index) => {
+    const draw = inside(index) * fabricThickness;
+    const away = Math.hypot(
+      stitches[round[0]].position.x,
+      stitches[round[0]].position.z,
+    );
+    const where = {
+      y: laid[index] - floor,
+      scale: draw > 0 && away > draw ? (away - draw) / away : 1,
+    };
+    round.forEach((id) => place.set(id, where));
+  });
   // Stitch 0 is the phantom start of the helix; it goes with the cast-on.
-  place.set(0, laid[0] - floor);
+  place.set(0, place.get(rounds[0][0]) ?? { y: laid[0] - floor, scale: 1 });
 
   for (const stitch of stitches) {
-    const y = place.get(stitch.id);
-    if (y !== undefined) stitch.position.y = y;
+    const where = place.get(stitch.id);
+    if (where !== undefined) {
+      stitch.position.y = where.y;
+      if (where.scale !== 1) {
+        stitch.position.x *= where.scale;
+        stitch.position.z *= where.scale;
+        /*
+         * And the stitches of a drawn-in round really are that much narrower,
+         * which is the point: a rope cut to the width they were built at
+         * would let the inner layer straight back out to the circle the outer
+         * one is on, and the two would settle one inside the other. A hem
+         * knitted to hang within a brim is made smaller than the brim on
+         * purpose - on finer needles, or over fewer stitches, or as here both.
+         */
+        stitch.width = (stitch.width ?? adjacentStitchDistance) * where.scale;
+      }
+    }
     stitch.fixed = false;
   }
   lows.forEach((index) =>

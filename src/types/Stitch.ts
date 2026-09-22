@@ -19,4 +19,11 @@ export interface Stitch {
    * colourway never rebuilds the knitting.
    */
   slot: string;
+  /**
+   * How wide this stitch is, and how tall its round, where the pattern knits
+   * in more than one fabric. Left off, they are the hat's own - see
+   * constants, engine's roundHeightFor, and HatPattern.tensions.
+   */
+  width?: number;
+  rise?: number;
 }

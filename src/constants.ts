@@ -29,3 +29,13 @@ export const settleStepBudgetMs = 16;
 export const restMovement = 0.003;
 export const minimumSettleFrames = 10;
 export const settleRestSeconds = 2;
+
+/**
+ * How thick a knitted fabric is, as a fraction of how wide its stitches are.
+ *
+ * Two ply jumper weight comes out about a millimetre and a half thick at four
+ * stitches to the centimetre, so a third of a stitch, and stranded colourwork
+ * rather more. It is only ever wanted where the fabric is doubled: it is what
+ * holds the two layers of a turned-up brim apart. See knitting/folding.ts.
+ */
+export const fabricThickness = adjacentStitchDistance * 0.35;

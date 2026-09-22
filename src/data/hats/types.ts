@@ -49,6 +49,11 @@ export const partKey = (chart: string, row: number, part: string): string =>
 export interface Chart {
   id: string;
   /**
+   * Which fabric this chart is knitted in, where the pattern has more than
+   * one. See HatPattern.tensions; a round spec may override it.
+   */
+  fabric?: string;
+  /**
    * Which yarn plays each part, row by row, for a chart drawn in ground and
    * motif. Keyed by the name a colourway asks for; each entry is
    * [ground, motif] and the first is chart row 1.
@@ -163,7 +168,7 @@ export type ShapingOp =
   | { repeat: ShapingOp[]; times: number };
 
 export type RoundSpec =
-  | { type: "castOn"; count: number; slot: string }
+  | { type: "castOn"; count: number; slot: string; fabric?: string }
   | {
       type: "rounds";
       count: number;
@@ -174,14 +179,38 @@ export type RoundSpec =
       slot: string;
       /** Repeated to the end of each round. Defaults to a single knit. */
       sequence?: ("k" | "p" | "k1tbl")[];
+      fabric?: string;
     }
-  | { type: "shaping"; slot: string; ops: ShapingOp[]; /** For the tests. */ to: number }
+  | {
+      type: "shaping";
+      slot: string;
+      ops: ShapingOp[];
+      /** For the tests. */
+      to: number;
+      fabric?: string;
+    }
   /**
    * The fabric turns back on itself here: no stitches, just the round the
    * fold runs along. A turned-up brim has one; a hem knitted to hang inside
    * one has two. What it does to the hat is in knitting/folding.ts.
    */
   | { type: "fold" }
+  /**
+   * "Turn work inside out so the wrong side of the brim is facing you."
+   *
+   * Also not a round. A brim meant to be worn turned up has to be knitted
+   * with its right side facing in, so that turning it up brings it out, and
+   * the pattern gets there by turning the whole work over partway. Everything
+   * before that point is therefore worked the other way about the hat from
+   * everything after it, and so goes on backwards: the brim's chart is laid
+   * over its round in the opposite direction from the body's.
+   *
+   * Which is why the brim charts are drawn upside down and back to front.
+   * Read them the usual way, turn the brim up, and the festival's name comes
+   * out the right way round - and a model that turned the brim without
+   * turning the work spells it in mirror writing.
+   */
+  | { type: "turn" }
   | {
       type: "chart";
       chart: string;
@@ -191,6 +220,8 @@ export type RoundSpec =
       repeats: number;
       /** How many times to work that block of rows. Defaults to one. */
       passes?: number;
+      /** Overrides the chart's own fabric, where it has one. */
+      fabric?: string;
     };
 
 export interface Section {
@@ -217,6 +248,28 @@ export interface HatPattern {
   colourways: Colourway[];
   charts: Chart[];
   sections: Section[];
+  /**
+   * The pattern's fabrics, where it knits in more than one, each as a
+   * fraction of the tension the pattern states.
+   *
+   * Most hats here are one fabric and leave this out: every stitch is a
+   * stitch wide and every round a round tall. But a hat can be knitted in two
+   * tensions at once and say so - 2026's Birsie Beanny prints one gauge
+   * measured over its ribbed brim and another over its colourwork, "because
+   * the brim is designed to be close-fitting while the top of the hat is
+   * slouchy". A pattern that does that names its fabrics here, and its charts
+   * and rounds say which one they are in; anything unnamed is knitted at the
+   * stated tension.
+   *
+   * `stitch` is the only thing that decides how wide a round comes out,
+   * because a round is its stitches laid end to end and nothing else - so a
+   * fabric knitted narrower makes a smaller circle of the same number of
+   * stitches, which is exactly what an increase round at a change of fabric
+   * is for. `round` is how tall its rounds are, which is what decides whether
+   * a facing knitted in one fabric reaches the depth of a brim knitted in
+   * another.
+   */
+  tensions?: Record<string, { stitch?: number; round?: number }>;
 }
 
 /** Stitches a cell consumes from the round below. */

@@ -27,18 +27,43 @@ import charts from "./sww26-birsie-beanny.charts.json";
  * arithmetic has to chain, and does. The brim has to spell something, and
  * spells SHETLAND WOOL WEEK 2026 with a heart either side.
  *
- * Its brim is worn turned up, with the inside rib hanging within it, so the
- * fabric turns twice: once at the top of the lettering and once at the foot of
- * the hem, where the body sets off. See knitting/folding.ts.
+ * Its brim is doubled, and the pattern says how: it is "worked in the round
+ * from the brim up, starting with the rib and lettering brim, followed by the
+ * inside rib (which is turned inside out)", and it is worn "with brim folded
+ * up". So the lettering hangs from the top of the brim down to the fold - the
+ * purl round the chart draws right across row 17, which is a turning ridge
+ * and nothing else - and the inside rib climbs back up within it, until "it
+ * reaches the same depth". That is one fold, and the chart's own arithmetic
+ * agrees with it: the decrease from 160 stitches back to 128 falls just past
+ * the ridge, where the fabric has turned and wants to be smaller because it
+ * is now the layer inside. See knitting/folding.ts.
  *
- * It is the one hat here that comes out shorter on screen than the tape says,
- * and the reason is the slouch. The pattern's two tensions are measured over
- * two different fabrics - stitches over the close-fitting inside rib, rounds
- * over the colourwork - because no single one would describe both, and the
- * model has only one stitch width to give. So its hundred and ninety-two
- * stitches go round a wider circle than the wool would, and the length that a
- * slouchy hat gets by draping it spends on going sideways instead. The
- * knitting is right; the posture is a little squat.
+ * The brim is also turned twice, and only the second turn is the fold. "Turn
+ * work inside out so the wrong side of the brim is facing you", says the
+ * pattern at the body, which is how a brim meant to be worn up gets knitted
+ * with its right side in: everything below that point goes on the other way
+ * about the hat from everything above it. It is why the brim charts are drawn
+ * upside down and back to front, which looked for a while like an error in
+ * reading them and is not - read them the usual way, work the turn and the
+ * fold, and SHETLAND WOOL WEEK comes out the right way round. Model only the
+ * fold and it comes out in mirror writing. See the "turn" round in types.ts.
+ *
+ * It is also the one hat here knitted at two tensions at once, and says so:
+ * "the brim is designed to be close-fitting while the top of the hat is
+ * slouchy, therefore the tension has been measured over the number of sts of
+ * the inside rib, and the number of rows have been measured over the
+ * colourwork parts of the hat to check the length". One tension cannot hold
+ * both, and on one this hat came out a sixth short and half again too wide,
+ * because its hundred and ninety-two stitches went round a circle they never
+ * had and spent on going sideways what the slouch should have spent on going
+ * up. How much narrower the colourwork is the pattern says without saying it,
+ * and so does how much shorter its rounds are; see tensions below.
+ *
+ * On the two of them it settles to fifty point two centimetres round the
+ * inside brim, against the fifty the pattern prints, and twenty-seven point
+ * two from the folded edge over the crown against its twenty-seven and a
+ * half. Neither was fitted to: the one comes out of the rib's own tension and
+ * the other out of the colourwork's.
  */
 
 const rib = (): ChartCell[] => [
@@ -64,16 +89,16 @@ const plain = (): ChartCell[] => Array.from({ length: 4 }, () => ({ slot: "groun
 const parts: Record<string, Record<string, [SlotId, SlotId][]>> = {
   Brim: {
     "1-2": [
-      ["A", "A"], ["A", "A"], ["A", "A"], ["A", "A"], ["A", "B"],
-      ["A", "A"], ["E", "F"], ["E", "F"], ["E", "F"], ["C", "D"],
-      ["C", "D"], ["C", "D"], ["E", "F"], ["E", "F"], ["E", "F"],
-      ["A", "A"], ["A", "B"], ["A", "A"],
+      ["A", "A"], ["A", "B"], ["A", "A"], ["E", "F"], ["E", "F"],
+      ["E", "F"], ["C", "D"], ["C", "D"], ["C", "D"], ["E", "F"],
+      ["E", "F"], ["E", "F"], ["A", "A"], ["A", "B"], ["A", "A"],
+      ["A", "A"], ["A", "A"], ["A", "A"],
     ],
     "3-4": [
-      ["B", "B"], ["B", "B"], ["B", "B"], ["B", "B"], ["B", "A"],
-      ["B", "B"], ["B", "A"], ["B", "A"], ["B", "A"], ["B", "A"],
+      ["B", "B"], ["B", "A"], ["B", "B"], ["B", "A"], ["B", "A"],
       ["B", "A"], ["B", "A"], ["B", "A"], ["B", "A"], ["B", "A"],
-      ["B", "B"], ["B", "A"], ["B", "B"],
+      ["B", "A"], ["B", "A"], ["B", "B"], ["B", "A"], ["B", "B"],
+      ["B", "B"], ["B", "B"], ["B", "B"],
     ],
   },
   Body: {
@@ -143,16 +168,20 @@ const parts: Record<string, Record<string, [SlotId, SlotId][]>> = {
 };
 
 const chartsOf = (): Chart[] => [
+  // The three charted ones - the lettering, the body and the crown - are all
+  // colourwork, and so all knitted on the larger needles.
   ...charts.charts.map((chart) => ({
     id: chart.id,
     rows: chart.rows as Chart["rows"],
     parts: parts[chart.id],
+    fabric: "colourwork",
   })),
   {
     // "*K2 tbl, p2; rep from * to end", three rounds of it.
     id: "Rib",
     rows: [rib(), rib(), rib()],
     parts: parts.Rib,
+    fabric: "rib",
   },
   {
     /*
@@ -165,6 +194,7 @@ const chartsOf = (): Chart[] => [
       [5, 9, 17, 21].includes(i + 1) ? plain() : purlRib(),
     ),
     parts: parts.Hem,
+    fabric: "rib",
   },
 ];
 
@@ -306,18 +336,61 @@ const sww26: HatPattern = {
 
   charts: chartsOf(),
 
+  /*
+   * Two fabrics, and the pattern prints half of each: its stitch tension is
+   * measured over the inside rib and its round tension over the colourwork.
+   * So a ribbed stitch is a stitch wide and a colourwork round a round tall,
+   * by definition, and the pattern gives the other two without stating them.
+   *
+   * How wide a colourwork stitch is comes from the shaping. 128 ribbed
+   * stitches and 160 colourwork ones go round the same brim - that is what
+   * the increase above the rib and the decrease below the hem are for,
+   * neither of which changes how big the brim is - so 160 colourwork stitches
+   * are as wide as 128 ribbed ones. Which then makes the body 192 of them: a
+   * fifth wider than the brim rather than half again, and that fifth is the
+   * slouch.
+   *
+   * How tall a ribbed round is comes from the note under the inside rib: "If
+   * the rib is falling short of the top brim, continue ribbing until it
+   * reaches the same depth." The two sides of the fold are that same depth,
+   * then - four ribbed rounds and nineteen colourwork ones down the outside,
+   * twenty-six and one back up the inside - and one ratio satisfies that:
+   * eighteen colourwork rounds to twenty-two ribbed ones. Which is about
+   * forty-one rounds to ten centimetres of rib against the colourwork's
+   * thirty-three and a half, and finer needles do that.
+   */
+  tensions: {
+    rib: { stitch: 1, round: 9 / 11 },
+    colourwork: { stitch: 128 / 160, round: 1 },
+  },
+
   sections: [
     {
       label: "Brim",
       rounds: [
-        { type: "castOn", count: 128, slot: partKey("Rib", 1, "ground") },
+        // The top of the brim, not the bottom: this edge ends up level with
+        // the body, and the lettering hangs below it.
+        {
+          type: "castOn",
+          count: 128,
+          slot: partKey("Rib", 1, "ground"),
+          fabric: "rib",
+        },
         { type: "chart", chart: "Rib", rows: [1, 3], repeats: 32 },
-        { type: "rounds", count: 1, slot: partKey("Rib", 3, "ground") },
+        {
+          type: "rounds",
+          count: 1,
+          slot: partKey("Rib", 3, "ground"),
+          fabric: "rib",
+        },
         {
           // "Inc Round: K2, m1, [k4, m1] x 31, k2. 160 sts."
+          // Thirty-two more stitches and not a millimetre more brim: this is
+          // the change of fabric, not a change of size.
           type: "shaping",
           slot: partKey("Rib", 3, "ground"),
           to: 160,
+          fabric: "colourwork",
           ops: [
             { work: "k", times: 2 },
             { work: "m1" },
@@ -325,7 +398,12 @@ const sww26: HatPattern = {
             { work: "k", times: 2 },
           ],
         },
-        { type: "rounds", count: 1, slot: partKey("Rib", 3, "ground") },
+        {
+          type: "rounds",
+          count: 1,
+          slot: partKey("Rib", 3, "ground"),
+          fabric: "colourwork",
+        },
       ],
     },
     {
@@ -333,12 +411,21 @@ const sww26: HatPattern = {
       // One hundred and sixty stitches of it, worked once: the brim spells
       // the festival's name, so it does not repeat.
       rounds: [
-        { type: "chart", chart: "Brim", rows: [1, 18], repeats: 1 },
+        { type: "chart", chart: "Brim", rows: [1, 17], repeats: 1 },
+        // The one place the fabric turns, and the chart says where: row 17 is
+        // drawn purl right the way round, which is a turning ridge and
+        // nothing else. Everything above is knitted downwards to here;
+        // everything below it climbs back up inside.
+        { type: "fold" },
+        { type: "chart", chart: "Brim", rows: [18, 18], repeats: 1 },
         {
           // "Dec round: [K3, k2tog] x 32. 128 sts."
+          // The change of fabric again, the other way about, and again the
+          // brim does not change size for it.
           type: "shaping",
           slot: partKey("Brim", 18, "ground"),
           to: 128,
+          fabric: "rib",
           ops: [
             {
               repeat: [{ work: "k", times: 3 }, { work: "k2tog" }],
@@ -346,29 +433,40 @@ const sww26: HatPattern = {
             },
           ],
         },
-        { type: "rounds", count: 1, slot: partKey("Brim", 18, "ground") },
-        // The brim is worn turned up: the fabric folds here and the inside
-        // rib hangs down within it.
-        { type: "fold" },
+        {
+          type: "rounds",
+          count: 1,
+          slot: partKey("Brim", 18, "ground"),
+          fabric: "rib",
+        },
       ],
     },
     {
       label: "Inside rib",
       rounds: [
         { type: "chart", chart: "Hem", rows: [1, 24], repeats: 32 },
-        // And turns back up here, where the body sets off.
-        { type: "fold" },
       ],
     },
     {
       label: "Body",
       rounds: [
-        { type: "rounds", count: 1, slot: partKey("Hem", 24, "ground") },
+        // "Turn work inside out so the wrong side of the brim is facing you."
+        // Everything below this goes on the other way about the hat - which
+        // is why the brim charts are drawn upside down and back to front, and
+        // why the name comes out the right way round once the brim is up.
+        { type: "turn" },
+        {
+          type: "rounds",
+          count: 1,
+          slot: partKey("Hem", 24, "ground"),
+          fabric: "rib",
+        },
         {
           // "Inc round: K1, m1, [K2, m1] x 63, k1. 192 sts."
           type: "shaping",
           slot: partKey("Hem", 24, "ground"),
           to: 192,
+          fabric: "colourwork",
           ops: [
             { work: "k", times: 1 },
             { work: "m1" },

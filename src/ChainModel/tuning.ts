@@ -241,15 +241,23 @@ export const tuningFromUrl = (): Tuning => {
  * already makes longer than that keeps the length it starts with, so the hat
  * begins in a state the solver can actually hold rather than one it has to
  * fight its way out of.
+ *
+ * Both are the stitch's own rather than the hat's, for a hat knitted in more
+ * than one fabric: 2026's colourwork stitch is four fifths of the width of
+ * its ribbed one and its rounds are taller, and ropes cut to the larger of
+ * each would let the other fabric out to a shape it never had. Its inside
+ * rib, hung from the fold and pushed at from within, grew a centimetre and a
+ * half out of the top of its own brim that way.
  */
 export const ropeLength = (
   tuning: Tuning,
   span: number,
   startsAt: number,
   roundHeight = verticalStitchDistance,
+  stitchWidth = adjacentStitchDistance,
 ): number => {
   const across = span === 1;
-  const base = across ? adjacentStitchDistance : roundHeight;
+  const base = across ? stitchWidth : roundHeight;
   const slack =
     tuning.ropeSlack * (across ? tuning.stitchSlack : tuning.roundSlack);
   if (tuning.ropes === "fixed") return base * slack;

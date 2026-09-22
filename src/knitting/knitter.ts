@@ -24,13 +24,14 @@ import { adjacentStitchDistance, verticalStitchDistance } from "../constants";
  */
 export default class Knitter {
   /**
-   * How tall a round is. A property of the pattern's tension rather than a
-   * constant - see roundHeightFor in engine.ts.
+   * How tall the round being worked is. A property of the pattern's tension
+   * rather than a constant - see roundHeightFor in engine.ts - and of which
+   * of the pattern's fabrics the round is in, where it has more than one.
    */
-  private readonly roundHeight: number;
+  private rise: number;
 
   constructor(roundHeight: number = verticalStitchDistance) {
-    this.roundHeight = roundHeight;
+    this.rise = roundHeight;
   }
 
   readonly stitches: Stitch[] = [];
@@ -42,6 +43,11 @@ export default class Knitter {
   private below = 1;
   private expected = 0;
   private slot: string = "A";
+  /**
+   * How wide a stitch of the round being worked is. One fabric's worth unless
+   * the pattern says it knits in more than one - see HatPattern.tensions.
+   */
+  private width: number = adjacentStitchDistance;
   /** Where the round being worked sits: its radius, and its height. */
   private radius = 0;
   private height = 0;
@@ -67,8 +73,16 @@ export default class Knitter {
     return round[round.length - 1] - this.below + 1;
   }
 
-  private static radiusFor(count: number) {
-    return (adjacentStitchDistance * Math.max(count, 3)) / (2 * Math.PI);
+  /**
+   * How wide a round of `count` stitches comes out.
+   *
+   * Its stitches laid end to end and no further, so a fabric whose stitches
+   * are narrower makes a smaller circle of the same number of them. That is
+   * what lets a pattern increase at a change of fabric without the hat
+   * getting any wider, which is what 2026's brim does.
+   */
+  private static radiusFor(count: number, width: number) {
+    return (width * Math.max(count, 3)) / (2 * Math.PI);
   }
 
   /**
@@ -83,7 +97,7 @@ export default class Knitter {
    */
   private riseTo(radius: number) {
     const pulledIn = this.radius - radius;
-    const rise = Math.sqrt(Math.max(this.roundHeight ** 2 - pulledIn ** 2, 0));
+    const rise = Math.sqrt(Math.max(this.rise ** 2 - pulledIn ** 2, 0));
     /*
      * A crown can decrease faster than its fabric can reach.
      *
@@ -96,7 +110,7 @@ export default class Knitter {
      * through the last nine of them gathers the top. So a round always rises
      * a little, however hard it is pulling in.
      */
-    return this.height + Math.max(rise, this.roundHeight * 0.35);
+    return this.height + Math.max(rise, this.rise * 0.35);
   }
 
   private place(index: number, count: number) {
@@ -108,9 +122,10 @@ export default class Knitter {
     };
   }
 
-  castOn(count: number, slot: string): this {
+  castOn(count: number, slot: string, width = adjacentStitchDistance): this {
     this.slot = slot;
-    this.radius = Knitter.radiusFor(count);
+    this.width = width;
+    this.radius = Knitter.radiusFor(count, width);
     this.height = 0;
     for (let i = 0; i < count; i++) {
       this.stitches.push({
@@ -120,6 +135,8 @@ export default class Knitter {
         fixed: true,
         type: "k1",
         slot,
+        width,
+        rise: this.rise,
       });
     }
     // The seam closes the round by standing in for the phantom stitch 0.
@@ -130,6 +147,8 @@ export default class Knitter {
       fixed: true,
       type: "join",
       slot,
+      width,
+      rise: this.rise,
     });
     this.rounds.push(Array.from({ length: count }, (_, i) => i + 1));
     this.below = 1;
@@ -137,11 +156,18 @@ export default class Knitter {
   }
 
   /** Begin a round that is expected to end up `count` stitches long. */
-  startRound(count: number, slot: string = this.slot): this {
+  startRound(
+    count: number,
+    slot: string = this.slot,
+    width: number = this.width,
+    rise: number = this.rise,
+  ): this {
     this.current = [];
     this.expected = count;
     this.slot = slot;
-    const radius = Knitter.radiusFor(count);
+    this.width = width;
+    this.rise = rise;
+    const radius = Knitter.radiusFor(count, width);
     this.height = this.riseTo(radius);
     this.radius = radius;
     return this;
@@ -161,6 +187,8 @@ export default class Knitter {
       fixed: false,
       type,
       slot,
+      width: this.width,
+      rise: this.rise,
     });
     this.current.push(id);
     this.below += eaten;

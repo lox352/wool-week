@@ -130,7 +130,13 @@ export default function StitchPhysics({
               key={`${stitch.id}-${link}`}
               bodyA={stitchRefs.current[stitch.id]}
               bodyB={stitchRefs.current[link]}
-              length={ropeLength(tuning, stitch.id - link, startsAt, roundHeight)}
+              length={ropeLength(
+                tuning,
+                stitch.id - link,
+                startsAt,
+                stitch.rise ?? roundHeight,
+                stitch.width,
+              )}
               stiffness={tuning.stiffness}
               damping={tuning.springDamping}
             />

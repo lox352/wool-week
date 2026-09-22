@@ -32,22 +32,27 @@ import { adjacentStitchDistance } from "../constants";
  */
 
 /** `amount` is how far to take it: one for blocked to its measurements, less
- * for a hat only damped and patted into shape. */
+ * for a hat only damped and patted into shape. `stitchWidth` may be one width
+ * for the whole hat, or one per round where the pattern knits in more than
+ * one fabric. */
 export const blockHat = (
   rounds: number[][],
   at: Point[],
   amount = 1,
-  stitchWidth = adjacentStitchDistance,
+  stitchWidth: number | number[] = adjacentStitchDistance,
 ): Point[] => {
   const out = at.map((point) => ({ ...point }));
+  const widthOf = (round: number) =>
+    (Array.isArray(stitchWidth) ? stitchWidth[round] : stitchWidth) ??
+    adjacentStitchDistance;
 
-  for (const ids of rounds) {
+  for (const [round, ids] of rounds.entries()) {
     if (ids.length < 3) continue;
     const ring = ids.map((id) => at[id]).filter(Boolean);
     if (ring.length < 3) continue;
 
     // As wide as its own stitches make it, and as high as it settled.
-    const wanted = (ids.length * stitchWidth) / (2 * Math.PI);
+    const wanted = (ids.length * widthOf(round)) / (2 * Math.PI);
     const level = ring.reduce((total, point) => total + point.y, 0) / ring.length;
 
     for (const id of ids) {

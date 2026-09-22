@@ -128,6 +128,19 @@ const HatModel: React.FC<HatModelProps> = ({
   }, [hatId]);
 
   /*
+   * How wide each round's stitches are, for blocking. One fabric for most
+   * hats; 2026 knits its brim and its top at two different tensions, and a
+   * round eased out to the wrong one would come out the wrong size.
+   */
+  const widths = useMemo(
+    () =>
+      rounds.map(
+        (round) => stitches[round[0]]?.width ?? adjacentStitchDistance,
+      ),
+    [rounds, stitches],
+  );
+
+  /*
    * The hat itself, for the bench's geometry report. Only on the settle path,
    * which nothing but the scripts ever takes.
    */
@@ -159,11 +172,11 @@ const HatModel: React.FC<HatModelProps> = ({
         measureGauge(
           stitches,
           rounds,
-          blockHat(rounds, at, amount),
+          blockHat(rounds, at, amount, widths),
           adjacentStitchDistance / roundHeight,
         ),
     };
-  }, [stitches, rounds, target, roundHeight]);
+  }, [stitches, rounds, target, roundHeight, widths]);
 
   /** Hand over to the cheap renderer, and let the physics world go. */
   const rest = useCallback(() => setSettling(false), []);
@@ -190,8 +203,11 @@ const HatModel: React.FC<HatModelProps> = ({
 
   const blocking = blockedWanted();
   const shown = useMemo(
-    () => (settled && blocking > 0 ? blockHat(rounds, settled, blocking) : settled),
-    [settled, rounds, blocking],
+    () =>
+      settled && blocking > 0
+        ? blockHat(rounds, settled, blocking, widths)
+        : settled,
+    [settled, rounds, blocking, widths],
   );
 
   const reducedMotion =

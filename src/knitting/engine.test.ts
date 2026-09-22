@@ -3,7 +3,7 @@ import { buildHat, rowConsumes } from "./engine";
 import { hats, hatById } from "../data/hats";
 import { consumes } from "../data/hats/types";
 import { paletteOf } from "./palette";
-import { adjacentStitchDistance } from "../constants";
+import { adjacentStitchDistance, fabricThickness } from "../constants";
 
 /**
  * These are the tests that matter.
@@ -216,56 +216,44 @@ describe("the counts the patterns print", () => {
     expect(sizes.length).toBe(1 + 3 + 1 + 1 + 1 + 18 + 1 + 1 + 24 + 1 + 1 + 40 + 29);
   });
 
-  it("Birsie Beanny: its brim turns twice, and hangs from both", () => {
+  it("Birsie Beanny: its brim hangs from the one fold in it", () => {
     const hat = hatById("sww26-birsie-beanny")!;
-    const { stitches, rounds } = buildHat(hat);
+    const { stitches, rounds, roundLabels } = buildHat(hat);
     const heights = rounds.map((round) => stitches[round[0]].position.y);
 
-    // The fabric goes up the outer brim, back down the inside rib, and up
-    // again from the foot of it. So its height has one peak and one trough.
-    const peak = heights.indexOf(Math.max(...heights.slice(0, 40)));
-    expect(peak).toBeGreaterThan(20);
-    expect(heights[peak + 1]).toBeLessThan(heights[peak]);
-    const trough = heights.indexOf(Math.min(...heights.slice(30, 60)));
-    expect(trough).toBeGreaterThan(peak);
-    expect(heights[trough + 1]).toBeGreaterThan(heights[trough]);
+    // The cast-on is at the *top* of the brim - which is why the pattern
+    // calls its first three rounds the "brim top rib" - so the lettering is
+    // knitted downwards, turns at the fold, and the inside rib climbs back up
+    // inside it before the body carries on.
+    expect(heights[0]).toBeGreaterThan(0);
+    const fold = heights.indexOf(Math.min(...heights));
+    expect(fold).toBeGreaterThan(20);
+    // And it turns on the purl round the chart draws across row 17, which is
+    // a turning ridge and nothing else.
+    expect(roundLabels[fold]).toBe("Chart Brim, row 17");
+    expect(heights.slice(0, fold).every((y, i, all) => i === 0 || y <= all[i - 1]))
+      .toBe(true);
+    expect(heights.slice(fold).every((y, i, all) => i === 0 || y >= all[i - 1]))
+      .toBe(true);
     expect(heights[heights.length - 1]).toBe(Math.max(...heights));
 
-    // And it is held at the two rounds where the fabric turns back upwards:
-    // the cast-on, and the round the body sets off from.
+    // It is held at the one round where the fabric turns back upwards.
     const held = rounds
       .map((round, index) => [index, round.every((id) => stitches[id].fixed)] as const)
       .filter(([, all]) => all)
       .map(([index]) => index);
-    expect(held).toEqual([0, trough]);
-    // The inside rib reaches the depth of the brim, as the pattern asks.
-    expect(heights[trough]).toBeLessThan(heights[1]);
-  });
+    expect(held).toEqual([fold]);
 
-  it("Birsie Beanny: one grid of parts, two castings of it", () => {
-    const hat = hatById("sww26-birsie-beanny")!;
-    const body = hat.charts.find((chart) => chart.id === "Body")!;
-    // Every cell of the colourwork charts is a part, not a yarn.
-    expect(
-      body.rows.flat().every((cell) => cell.slot === "ground" || cell.slot === "motif"),
-    ).toBe(true);
-    // The two sets name different yarns on the same row, which is the whole
-    // reason the pattern prints each chart twice.
-    expect(body.parts?.["1-2"][0]).toEqual(["D", "D"]);
-    expect(body.parts?.["3-4"][0]).toEqual(["A", "A"]);
-    // Colourways 3 and 4 are knitted in four yarns, never E or F.
-    const four = body.parts?.["3-4"].flat() ?? [];
-    expect(four.some((slot) => slot === "E" || slot === "F")).toBe(false);
-    // The crown takes thirty-two stitches to two on fifteen centred
-    // decreases, one on every odd row.
-    const crown = hat.charts.find((chart) => chart.id === "Crown")!;
-    const marks = crown.rows.flat().filter((cell) => cell.symbol === "s2kp");
-    expect(marks).toHaveLength(15);
-    expect(crown.rows[crown.rows.length - 1]).toHaveLength(2);
-    // And the brim is one round of 160, not a repeat: it spells something.
-    const brim = hat.charts.find((chart) => chart.id === "Brim")!;
-    expect(brim.rows.every((row) => row.length === 160)).toBe(true);
-    expect(brim.rows[1].every((cell) => cell.symbol === "purl")).toBe(true);
+    // "If the rib is falling short of the top brim, continue ribbing until it
+    // reaches the same depth." The last round of the hem reaches it exactly,
+    // which is what the rib's round tension was taken from - see tensions in
+    // the pattern.
+    const hemTop = roundLabels.lastIndexOf("Chart Hem, row 24");
+    expect(heights[hemTop]).toBeCloseTo(heights[0], 6);
+
+    // And the body stands on top of the brim rather than beside it, which is
+    // the whole of the difference between this hat and a squat one.
+    expect(Math.max(...heights)).toBeGreaterThan(heights[0] * 3);
   });
 
   it("Merrie Dancers Toorie: 120 sts, 144 after the rib, 120, 10 at the crown", () => {
@@ -354,6 +342,94 @@ describe("the counts the patterns print", () => {
     expect(topOf(0)).toBeLessThan(topOf(25));
   });
 
+  it("Birsie Beanny: turned up, the brim spells it the right way round", () => {
+    /*
+     * The brim charts are drawn upside down and back to front, because the
+     * pattern turns the work inside out before the body ("Turn work inside
+     * out so the wrong side of the brim is facing you") and then the brim is
+     * worn turned up. Both halves of that have to be modelled or the
+     * festival's name comes out in mirror writing: the fold gives the one
+     * turn and the turn the other, and either alone is a mirror.
+     *
+     * So the brim, as it is worn, is its chart through half a turn - which
+     * is to say chart row 1 hangs highest and its first stitch is on the
+     * left, where a chart's first stitch is on the right.
+     */
+    const hat = hatById("sww26-birsie-beanny")!;
+    const { stitches, rounds, roundLabels } = buildHat(hat);
+    const chart = hat.charts.find((c) => c.id === "Brim")!;
+    const motif = (slot: string) => slot.endsWith(":motif");
+
+    // Rows down the brim from its cast-on edge, stitches left to right. A
+    // round is worked anticlockwise seen from above, which puts its first
+    // stitch on the right, so reading it left to right is reading it back.
+    const worn = chart.rows.map((_, index) => {
+      const round = rounds[roundLabels.indexOf(`Chart Brim, row ${index + 1}`)];
+      return [...round].reverse().map((id) => motif(stitches[id].slot));
+    });
+    expect(worn).toHaveLength(18);
+    worn.forEach((row, index) =>
+      row.forEach((on, at) =>
+        expect(on).toBe(chart.rows[index][at].slot === "motif"),
+      ),
+    );
+
+    /*
+     * Which is only a statement about two grids, so: the heart at the start
+     * of the round has to be a heart. Fifteen stitches of the nine lettering
+     * rows, and it wants two lobes at the top, a point at the bottom, and to
+     * narrow all the way down. Upside down it is a spade, and back to front
+     * it is neither - but so is a heart, which is why the name is checked
+     * against the chart above and the shape only for which way up it is.
+     */
+    const runs = (row: boolean[]) =>
+      row.filter((on, at) => on && !row[at - 1]).length;
+    const width = (row: boolean[]) => row.filter(Boolean).length;
+    const heart = worn.slice(3, 11).map((row) => row.slice(0, 15));
+    expect(runs(heart[0])).toBe(2);
+    expect(runs(heart[7])).toBe(1);
+    expect(width(heart[5])).toBeGreaterThan(width(heart[6]));
+    expect(width(heart[6])).toBeGreaterThan(width(heart[7]));
+    expect(width(heart[7])).toBeLessThan(width(heart[1]));
+  });
+
+  it("Birsie Beanny: two fabrics, and the brim one circumference through both", () => {
+    /*
+     * "The brim is designed to be close-fitting while the top of the hat is
+     * slouchy, therefore the tension has been measured over the number of sts
+     * of the inside rib, and the number of rows have been measured over the
+     * colourwork parts of the hat to check the length."
+     *
+     * So its increase from 128 to 160 above the rib buys stitches and not
+     * size: a colourwork stitch is four fifths of a ribbed one, and the top
+     * rib, the lettering and the inside rib are all the same way round. What
+     * is bigger is the body, by the fifth that is the slouch.
+     */
+    const hat = hatById("sww26-birsie-beanny")!;
+    const { stitches, rounds, roundLabels } = buildHat(hat);
+    const round = (label: string) => rounds[roundLabels.indexOf(label)];
+    const across = (ids: number[]) =>
+      (ids.length * (stitches[ids[0]].width ?? adjacentStitchDistance)) /
+      Math.PI;
+
+    const topRib = across(rounds[0]);
+    // Thirty-two more stitches and not a millimetre more brim.
+    expect(across(round("Chart Brim, row 1"))).toBeCloseTo(topRib, 6);
+    // The hem is drawn in behind the lettering, and by one thickness only.
+    expect(topRib - across(round("Chart Hem, row 12"))).toBeCloseTo(
+      2 * fabricThickness,
+      6,
+    );
+    // And the body is a fifth wider than the brim, which is the slouch.
+    expect(across(round("Chart Body, row 1")) / topRib).toBeCloseTo(1.2, 2);
+
+    // Which is the size the pattern prints, for the size it prints it for.
+    const size = hat.sizes[1];
+    const perCm = (rounds[0].length * adjacentStitchDistance) /
+      size.circumferenceCm;
+    expect((topRib * Math.PI) / perCm).toBeCloseTo(size.circumferenceCm, 6);
+  });
+
   it("Baa-ble Hat: folding it keeps every joint the length it was built", () => {
     // A reflection is an isometry, and the plane it is done in is the plane
     // the fold ring sits in, so a joint that crosses the fold spans exactly
@@ -377,9 +453,47 @@ describe("the counts the patterns print", () => {
         .sort((a, b) => a - b);
 
     const fold = spans(12);
-    const ordinary = spans(20);
+    const ordinary = spans(6);
     expect(fold).toHaveLength(ordinary.length);
     fold.forEach((length, i) => expect(length).toBeCloseTo(ordinary[i], 10));
+  });
+
+  it("Baa-ble Hat: what the turn-up covers is drawn in behind it", () => {
+    // The one thing a reflection will not give is which layer is inside.
+    // Both halves of a fold are the same knitting, so both come out on the
+    // same circle and land on top of each other; wool does not, because a
+    // fold has a thickness. So the covered part is drawn in by one, and its
+    // stitches are that much narrower, which is what keeps it there once the
+    // ropes are on it.
+    const hat = hatById("sww15-baa-ble-hat")!;
+    const { stitches, rounds } = buildHat(hat);
+    const radius = (round: number) =>
+      Math.hypot(
+        stitches[rounds[round][0]].position.x,
+        stitches[rounds[round][0]].position.z,
+      );
+    const height = (round: number) => stitches[rounds[round][0]].position.y;
+
+    const fold = rounds.findIndex(
+      (_, i) => height(i) === Math.min(...rounds.map((_, j) => height(j))),
+    );
+    const covered = rounds
+      .map((_, i) => i)
+      .filter((i) => i > fold && height(i) <= height(0));
+    expect(covered.length).toBeGreaterThan(5);
+
+    // The outer layer sits where its own stitches put it; what hides behind
+    // it sits one fabric's thickness in, and no further.
+    const outer = rounds.map((_, i) => i).filter((i) => i <= fold);
+    const outside = outer.map(radius);
+    outside.forEach((r) => expect(r).toBeCloseTo(outside[0], 6));
+    covered.forEach((i) =>
+      expect(outside[0] - radius(i)).toBeCloseTo(fabricThickness, 6),
+    );
+
+    // And above the turn-up nothing is behind anything, so nothing moves.
+    const clear = rounds.map((_, i) => i).filter((i) => height(i) > height(0));
+    expect(radius(clear[0])).toBeCloseTo(outside[0], 6);
   });
 
   it("Baa-ble Hat: turned up, it is the height the pattern says it is", () => {

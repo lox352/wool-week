@@ -63,7 +63,9 @@ export default function ChainModel({
    * narrows, so it can sit higher and still let the rib grip.
    */
   const brim =
-    ((rounds[0]?.length ?? 0) * adjacentStitchDistance) / (2 * Math.PI);
+    ((rounds[0]?.length ?? 0) *
+      (props.stitches[rounds[0]?.[0] ?? 0]?.width ?? adjacentStitchDistance)) /
+    (2 * Math.PI);
   const tall =
     tuning.head === "ball"
       ? tuning.headRadius

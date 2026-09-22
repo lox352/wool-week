@@ -149,11 +149,39 @@ const runRound = (
   label: string,
   work: { type: StitchType; slot: string }[],
   length: number,
+  fabric: { width: number; rise: number },
+  backwards = false,
 ) => {
-  knitter.startRound(length);
-  work.forEach(({ type, slot }) => knitter.knit(type, slot));
+  knitter.startRound(length, undefined, fabric.width, fabric.rise);
+  const order = backwards ? [...work].reverse() : work;
+  order.forEach(({ type, slot }) => knitter.knit(type, slot));
   knitter.endRound();
   labels.push(label);
+};
+
+/**
+ * How wide a stitch of a named fabric is, and how tall its rounds are.
+ *
+ * A pattern that knits in one fabric names none, and a stitch is a stitch
+ * wide and a round a round tall. One that knits in two - 2026's close-fitting
+ * ribbed brim and slouchy colourwork top - gives each a tension relative to
+ * its stated one, and a round that does not say which fabric it is in is in
+ * the stated one.
+ */
+export const fabricOf = (
+  pattern: HatPattern,
+  roundHeight: number,
+  fabric?: string,
+): { width: number; rise: number } => {
+  if (!fabric) return { width: adjacentStitchDistance, rise: roundHeight };
+  const tension = pattern.tensions?.[fabric];
+  if (tension === undefined) {
+    throw new Error(`${pattern.id}: no tension for the fabric "${fabric}"`);
+  }
+  return {
+    width: adjacentStitchDistance * (tension.stitch ?? 1),
+    rise: roundHeight * (tension.round ?? 1),
+  };
 };
 
 export const buildHat = (pattern: HatPattern): HatStitches => {
@@ -163,16 +191,37 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
   let count = 0;
   /** The rounds the fabric turns on, if the pattern says it has any. */
   const turns: number[] = [];
+  /*
+   * Which way about the hat the round being worked goes.
+   *
+   * A pattern that turns its work inside out partway - see the "turn" round -
+   * knits the two halves the opposite way about, and only their relation to
+   * each other means anything. The body is drawn the way a chart reads, so it
+   * is the part before the turn that goes on backwards.
+   */
+  let backwards = pattern.sections.some((section) =>
+    section.rounds.some((round) => round.type === "turn"),
+  );
 
   const apply = (round: RoundSpec, section: string) => {
     switch (round.type) {
+      case "turn": {
+        // Not a round: the work is turned over, and goes on the other way
+        // about from here.
+        backwards = false;
+        return;
+      }
       case "fold": {
         // Not a round: the fabric turns on the last one worked.
         turns.push(knitter.rounds.length - 1);
         return;
       }
       case "castOn": {
-        knitter.castOn(round.count, round.slot);
+        knitter.castOn(
+          round.count,
+          round.slot,
+          fabricOf(pattern, roundHeight, round.fabric).width,
+        );
         count = round.count;
         labels.push(`${section} · cast on`);
         return;
@@ -184,12 +233,21 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
           p: "p1",
           k1tbl: "k1tbl",
         };
+        const fabric = fabricOf(pattern, roundHeight, round.fabric);
         for (let pass = 0; pass < round.count; pass++) {
           const work = Array.from({ length: count }, (_, i) => ({
             type: asStitch[sequence[i % sequence.length]],
             slot: round.slot,
           }));
-          runRound(knitter, labels, `${section} · round ${pass + 1}`, work, count);
+          runRound(
+            knitter,
+            labels,
+            `${section} · round ${pass + 1}`,
+            work,
+            count,
+            fabric,
+            backwards,
+          );
         }
         return;
       }
@@ -197,7 +255,15 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
         const types = expand(round.ops, count);
         const work = types.map((type) => ({ type, slot: round.slot }));
         const after = types.length;
-        runRound(knitter, labels, `${section} · shaping round`, work, after);
+        runRound(
+          knitter,
+          labels,
+          `${section} · shaping round`,
+          work,
+          after,
+          fabricOf(pattern, roundHeight, round.fabric),
+          backwards,
+        );
         if (after !== round.to) {
           throw new Error(
             `${section}: shaping round left ${after} stitches, ` +
@@ -209,6 +275,7 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
       }
       case "chart": {
         const chart = chartOf(pattern as HatPattern, round.chart);
+        const fabric = fabricOf(pattern, roundHeight, round.fabric ?? chart.fabric);
         const [from, to] = round.rows;
         for (let pass = 0; pass < (round.passes ?? 1); pass++) {
           for (let row = from; row <= to; row++) {
@@ -242,6 +309,8 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
               `Chart ${chart.id}, row ${row}`,
               work,
               work.length,
+              fabric,
+              backwards,
             );
             count = work.length;
           }
