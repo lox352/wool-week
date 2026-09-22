@@ -12,7 +12,7 @@
 import {
   adjacentStitchDistance,
   minimumSettleFrames,
-  restMotionThreshold,
+  restMovement,
   settleDamping,
   settleRestSeconds,
   settleStepBudgetMs,
@@ -47,8 +47,11 @@ export interface Tuning {
   iterations: number;
   substeps: number;
   damping: number;
-  /** Mean per-stitch motion below which the hat counts as still. */
-  restThreshold: number;
+  /**
+   * How far the average stitch may move in a step and still count as still,
+   * as a fraction of a stitch's width. See restMovement in constants.
+   */
+  restMovement: number;
   restSeconds: number;
   minimumFrames: number;
   /**
@@ -170,7 +173,7 @@ export const defaultTuning: Tuning = {
   iterations: solverIterations,
   substeps: settleSubsteps,
   damping: settleDamping,
-  restThreshold: restMotionThreshold,
+  restMovement,
   restSeconds: settleRestSeconds,
   minimumFrames: minimumSettleFrames,
   gravity: 9.81,
@@ -194,7 +197,7 @@ const numbers: (keyof Tuning)[] = [
   "iterations",
   "substeps",
   "damping",
-  "restThreshold",
+  "restMovement",
   "restSeconds",
   "minimumFrames",
   "gravity",

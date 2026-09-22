@@ -125,7 +125,7 @@ export default function Settler({
         /** Mean distance a stitch travelled this step, in stitch widths. */
         moved: meanMoved / adjacentStitchDistance,
       };
-      if (rest.current(meanMotion)) {
+      if (rest.current(meanMoved)) {
         complete.current = true;
         const positions = stitchRefs.current.map((r) =>
           r.current!.translation(),

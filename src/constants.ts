@@ -9,6 +9,23 @@ export const solverIterations = 20;
 export const settleSubsteps = 2;
 /** Check the budget between indivisible physics steps. */
 export const settleStepBudgetMs = 16;
-export const restMotionThreshold = 0.15;
+/**
+ * How still a hat has to be to count as settled: how far the average stitch
+ * moves in a step, as a fraction of its own width.
+ *
+ * Distance rather than speed, which was measured and not assumed. A settling
+ * hat's mean velocity does not fall to nothing - it comes down to a floor and
+ * stays there, because the solver's corrections reverse from step to step and
+ * so register as speed while going nowhere. On Da Crofter's Kep that floor is
+ * 0.167 against a threshold of 0.15, so no amount of running would ever have
+ * settled it: at four hundred steps its stitches were moving four
+ * ten-thousandths of a width each and it was plainly finished.
+ *
+ * Distance has no such floor. Three thousandths of a stitch a step is about
+ * where the velocity rule used to stop the hats that it did stop, so the
+ * shapes are the ones it was already choosing - it is the hats it never
+ * stopped that this changes.
+ */
+export const restMovement = 0.003;
 export const minimumSettleFrames = 10;
 export const settleRestSeconds = 2;
