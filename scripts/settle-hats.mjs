@@ -146,6 +146,12 @@ for (let attempt = 0; ; attempt++) {
   await new Promise((resolve) => setTimeout(resolve, 250));
 }
 
+/*
+ * PLAYWRIGHT_CHROMIUM says which browser to drive, for a machine whose
+ * installed browsers do not match the version Playwright expects to find -
+ * which is the case in the container this is usually run in, and the failure
+ * is a launch that says the executable does not exist.
+ */
 const browser = await chromium.launch({
   executablePath: process.env.PLAYWRIGHT_CHROMIUM || undefined,
 });
@@ -155,15 +161,15 @@ for (const hatId of hatIds) {
   page.on("pageerror", (error) => say(`  ${hatId}: ERROR ${error.message}`));
 
   /*
-   * The site prefers a settled file over settling, so a rerun would find the
-   * file it wrote last time and settle nothing. Hiding them forces the
-   * physics, which is the whole point of the exercise.
+   * "settled=0" in the query below is what stops the page loading the file it
+   * wrote last time. Blocking the request does not work: Vite compiles a JSON
+   * import into a JS chunk, so there is no .json to block, and a run made
+   * that way quietly re-reports the answer it already had.
    */
-  await page.route("**/settled/*.json", (route) => route.abort());
 
   // ?settle=1 is what asks the page for the physics stage rather than a hat
   // drawn where it already came to rest; the rest is the tuning above.
-  const query = Object.entries({ settle: 1, stepBudgetMs, ...tuning })
+  const query = Object.entries({ settle: 1, settled: 0, stepBudgetMs, ...tuning })
     .map(([key, value]) => `${key}=${value}`)
     .join("&");
   await page.goto(`${base}#/hat/${hatId}?${query}`, { waitUntil: "networkidle" });
