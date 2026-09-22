@@ -25,7 +25,7 @@ export const hatStitches = (pattern: HatPattern) => {
 export const useHat = (pattern: HatPattern) => {
   const built = useMemo(() => hatStitches(pattern), [pattern]);
   const index = useMemo(
-    () => indexRounds(built.rounds, built.roundLabels),
+    () => indexRounds(built.rounds, built.roundLabels, built.turns),
     [built],
   );
   return { ...built, index };

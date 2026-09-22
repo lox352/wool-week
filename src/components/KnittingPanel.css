@@ -109,3 +109,31 @@
     flex: 1 1 auto;
   }
 }
+
+/*
+ * The turn. Given the accent and a rule of its own, matching the chart's, so
+ * that it reads as an instruction about the work rather than as another line
+ * of the readout.
+ */
+.knitting-turn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0.5rem 0 0;
+  padding: 0.45rem 0 0.1rem;
+  border-top: 2.5px solid var(--crimson);
+}
+
+.knitting-turn strong {
+  color: var(--crimson-dark);
+  font-size: 1rem;
+}
+
+.knitting-turn-open strong {
+  font-size: 1.15rem;
+}
+
+.knitting-turn .quiet {
+  font-size: 0.9rem;
+  line-height: 1.35;
+}

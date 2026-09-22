@@ -146,7 +146,8 @@ const ProjectView: React.FC<{
   restoreShades,
 }) => {
   const hat = hatById(hatId)!;
-  const { stitches, rounds, roundHeight, roundLabels, index } = useHat(hat);
+  const { stitches, rounds, roundHeight, roundLabels, turns, index } =
+    useHat(hat);
 
   const colourway =
     hat.colourways.find((c) => c.id === project.colourwayId) ?? hat.colourways[0];
@@ -272,6 +273,7 @@ const ProjectView: React.FC<{
           progress={project.progress}
           follow={knitting}
           labels={roundLabels}
+          turns={turns}
         />
         <ul className="chart-key">
           {hat.slots.map((slot) => (

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildHat, rowConsumes } from "./engine";
 import { hats, hatById } from "../data/hats";
-import { consumes } from "../data/hats/types";
+import { HatPattern, RoundSpec, consumes } from "../data/hats/types";
 import { paletteOf } from "./palette";
 import { adjacentStitchDistance, fabricThickness } from "../constants";
 
@@ -555,5 +555,110 @@ describe("the invariants the rest of the site leans on", () => {
         if (index > 0) expect(id).toBeGreaterThan(flat[index - 1]);
       });
     });
+  });
+});
+
+/**
+ * The turn, carried out of the engine.
+ *
+ * "Turn work inside out so the wrong side of the brim is facing you" is not
+ * a round and not a stitch: it is the boundary between two regions of the hat
+ * worked on opposite faces. The engine has always known about it - it is what
+ * decides which way about a round goes on - but until it is returned, nothing
+ * downstream can draw it or say it.
+ */
+describe("where the work is turned inside out", () => {
+  it("Birsie Beanny: one turn, between its inside rib and its body", () => {
+    const hat = hatById("sww26-birsie-beanny")!;
+    const { turns, roundLabels, rounds } = buildHat(hat);
+
+    expect(turns).toHaveLength(1);
+    const [turn] = turns;
+    // 1-based, the round it falls after, so it sits between turn and turn + 1.
+    expect(roundLabels[turn - 1]).toBe("Chart Hem, row 24");
+    expect(roundLabels[turn]).toBe("Body · round 1");
+    expect(turn).toBeGreaterThan(0);
+    expect(turn).toBeLessThan(rounds.length);
+  });
+
+  it("a hat that is never turned has none", () => {
+    hats
+      .filter((hat) =>
+        hat.sections.every((section) =>
+          section.rounds.every((round) => round.type !== "turn"),
+        ),
+      )
+      .forEach((hat) => expect(buildHat(hat).turns).toEqual([]));
+  });
+
+  it("no stitch is added: a turn costs nothing in the count", () => {
+    /*
+     * The whole reason the turn is a boundary rather than an invisible
+     * "instruction stitch". A stitch would take an id, and every id after it
+     * would shift - which is the settled models, the chart's layout and every
+     * saved knitter's progress, all moved by one, for something nobody works.
+     */
+    const { stitches, rounds } = buildHat(hatById("sww26-birsie-beanny")!);
+    const worked = rounds.flat();
+    // Every stitch is in a round, bar the phantom the hat hangs from.
+    expect(stitches).toHaveLength(worked.length + 1);
+    // And ids run 1..n in order, so nothing has been shifted by a marker.
+    expect(worked).toEqual(worked.map((_, at) => at + 1));
+  });
+
+  it("turns alternate, so n of them leave n + 1 regions", () => {
+    /*
+     * One turn is the only case any published hat here has, but the model is
+     * not "before and after": each turn flips the work back, and the region
+     * being worked when the hat is finished is always the one a chart is
+     * drawn for. So two turns must put the first and last regions the same
+     * way about, and the middle one the other.
+     */
+    const hat = hatById("sww15-baa-ble-hat")!;
+    const plain = (turnAt: number[]): HatPattern => ({
+      ...hat,
+      id: `synthetic-${turnAt.join("-")}`,
+      charts: [],
+      sections: [
+        {
+          label: "Tube",
+          rounds: [
+            { type: "castOn", count: 8, slot: hat.slots[0] },
+            ...[0, 1, 2, 3].flatMap((round): RoundSpec[] => [
+              ...(turnAt.includes(round) ? [{ type: "turn" as const }] : []),
+              // Asymmetric, so which way about it went on can be read off it.
+              {
+                type: "rounds",
+                count: 1,
+                slot: hat.slots[0],
+                sequence: ["k", "k", "k", "p"],
+              },
+            ]),
+          ],
+        },
+      ],
+    });
+
+    // What each round opens on: a knit the way it is written, a purl backwards.
+    const opening = (turnAt: number[]) => {
+      const { stitches, rounds } = buildHat(plain(turnAt));
+      return rounds.slice(1).map((round) => stitches[round[0]].type);
+    };
+
+    const straight = opening([]);
+    const once = opening([2]);
+    const twice = opening([1, 3]);
+
+    // No turn: every round goes on the same way.
+    expect(new Set(straight).size).toBe(1);
+    // One turn: the rounds before it are the other way about, the ones after
+    // it read as an unturned hat's do.
+    expect(once.slice(2)).toEqual(straight.slice(2));
+    expect(once[0]).not.toBe(straight[0]);
+    // Two turns: the middle region is turned, the outer two are not.
+    expect(twice[0]).toBe(straight[0]);
+    expect(twice[1]).not.toBe(straight[1]);
+    expect(twice[2]).not.toBe(straight[2]);
+    expect(twice[3]).toBe(straight[3]);
   });
 });

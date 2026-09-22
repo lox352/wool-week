@@ -4,6 +4,8 @@ import { hatById } from "../data/hats";
 import {
   currentRun,
   indexRounds,
+  positionOf,
+  regionsOf,
   runInstruction,
   stitchWord,
   upcomingRuns,
@@ -11,8 +13,13 @@ import {
 
 const hatOf = (id: string) => {
   const hat = hatById(id)!;
-  const { stitches, rounds, roundLabels } = buildHat(hat);
-  return { stitches, rounds, index: indexRounds(rounds, roundLabels) };
+  const { stitches, rounds, roundLabels, turns } = buildHat(hat);
+  return {
+    stitches,
+    rounds,
+    turns,
+    index: indexRounds(rounds, roundLabels, turns),
+  };
 };
 
 describe("what to work next", () => {
@@ -97,5 +104,73 @@ describe("what to work next", () => {
     expect(["s2kp", "k1"]).toContain(run.type);
     // Whatever it is, it is said rather than called "work".
     expect(runInstruction(run)).not.toMatch(/^Work/);
+  });
+});
+
+/**
+ * The turn is not a stitch, so the only thing that can carry it is the round
+ * it falls between. n of them cut the hat into n + 1 regions, and a round's
+ * region is simply how many turns are below it - the parity that decides
+ * which way about the hat its stitches go.
+ */
+describe("the regions a turn divides a hat into", () => {
+  it("makes two regions from one turn, meeting at it", () => {
+    expect(regionsOf([41], 100)).toEqual([
+      { from: 1, to: 41, turns: 0 },
+      { from: 42, to: 100, turns: 1 },
+    ]);
+  });
+
+  it("makes n + 1 regions from n turns", () => {
+    expect(regionsOf([10, 20, 30], 40).map((region) => region.turns)).toEqual([
+      0, 1, 2, 3,
+    ]);
+  });
+
+  it("is one region when nothing is turned", () => {
+    expect(regionsOf([], 100)).toEqual([{ from: 1, to: 100, turns: 0 }]);
+  });
+
+  it("drops a turn that divides nothing", () => {
+    // Before the cast-on, or after the last round: no fabric on one side.
+    expect(regionsOf([0, 100, 140], 100)).toEqual([
+      { from: 1, to: 100, turns: 0 },
+    ]);
+  });
+
+  it("puts 2026's turn between its inside rib and its body", () => {
+    const { stitches, turns, index } = hatOf("sww26-birsie-beanny");
+    expect(turns).toHaveLength(1);
+    const [turn] = turns;
+
+    // The pattern turns the work at the head of the body, which is the round
+    // after the last of the hem's chart.
+    expect(index.labels[turn - 1]).toBe("Chart Hem, row 24");
+    expect(index.labels[turn]).toBe("Body · round 1");
+
+    // The last stitch of the round below the turn is still in region 0 ...
+    const before = index.rounds[turn - 1];
+    expect(positionOf(stitches, before[before.length - 2], index)).toMatchObject(
+      { round: turn, region: 0 },
+    );
+    // ... and the first of the round above it opens region 1.
+    expect(positionOf(stitches, before[before.length - 1], index)).toMatchObject(
+      { round: turn + 1, region: 1, regionRound: 1, stitchInRound: 1 },
+    );
+    // The reminder comes down at the end of that round, not before it.
+    const after = index.rounds[turn];
+    expect(
+      positionOf(stitches, after[after.length - 2], index),
+    ).toMatchObject({ round: turn + 1, regionRound: 1 });
+    expect(
+      positionOf(stitches, after[after.length - 1], index),
+    ).toMatchObject({ round: turn + 2, regionRound: 2 });
+  });
+
+  it("leaves a hat that is never turned in one region throughout", () => {
+    const { stitches, turns, index } = hatOf("sww15-baa-ble-hat");
+    expect(turns).toEqual([]);
+    expect(index.regions).toHaveLength(1);
+    expect(positionOf(stitches, 0, index).region).toBe(0);
   });
 });

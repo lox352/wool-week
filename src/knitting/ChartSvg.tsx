@@ -20,7 +20,11 @@ interface ChartSvgProps {
   progress: number;
   nextStitchId?: number;
   cell: number;
+  /** Rounds after which the work is turned inside out. */
+  turns?: number[];
 }
+
+type Grid = ReturnType<typeof gridPaths>;
 
 /**
  * The chart, as vectors.
@@ -41,12 +45,12 @@ const Knitting: React.FC<{
   layout: ChartLayout;
   palette: Palette;
   cell: number;
-}> = React.memo(({ stitches, layout, palette, cell }) => {
+  grid: Grid;
+}> = React.memo(({ stitches, layout, palette, cell, grid }) => {
   const fills = useMemo(
     () => fillPaths(stitches, layout, cell),
     [stitches, layout, cell],
   );
-  const grid = useMemo(() => gridPaths(layout, cell), [layout, cell]);
   const marks = useMemo(
     () => markPaths(stitches, layout, palette, cell),
     [stitches, layout, palette, cell],
@@ -87,14 +91,27 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
   progress,
   nextStitchId,
   cell,
+  turns,
 }) => {
   const { width, height } = chartSize(layout, cell);
+  /*
+   * Built here rather than inside the knitting, because the turn's rule is
+   * drawn over the worked-so-far veil: it says which way about the chart is
+   * read, which is as much use behind you as ahead of you.
+   */
+  const grid = useMemo(
+    () => gridPaths(layout, cell, turns),
+    [layout, cell, turns],
+  );
 
   const veil = useMemo(
     () => progressPath(layout, rounds, progress, cell),
     [layout, rounds, progress, cell],
   );
-  const numbers = useMemo(() => numberedRounds(layout), [layout]);
+  const numbers = useMemo(
+    () => numberedRounds(layout, turns),
+    [layout, turns],
+  );
   const next = nextStitchId === undefined ? undefined : layout.cells.get(nextStitchId);
 
   return (
@@ -105,8 +122,19 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
       viewBox={`0 0 ${width} ${height}`}
       shapeRendering="crispEdges"
     >
-      <Knitting stitches={stitches} layout={layout} palette={palette} cell={cell} />
+      <Knitting
+        stitches={stitches}
+        layout={layout}
+        palette={palette}
+        cell={cell}
+        grid={grid}
+      />
       {veil && <path d={veil} className="chart-done" />}
+      {grid.turn && (
+        <path d={grid.turn} className="chart-rule chart-rule-turn">
+          <title>The work is turned inside out here.</title>
+        </path>
+      )}
       {next && (
         <rect
           className="chart-next"

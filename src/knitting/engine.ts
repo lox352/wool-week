@@ -28,6 +28,16 @@ export interface HatStitches {
   rounds: number[][];
   /** A label per round, for the chart's margin: "Chart A, row 7". */
   roundLabels: string[];
+  /**
+   * The rounds after which the work is turned inside out.
+   *
+   * A round number, 1-based, so a turn at 41 falls between rounds 41 and 42.
+   * Not a round itself and not a stitch: it is the boundary between two
+   * regions of the hat worked on opposite faces of the tube. n of them make
+   * n + 1 regions, and a round's region is how many of these are below it -
+   * which is the parity that decides which way about its stitches go.
+   */
+  turns: number[];
   /** How tall a round is, in the units the stitches are placed in. */
   roundHeight: number;
 }
@@ -222,31 +232,40 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
   const knitter = new Knitter(roundHeight);
   const labels: string[] = [];
   let count = 0;
-  /** The rounds the fabric turns on, if the pattern says it has any. */
+  /** The rounds the fabric folds back on, if the pattern says it has any. */
+  const folds: number[] = [];
+  /** The rounds after which the work is turned inside out. */
   const turns: number[] = [];
   /*
    * Which way about the hat the round being worked goes.
    *
    * A pattern that turns its work inside out partway - see the "turn" round -
    * knits the two halves the opposite way about, and only their relation to
-   * each other means anything. The body is drawn the way a chart reads, so it
-   * is the part before the turn that goes on backwards.
+   * each other means anything. The last region is the one drawn the way a
+   * chart reads, so with an odd number of turns it is the first that goes on
+   * backwards, and with an even number none of them does.
    */
-  let backwards = pattern.sections.some((section) =>
-    section.rounds.some((round) => round.type === "turn"),
+  const turnCount = pattern.sections.reduce(
+    (total, section) =>
+      total + section.rounds.filter((round) => round.type === "turn").length,
+    0,
   );
+  let backwards = turnCount % 2 === 1;
 
   const apply = (round: RoundSpec, section: string) => {
     switch (round.type) {
       case "turn": {
         // Not a round: the work is turned over, and goes on the other way
-        // about from here.
-        backwards = false;
+        // about from here. The boundary is kept so the chart can draw it and
+        // the knitting panel can say so; a turn before the cast-on divides
+        // nothing, so it is only a flip.
+        if (knitter.rounds.length > 0) turns.push(knitter.rounds.length);
+        backwards = !backwards;
         return;
       }
       case "fold": {
         // Not a round: the fabric turns on the last one worked.
-        turns.push(knitter.rounds.length - 1);
+        folds.push(knitter.rounds.length - 1);
         return;
       }
       case "castOn": {
@@ -358,6 +377,6 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
   );
 
   const { stitches, rounds } = knitter.finish();
-  foldAt(stitches, rounds, turns);
-  return { stitches, rounds, roundLabels: labels, roundHeight };
+  foldAt(stitches, rounds, folds);
+  return { stitches, rounds, roundLabels: labels, turns, roundHeight };
 };

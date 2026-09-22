@@ -82,7 +82,8 @@ const HatPage: React.FC<{
   navigate,
 }) => {
   const hat = hatById(hatId)!;
-  const { stitches, rounds, roundHeight, roundLabels, index } = useHat(hat);
+  const { stitches, rounds, roundHeight, roundLabels, turns, index } =
+    useHat(hat);
 
   const size = hat.sizes.find((s) => s.id === sizeId) ?? hat.sizes[0];
   const colourway =
@@ -283,6 +284,7 @@ const HatPage: React.FC<{
           palette={palette}
           progress={0}
           labels={roundLabels}
+          turns={turns}
         />
       </section>
     </PageLayout>

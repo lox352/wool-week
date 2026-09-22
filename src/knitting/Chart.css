@@ -43,6 +43,16 @@
   stroke: rgb(0 0 0 / 0.7);
 }
 
+/*
+ * Where the work is turned inside out. Not a counting line but the seam
+ * between two regions worked on opposite faces, so it is given the accent
+ * rather than another weight of grey.
+ */
+.chart-rule-turn {
+  stroke: var(--crimson);
+  stroke-width: 2.5;
+}
+
 .chart-mark {
   fill: none;
   stroke-width: 1.2;
@@ -104,4 +114,20 @@
   border: 1px solid rgb(0 0 0 / 0.35);
   border-radius: 2px;
   flex: none;
+}
+
+/* The one line under the chart that says what the crimson rule is. */
+.chart-turn-note {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+}
+
+.chart-turn-note .chart-key-turn {
+  flex: none;
+  width: 1.6rem;
+  height: 0;
+  margin-top: 0.55rem;
+  border-top: 2.5px solid var(--crimson);
 }

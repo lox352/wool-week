@@ -23,6 +23,8 @@ const emphasis = 5;
 
 const grid = "rgba(0, 0, 0, 0.22)";
 const gridStrong = "rgba(0, 0, 0, 0.7)";
+/** The seam between two regions worked on opposite faces. See gridPaths. */
+const gridTurn = "#a8202a";
 
 /** Where a cell's top left corner is, in pixels. */
 export const cellAt = (
@@ -55,7 +57,9 @@ const drawRoundNumbers = (
   layout: ChartLayout,
   cell: number,
   ink: string,
+  turns: number[] = [],
 ) => {
+  const named = new Set(turns.flatMap((round) => [round, round + 1]));
   ctx.save();
   ctx.fillStyle = ink;
   ctx.font = `${Math.round(cell * 0.72)}px ui-monospace, "Source Sans 3", system-ui, sans-serif`;
@@ -63,7 +67,14 @@ const drawRoundNumbers = (
   ctx.textBaseline = "middle";
   const x = layout.columns * cell + Math.round(cell * 0.45);
   for (let round = 1; round <= layout.rounds; round++) {
-    if (round % emphasis !== 0 && round !== 1 && round !== layout.rounds) continue;
+    if (
+      round % emphasis !== 0 &&
+      round !== 1 &&
+      round !== layout.rounds &&
+      !named.has(round)
+    ) {
+      continue;
+    }
     const { y } = cellAt(layout, round, 1, cell);
     ctx.fillText(String(round), x, y + cell / 2);
   }
@@ -84,7 +95,9 @@ export const drawChart = (
   palette: Palette,
   cell: number,
   ink = "#a29a91",
+  turns: number[] = [],
 ) => {
+  const turnsAt = new Set(turns);
   const { width, height } = chartSize(layout, cell);
   ctx.clearRect(0, 0, width, height);
 
@@ -120,16 +133,20 @@ export const drawChart = (
       Math.abs(at.column - Math.round(at.column)) < 1e-6 &&
       Math.round(at.column) % emphasis === 0;
     const majorRow = at.round !== 1 && (at.round - 1) % emphasis === 0;
+    // A cell draws its bottom edge, so round r's is the boundary below it.
+    const turnRow = turnsAt.has(at.round - 1);
     ctx.beginPath();
     ctx.strokeStyle = majorCol ? gridStrong : grid;
     ctx.moveTo(x + 0.5, y);
     ctx.lineTo(x + 0.5, y + cell);
     ctx.stroke();
     ctx.beginPath();
-    ctx.strokeStyle = majorRow ? gridStrong : grid;
+    ctx.lineWidth = turnRow ? 2.5 : 1;
+    ctx.strokeStyle = turnRow ? gridTurn : majorRow ? gridStrong : grid;
     ctx.moveTo(x, y + cell - 0.5);
     ctx.lineTo(x + cell, y + cell - 0.5);
     ctx.stroke();
+    ctx.lineWidth = 1;
 
     ctx.strokeStyle = grid;
     if (!filled.has(key(at.round + 1, at.column))) {
@@ -174,7 +191,7 @@ export const drawChart = (
     ctx.lineWidth = 1;
   }
 
-  drawRoundNumbers(ctx, layout, cell, ink);
+  drawRoundNumbers(ctx, layout, cell, ink, turns);
 };
 
 /**

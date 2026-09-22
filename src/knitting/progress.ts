@@ -14,6 +14,45 @@ import { StitchType } from "../types/StitchType";
  * pattern prints.
  */
 
+/**
+ * A stretch of rounds worked on one face of the tube.
+ *
+ * A pattern that turns its work inside out partway divides itself in two;
+ * n turns divide it into n + 1. Which region a round is in is simply how many
+ * turns are below it, and that parity is what decides which way about the
+ * hat its stitches go - so the chart above and below a turn is read on
+ * opposite faces. See the "turn" round in data/hats/types.ts.
+ */
+export interface Region {
+  /** 1-based round it starts at. */
+  from: number;
+  /** 1-based round it ends at, inclusive. */
+  to: number;
+  /** How many turns are below it: 0, 1, 2 ... */
+  turns: number;
+}
+
+/**
+ * The regions n turns cut a hat of this many rounds into.
+ *
+ * Turns at or past the last round divide nothing and are dropped, so there is
+ * always at least one region and every round falls in exactly one.
+ */
+export const regionsOf = (turns: number[], rounds: number): Region[] => {
+  if (rounds <= 0) return [];
+  const cuts = [...new Set(turns)]
+    .filter((round) => round > 0 && round < rounds)
+    .sort((a, b) => a - b);
+  const regions: Region[] = [];
+  let from = 1;
+  cuts.forEach((cut, index) => {
+    regions.push({ from, to: cut, turns: index });
+    from = cut + 1;
+  });
+  regions.push({ from, to: rounds, turns: cuts.length });
+  return regions;
+};
+
 export interface RoundIndex {
   rounds: number[][];
   /** Round number, 1-based, for each stitch id. */
@@ -28,11 +67,14 @@ export interface RoundIndex {
   worked: number[];
   labels: string[];
   totalRounds: number;
+  /** One per region, in order from the cast-on. Never empty. */
+  regions: Region[];
 }
 
 export const indexRounds = (
   rounds: number[][],
   labels: string[] = [],
+  turns: number[] = [],
 ): RoundIndex => {
   const roundOf = new Map<number, number>();
   const worked: number[] = [];
@@ -42,7 +84,14 @@ export const indexRounds = (
       worked.push(id);
     }),
   );
-  return { rounds, roundOf, worked, labels, totalRounds: rounds.length };
+  return {
+    rounds,
+    roundOf,
+    worked,
+    labels,
+    totalRounds: rounds.length,
+    regions: regionsOf(turns, rounds.length),
+  };
 };
 
 /** How many of an ascending list are at or below a value. */
@@ -63,6 +112,10 @@ export interface Position {
   label?: string;
   stitchInRound: number;
   stitchesInRound: number;
+  /** Which region the round is in: 0 up to the first turn, then 1, 2 ... */
+  region: number;
+  /** Which round of that region this is, 1-based. */
+  regionRound: number;
   nextStitchId?: number;
   finished: boolean;
 }
@@ -77,6 +130,9 @@ export const positionOf = (
   const reference = nextStitchId ?? progress;
   const round = index.roundOf.get(reference) ?? index.totalRounds;
   const ids = index.rounds[round - 1] ?? [];
+  const region =
+    index.regions.find((candidate) => round <= candidate.to) ??
+    index.regions[index.regions.length - 1];
 
   return {
     round,
@@ -84,6 +140,8 @@ export const positionOf = (
     label: index.labels[round - 1],
     stitchInRound: Math.max(ids.indexOf(reference) + 1, 1),
     stitchesInRound: ids.length,
+    region: region?.turns ?? 0,
+    regionRound: region ? round - region.from + 1 : round,
     nextStitchId,
     finished: nextStitchId === undefined,
   };

@@ -160,13 +160,16 @@ export const fillPaths = (
 export const gridPaths = (
   layout: ChartLayout,
   cell: number,
-): { light: string; heavy: string } => {
+  turns: number[] = [],
+): { light: string; heavy: string; turn: string } => {
+  const turnsAt = new Set(turns);
   const rows = byRound(layout);
   const runs = new Map<number, Cell[][]>();
   rows.forEach((cells, round) => runs.set(round, runsOf(cells)));
 
   const light: string[] = [];
   const heavy: string[] = [];
+  const turn: string[] = [];
 
   /*
    * Horizontal rules: a boundary needs one wherever there is fabric on
@@ -181,7 +184,16 @@ export const gridPaths = (
       (a, b) => a.left - b.left,
     );
     const y = (layout.rounds - round) * cell;
-    const into = round !== 0 && round % emphasis === 0 ? heavy : light;
+    /*
+     * A turn takes the boundary for itself: it is not a counting line but
+     * the seam between two regions worked on opposite faces, and the chart
+     * either side of it is read the other way about.
+     */
+    const into = turnsAt.has(round)
+      ? turn
+      : round !== 0 && round % emphasis === 0
+        ? heavy
+        : light;
     let open: { left: number; right: number } | null = null;
     for (const span of all) {
       if (open && span.left <= open.right + 1e-6) {
@@ -237,7 +249,11 @@ export const gridPaths = (
     flush();
   });
 
-  return { light: light.join(""), heavy: heavy.join("") };
+  return {
+    light: light.join(""),
+    heavy: heavy.join(""),
+    turn: turn.join(""),
+  };
 };
 
 /**
@@ -333,11 +349,29 @@ export const progressPath = (
   return parts.join("");
 };
 
-/** Which rounds get a number down the right-hand edge. */
-export const numberedRounds = (layout: ChartLayout): number[] => {
+/**
+ * Which rounds get a number down the right-hand edge.
+ *
+ * Every fifth, the first and the last - and both rounds a turn falls between,
+ * so the line across the chart can be named in words and found by eye.
+ */
+export const numberedRounds = (
+  layout: ChartLayout,
+  turns: number[] = [],
+): number[] => {
+  const named = new Set<number>();
+  turns.forEach((round) => {
+    named.add(round);
+    named.add(round + 1);
+  });
   const out: number[] = [];
   for (let round = 1; round <= layout.rounds; round++) {
-    if (round % emphasis === 0 || round === 1 || round === layout.rounds) {
+    if (
+      round % emphasis === 0 ||
+      round === 1 ||
+      round === layout.rounds ||
+      named.has(round)
+    ) {
       out.push(round);
     }
   }

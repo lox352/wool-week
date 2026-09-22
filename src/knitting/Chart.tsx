@@ -8,6 +8,10 @@ import "./Chart.css";
 
 const cellSize = 13;
 
+/** How many turns are below a round: which region it is in, and its parity. */
+const regionsBelow = (turns: number[], round: number): number =>
+  turns.filter((at) => at < round).length;
+
 /**
  * How far above the panel the stitch being worked should sit, in rounds.
  *
@@ -66,6 +70,14 @@ interface ChartProps {
   /** Mark the next stitch and keep it in view. */
   follow?: boolean;
   labels?: string[];
+  /**
+   * Rounds after which the work is turned inside out.
+   *
+   * Drawn as a rule across the chart, because it is the one boundary that
+   * changes how the chart is read: the rounds either side of it go on
+   * opposite faces of the tube, and so the other way about the hat.
+   */
+  turns?: number[];
 }
 
 /**
@@ -90,6 +102,7 @@ const Chart: React.FC<ChartProps> = ({
   progress,
   follow = false,
   labels,
+  turns,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const baseRef = useRef<HTMLCanvasElement>(null);
@@ -98,6 +111,18 @@ const Chart: React.FC<ChartProps> = ({
   const drawWith = useMemo(() => renderer(), []);
 
   const layout = useMemo(() => layOut(stitches, rounds), [stitches, rounds]);
+  /*
+   * The turns that actually fall inside the chart, in order. One at the very
+   * top or bottom would divide nothing, and there would be no fabric either
+   * side of it to draw the rule across.
+   */
+  const marked = useMemo(
+    () =>
+      [...new Set(turns ?? [])]
+        .filter((round) => round > 0 && round < layout.rounds)
+        .sort((a, b) => a - b),
+    [turns, layout.rounds],
+  );
   const { width, height } = chartSize(layout, cellSize);
 
   const ratio = useMemo(() => {
@@ -135,7 +160,15 @@ const Chart: React.FC<ChartProps> = ({
     if (!canvas || !ctx) return;
     size(canvas);
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    drawChart(ctx, drawn, layout, palette, cellSize, token("--ink-faint", "#a29a91"));
+    drawChart(
+      ctx,
+      drawn,
+      layout,
+      palette,
+      cellSize,
+      token("--ink-faint", "#a29a91"),
+      marked,
+    );
     // Size is derived from the same values this already depends on.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drawn, layout, palette, width, height, ratio]);
@@ -232,8 +265,16 @@ const Chart: React.FC<ChartProps> = ({
           aria-label={
             `The chart: ${layout.columns} stitches at its widest and ` +
             `${layout.rounds} rounds.` +
+            (marked.length > 0
+              ? ` The work is turned inside out after ${
+                  marked.length === 1 ? "round" : "rounds"
+                } ${marked.join(", ")}.`
+              : "") +
             (focusRound && labels?.[focusRound - 1]
               ? ` You are on ${labels[focusRound - 1]}.`
+              : "") +
+            (focusRound && regionsBelow(marked, focusRound) > 0
+              ? " You are working it inside out."
               : "")
           }
         >
@@ -246,6 +287,7 @@ const Chart: React.FC<ChartProps> = ({
               progress={progress}
               nextStitchId={nextId}
               cell={cellSize}
+              turns={marked}
             />
           ) : (
             <>
@@ -261,6 +303,20 @@ const Chart: React.FC<ChartProps> = ({
         whole round. Where a round is shorter than the one below it, stitches
         have been decreased away.
       </p>
+      {marked.length > 0 && (
+        <p className="chart-caption chart-turn-note">
+          <span className="chart-key-turn" aria-hidden="true" />
+          <span>
+            The work is turned inside out after{" "}
+            {marked.length === 1 ? "round" : "rounds"} {marked.join(", ")}.
+            Each rule divides two regions worked on opposite faces of the hat:
+            the rounds below it go on the other way about, so they read back to
+            front against the rounds above. Which, with the fold, is why a brim
+            charted this way comes out the right way round once it is turned
+            up.
+          </span>
+        </p>
+      )}
     </div>
   );
 };
