@@ -56,6 +56,11 @@ python3 scripts/extract_chart.py SWW22.pdf --page 6 --vector 0 \
 python3 scripts/extract_chart.py SWW22.pdf --page 7 --vector 1 \
     --key knit k2tog sk2p A B C D E \
     --charts D:12x14 E:16x19 --out .../p7.json
+
+# SWW15, the Baa-ble Hat - one chart, set as a word-processor table.
+python3 scripts/extract_chart.py SWW15.pdf --page 3 --vector 0 --ruled \
+    --key A B C D k2tog \
+    --charts A:60x45 --out src/data/hats/sww15-baa-ble-hat.charts.json
 ```
 
 Where a pattern's charts are split across pages, the pieces are merged into
@@ -76,6 +81,38 @@ It reads a page two ways and makes them agree:
 - **Names from the key.** "Yarn A" beside a swatch is what ties a fill to a
   slot. Where a pattern draws those captions outside the page's content stream,
   `--key knit purl s2kp A B C D E` names the swatches top to bottom instead.
+
+### Charts set as a table
+
+2015's is the odd one out, and `--ruled` is for it. It was laid out in a word
+processor rather than a page layout program, and a word processor draws a
+table, not a chart:
+
+- **Shading comes in runs.** Eleven white stitches in a row are one rectangle
+  eleven cells wide, and two rows the same are one rectangle two cells tall.
+  Only a stitch that breaks a run is drawn on its own.
+- **A default cell is not drawn at all.** Whole runs of white stitches through
+  the middle of the sheep are simply absent from the page's drawing.
+- **There are no gutters.** Every cell of every row is part of the table to
+  the very top, and the staircase down the crown is drawn by taking the
+  *borders* off the cells that are not stitches. Read from the shading alone
+  the crown comes out sixty stitches wide all the way up.
+
+So under `--ruled` the rules say which cells a knitter works and the shading is
+asked only what colour each one is. A stitch is a cell with a line above it and
+a line below it: the line above gives a row its extent, since that is the one a
+row draws for itself, and wanting the line below as well is what tells a row of
+stitches from the empty row a table is apt to end with. The column of row
+numbers is ruled exactly like the rest and is dropped because nothing in it is
+ever shaded.
+
+Two smaller things came from the same page. A key set into the same table as
+its chart is not separable by position, so its swatches are found by being
+boxed in on their own - the line down each side is one cell tall, where a
+chart's verticals run the height of the whole grid. And one cell of this chart
+is shaded 15% grey where its neighbours are 25%; a shade plainly nearer one
+yarn than any other is read as that yarn, with a note, and one that could be
+either is still an error.
 
 It refuses to write a file whose arithmetic does not chain: a chart row holds
 the stitches *worked* in that round, so its length is the count afterwards and

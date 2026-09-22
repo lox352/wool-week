@@ -84,8 +84,10 @@ def cell_span(stream):
     itself to the last decimal.
     """
     sizes = collections.Counter()
-    for _x, _y, width, _fill in cells_in(stream, span=(3.0, 30.0)):
-        sizes[round(width, 1)] += 1
+    for _x, _y, width, height, _fill in painted(stream):
+        if 3.0 < width < 30.0 and 3.0 < height < 30.0 \
+                and abs(height - width) < width * 0.25:
+            sizes[round(width, 1)] += 1
     if not sizes:
         return None
     cell, seen = sizes.most_common(1)[0]
@@ -95,22 +97,19 @@ def cell_span(stream):
     return (cell * 0.85, cell * 1.15)
 
 
-def cells_in(stream, span=None):
-    """Filled square-ish rectangles on a page, as (x, y, size, rgb).
+def painted(stream):
+    """Every filled rectangle on a page, in page points, as (x, y, w, h, rgb).
 
     Rectangles are accumulated and painted on the paint operator rather than
     on sight, because a page may build a path of many and fill it in one go
     ("re re re ... f*") as readily as one at a time ("re f").
 
-    `span` is the (smallest, largest) a cell may be, in points. Left out, it
-    is worked out from the page - see cell_span - because a chart cell is
-    whatever size the leaflet it is printed in makes it: the same designer's
-    charts are 10.6pt on an A4 pattern and 7.6pt on an A5 one, and a range
-    that fits one silently finds nothing at all in the other.
+    Coordinates are put through the current transformation matrix, because a
+    page need not draw in page units. Word exports a chart into a space of
+    its own and scales it down to fit - 2015's cells are 20 units square
+    under a 0.3 scale - so numbers straight out of the stream can be three
+    times the size of the page they are on.
     """
-    if span is None:
-        span = (3.0, 30.0)
-    smallest, largest = span
     text = stream.decode("latin-1")
     # Text blocks carry digits and slashes that would otherwise parse as geometry.
     text = re.sub(r"BT.*?ET", " ", text, flags=re.S)
@@ -118,6 +117,9 @@ def cells_in(stream, span=None):
     tokens = text.replace("/", " /").split()
 
     fill = None
+    # (x scale, y scale, x shift, y shift): rotation and skew are not something
+    # a chart is drawn with, and ignoring them is better than half-reading them.
+    ctm = (1.0, 1.0, 0.0, 0.0)
     stack = []
     pending = []
     numbers = []
@@ -128,9 +130,13 @@ def cells_in(stream, span=None):
             numbers.append(float(token))
             continue
         if token == "q":
-            stack.append(fill)
+            stack.append((fill, ctm))
         elif token == "Q":
-            fill = stack.pop() if stack else None
+            fill, ctm = stack.pop() if stack else (None, (1.0, 1.0, 0.0, 0.0))
+        elif token == "cm" and len(numbers) >= 6:
+            a, _b, _c, d, e, f = numbers[-6:]
+            sx, sy, tx, ty = ctm
+            ctm = (sx * a, sy * d, sx * e + tx, sy * f + ty)
         elif token == "rg" and len(numbers) >= 3:
             fill = tuple(round(v, 2) for v in numbers[-3:])
         elif token == "g" and numbers:
@@ -151,22 +157,208 @@ def cells_in(stream, span=None):
                 grey = round(numbers[0], 2)
                 fill = (grey, grey, grey)
         elif token == "re" and len(numbers) >= 4:
-            pending.append(tuple(numbers[-4:]))
+            pending.append((tuple(numbers[-4:]), ctm))
         elif token in ("f", "F", "f*", "b", "b*", "B", "B*"):
-            for x, y, width, height in pending:
-                if (
-                    smallest < width < largest
-                    and smallest < abs(height) < largest
-                    # Square-ish: a chart cell is, and a rule or a swatch of
-                    # background is not.
-                    and abs(abs(height) - width) < width * 0.25
-                ):
-                    out.append((x, min(y, y + height), width, fill))
+            for (x, y, width, height), where in pending:
+                sx, sy, tx, ty = where
+                left = min(sx * x + tx, sx * (x + width) + tx)
+                low = min(sy * y + ty, sy * (y + height) + ty)
+                out.append(
+                    (left, low, abs(width * sx), abs(height * sy), fill)
+                )
             pending = []
         elif token in ("S", "s", "n"):
             pending = []
         numbers = []
 
+    return out
+
+
+def grid_of(stream, span=None):
+    """A page's drawing and the grid its chart cells sit on.
+
+    Returns the page's rectangles, the ones a chart could be drawn out of,
+    the size a cell is drawn at and the pitch across and up.
+
+    `span` is the (smallest, largest) a cell may be, in points. Left out, it
+    is worked out from the page - see cell_span - because a chart cell is
+    whatever size the leaflet it is printed in makes it: the same designer's
+    charts are 10.6pt on an A4 pattern and 7.6pt on an A5 one, and a range
+    that fits one silently finds nothing at all in the other.
+
+    A cell need not have been drawn as its own rectangle. A word processor
+    shades a table by run: eleven white stitches in a row come out as one
+    rectangle eleven cells wide and one cell tall, and only the stitches that
+    break a run are drawn singly. So a rectangle of cell height is measured
+    against the pitch and handed back as the several cells it stands for,
+    which leaves a chart drawn cell by cell exactly as it was.
+    """
+    if span is None:
+        span = (3.0, 30.0)
+    smallest, largest = span
+    rectangles = painted(stream)
+
+    square = [
+        r for r in rectangles
+        if smallest < r[2] < largest
+        and smallest < r[3] < largest
+        # Square-ish: a chart cell is, and a rule or a swatch of background
+        # is not.
+        and abs(r[3] - r[2]) < r[2] * 0.25
+    ]
+    if not square:
+        return None
+    size = collections.Counter(round(r[2], 1) for r in square).most_common(1)[0][0]
+    tall = collections.Counter(round(r[3], 1) for r in square).most_common(1)[0][0]
+
+    # Cells and runs alike, which is everything the chart is drawn out of.
+    pieces = [r for r in rectangles if r[2] > size * 0.6 and r[3] > tall * 0.6]
+
+    def pitch_of(values, drawn):
+        """The step between neighbouring cells, from where they are drawn.
+
+        Every piece of a chart starts on a grid line, whether it is one cell
+        or eleven, so their edges taken together mark out the whole grid. The
+        commonest step between neighbouring edges is a single cell - commonest
+        rather than smallest, because one cell nudged half a point by rounding
+        would otherwise set the pitch for the whole page and leave every run
+        measuring a fraction of a stitch too wide.
+        """
+        edges = sorted(set(values))
+        gaps = [b - a for a, b in zip(edges, edges[1:]) if b - a > drawn * 0.4]
+        if not gaps:
+            return drawn
+        about = collections.Counter(round(g, 1) for g in gaps).most_common(1)[0][0]
+        near = [g for g in gaps if abs(g - about) < 0.15]
+        return sum(near) / len(near)
+
+    across = pitch_of((round(r[0], 2) for r in pieces), size)
+    up = pitch_of((round(r[1], 2) for r in pieces), tall)
+    return rectangles, pieces, size, across, up
+
+
+def cells_in(stream, span=None, ruled=False, runs=True):
+    """A page's chart cells, as (x, y, size, rgb), one entry per stitch.
+
+    `span` is the (smallest, largest) a cell may be, in points - see grid_of.
+
+    A cell need not have been drawn as its own rectangle. A word processor
+    shades a table by run: eleven white stitches in a row come out as one
+    rectangle eleven cells wide and one cell tall, and only the stitches that
+    break a run are drawn singly. So a rectangle is measured against the pitch
+    and handed back as the several cells it stands for, which leaves a chart
+    drawn cell by cell exactly as it was.
+    """
+    found = grid_of(stream, span)
+    if not found:
+        return []
+    rectangles, pieces, size, across, up = found
+
+    out = []
+    for x, y, width, height, fill in pieces:
+        # One cell, drawn at whatever size its own row and column happen to
+        # be: a key's swatches are often set in a taller row than the chart's.
+        # Only something half as big again as the pitch can be two cells.
+        wide = 1 if width < across * 1.5 else int(round(width / across))
+        high = 1 if height < up * 1.5 else int(round(height / up))
+        if ((wide > 1 and abs(width - wide * across) > across * 0.4)
+                or (high > 1 and abs(height - high * up) > up * 0.4)):
+            continue
+        if not runs and wide * high != 1:
+            continue
+        # A run's own extent divides more evenly than the page's average pitch
+        # does, because a word processor's rows are not all quite the same
+        # height, and one drawn taller than its neighbours would otherwise put
+        # the cells under it half a row out.
+        for j in range(high):
+            for i in range(wide):
+                out.append((x + i * width / wide, y + j * height / high, size, fill))
+
+    return within_rules(out, rectangles, across, up) if ruled else out
+
+
+def boxed_in(stream, cells):
+    """The cells the page draws a box of their own around.
+
+    A key set into the same table as its chart is not separable by position -
+    it is one more row of it, and its swatches touch their neighbours exactly
+    as the chart's cells touch theirs. What marks a swatch out is that it is
+    ruled on its own: the line down its left and the line down its right are
+    each one cell tall, where a chart's verticals run the height of the whole
+    grid because the cells beside them share them.
+    """
+    found = grid_of(stream)
+    if not found:
+        return []
+    rectangles, _pieces, _size, across, up = found
+    sides = [(r[0], r[1]) for r in rectangles
+             if r[2] < across * 0.25 and up * 0.8 < r[3] < up * 2.0]
+
+    def ruled(x, y):
+        return any(abs(a - x) < across * 0.15 and abs(b - y) < up * 0.5
+                   for a, b in sides)
+
+    return [c for c in cells
+            if ruled(c[0], c[1]) and ruled(c[0] + across, c[1])]
+
+
+def within_rules(cells, rectangles, across, up):
+    """The chart as its table rules it, rather than as its shading draws it.
+
+    A chart set as a table has no gutters to leave blank: a word processor
+    fills every cell of every row, and the staircase down a crown is drawn by
+    taking the *borders* off the cells that are not stitches, not by leaving
+    them out. Read from the shading alone, 2015's Baa-ble crown comes out
+    sixty stitches wide to the very top. The other way round, a cell left at
+    the table's default shading is not drawn at all, so whole runs of white
+    stitches are missing from the middle of the sheep. Only the rules know
+    which cells a knitter works, so here they say, and the shading is asked
+    only what colour each one is.
+
+    A stitch is a cell with a line above it and a line below it. The line
+    above gives a row its extent, that being the one a row draws for itself;
+    wanting the line below as well is what tells a row of stitches from the
+    empty row a table is apt to end with, which has the chart's bottom edge
+    over it and nothing under it at all.
+    """
+    if not cells:
+        return cells
+    rules = [r for r in rectangles if r[3] < up * 0.25 and r[2] > across * 0.7]
+    if len(rules) < 20:
+        return cells
+
+    origin = min(c[0] for c in cells)
+    column = lambda x: int(round((x - origin) / across))
+
+    # A chart's columns are the ones that are shaded somewhere. It matters
+    # because the table usually carries the row numbers in a column of its
+    # own, ruled exactly like the rest and no part of the knitting.
+    seen = collections.Counter(column(c[0]) for c in cells)
+    busiest = max(seen.values())
+    columns = {c for c, n in seen.items() if n * 5 >= busiest}
+
+    ruled = collections.defaultdict(set)
+    for x, y, width, _height, _fill in rules:
+        start = column(x)
+        ruled[round(y, 1)].update(
+            range(start, start + max(int(round(width / across)), 1))
+        )
+    at = lambda y: columns & set().union(
+        set(), *(v for k, v in ruled.items() if abs(k - y) < up * 0.3)
+    )
+
+    painted_at = {(round(c[1], 1), column(c[0])): c[3] for c in cells}
+    size = collections.Counter(c[2] for c in cells).most_common(1)[0][0]
+
+    out = []
+    for y in sorted({round(c[1], 1) for c in cells}):
+        above, below = at(y + up), at(y)
+        if not above or not above <= below:
+            continue
+        for c in sorted(above):
+            # Nothing drawn means the table's default, which is the paper.
+            fill = painted_at.get((y, c), (1.0, 1.0, 1.0))
+            out.append((origin + c * across, y, size, fill))
     return out
 
 
@@ -424,9 +616,16 @@ def read_key(pdf, page, vector_index, order=None):
     cells = cells_in(stream)
     size = collections.Counter(round(c[2], 1) for c in cells).most_common(1)[0][0]
     rendered = RenderedPage(pdf, page)
+    # Top to bottom, then left to right, because a key set as one line across
+    # the foot of a chart has all its swatches at the same height.
+    order_by = lambda c: (-round(c[1] / size), c[0])
     swatches = sorted(
-        (b[0] for b in blocks_of(cells, size) if len(b) == 1), key=lambda c: -c[1]
+        (b[0] for b in blocks_of(cells, size) if len(b) == 1), key=order_by
     )
+    if order and len(swatches) != len(order):
+        boxed = sorted(boxed_in(stream, cells), key=order_by)
+        if len(boxed) == len(order):
+            swatches = boxed
 
     if order:
         if len(order) != len(swatches):
@@ -484,15 +683,35 @@ def resolve_fills(cells, slots):
     spare = sorted(set(slots) - {by_fill[f] for f in by_fill})
     spare = [slot for slot in slots if slot not in
              {by_fill[f] for f in by_fill if f in {c[3] for c in cells}}]
+    distance = lambda a, b: sum((x - y) ** 2 for x, y in zip(a, b))
+
     if len(spare) != len(unmatched):
+        # No slot going spare, so this is not a page drawn in slightly
+        # different colours from the key - it is a cell shaded a shade off.
+        # 2015's chart has one cell at 15% grey in a row of 25% grey ones,
+        # and a shade that is plainly nearer one yarn than any other is that
+        # yarn; one that could be either is an error and says so.
+        left = []
+        for fill in unmatched:
+            ranked = sorted(slots, key=lambda s: distance(fill, slots[s]))
+            if (len(ranked) < 2
+                    or distance(fill, slots[ranked[0]]) * 1.5
+                    > distance(fill, slots[ranked[1]])):
+                left.append(fill)
+                continue
+            by_fill[fill] = ranked[0]
+            print("  note: #%02x%02x%02x read as yarn %s (a shade off it, and "
+                  "nothing else)" % (*[int(round(v * 255)) for v in fill],
+                                     ranked[0]), file=sys.stderr)
+        if not left:
+            return by_fill
         raise SystemExit(
             "these fills are not in the key: "
             + ", ".join("#%02x%02x%02x" % tuple(int(round(v * 255)) for v in f)
-                        for f in unmatched)
+                        for f in left)
             + f"; unused slots: {spare or 'none'}"
         )
 
-    distance = lambda a, b: sum((x - y) ** 2 for x, y in zip(a, b))
     for fill in unmatched:
         slot = min(spare, key=lambda s: distance(fill, slots[s]))
         spare.remove(slot)
@@ -512,9 +731,9 @@ def chart_stream(pdf, vector_index):
     return found[vector_index]
 
 
-def extract(pdf, page, vector_index, slots, templates):
+def extract(pdf, page, vector_index, slots, templates, ruled=False):
     stream = chart_stream(pdf, vector_index)
-    cells = cells_in(stream, cell_span(stream))
+    cells = cells_in(stream, cell_span(stream), ruled)
     size = collections.Counter(round(c[2], 1) for c in cells).most_common(1)[0][0]
     rendered = RenderedPage(pdf, page)
 
@@ -601,6 +820,10 @@ def main():
                         help="read the key from this page instead (a chart page "
                              "that carries no key borrows one)")
     parser.add_argument("--key-vector", type=int)
+    parser.add_argument("--ruled", action="store_true",
+                        help="the chart is a word-processor table, whose "
+                             "gutters are cells with their borders taken off "
+                             "rather than cells left out")
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
 
@@ -610,7 +833,8 @@ def main():
         args.key_vector if args.key_vector is not None else args.vector,
         args.key,
     )
-    charts = extract(args.pdf, args.page, args.vector, slots, templates)
+    charts = extract(args.pdf, args.page, args.vector, slots, templates,
+                     args.ruled)
 
     if len(charts) != len(args.charts):
         raise SystemExit(

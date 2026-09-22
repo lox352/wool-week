@@ -159,6 +159,44 @@ describe("the counts the patterns print", () => {
     expect(leaning).toHaveLength(11);
   });
 
+  it("Baa-ble Hat: 96 sts, 120 after the rib increase, 10 at the crown", () => {
+    const hat = hatById("sww15-baa-ble-hat")!;
+    const { rounds } = buildHat(hat);
+    const sizes = rounds.map((round) => round.length);
+
+    expect(sizes[0]).toBe(96);
+    // "Row 1: *K2, P2*... Continue with rib for another 24 rows" - so the
+    // cast-on and twenty-five rounds of rib, all over 96.
+    expect(sizes.slice(0, 26).every((n) => n === 96)).toBe(true);
+    // "*K2, P2, M1* to the end. (24 stitches increased making a total of 120)"
+    expect(sizes[26]).toBe(120);
+    // Then one chart for everything else, worked twice a round.
+    expect(sizes.slice(26, 26 + 1 + 25).every((n) => n === 120)).toBe(true);
+    // "Row 26: begin decreasing" - the first round under 120 is chart row 26.
+    expect(sizes[26 + 26]).toBe(110);
+    // "You will be Left with 10 stitches on your needles."
+    expect(sizes[sizes.length - 1]).toBe(10);
+    expect(sizes.length).toBe(1 + 25 + 1 + 45);
+  });
+
+  it("Baa-ble Hat: one chart, half a round wide, decreasing eleven times", () => {
+    const hat = hatById("sww15-baa-ble-hat")!;
+    const chart = hat.charts.find((c) => c.id === "A")!;
+    expect(chart.rows).toHaveLength(45);
+    // Sixty stitches - half of the 120 - down to five, worked twice a round.
+    expect(chart.rows[0]).toHaveLength(60);
+    expect(chart.rows[44]).toHaveLength(5);
+    // Five decreases on each of eleven rows is what takes sixty to five, and
+    // the only mark on the chart is the one its key names.
+    const marks = chart.rows.flat().map((cell) => cell.symbol).filter(Boolean);
+    expect(marks).toHaveLength(55);
+    expect(marks.every((mark) => mark === "k2tog")).toBe(true);
+    const shrinking = chart.rows.filter(
+      (row, i) => i > 0 && row.length < chart.rows[i - 1].length,
+    );
+    expect(shrinking).toHaveLength(11);
+  });
+
   it("a chart repeat multiplied out matches the round it is worked over", () => {
     const hat = hatById("sww25-aal-ower-toorie")!;
     const crown = hat.charts.find((chart) => chart.id === "B")!;
