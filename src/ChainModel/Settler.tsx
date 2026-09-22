@@ -4,6 +4,7 @@ import { RapierRigidBody, useRapier } from "@react-three/rapier";
 import { createRestDetector, SettleMetrics } from "../helpers/settling";
 import { Tuning } from "./tuning";
 import { Point } from "../types/Point";
+import { adjacentStitchDistance } from "../constants";
 interface SettlerProps {
   active: boolean;
   tuning: Tuning;
@@ -66,6 +67,8 @@ export default function Settler({
   const complete = useRef(false);
   const count = useRef(0);
   const started = useRef(0);
+  /** Where everything was a step ago, so how far it moved can be measured. */
+  const was = useRef<Float32Array | null>(null);
 
   useFrame(() => {
     if (
@@ -80,12 +83,37 @@ export default function Settler({
       if (tuning.pressure !== 0) inflate(stitchRefs.current, tuning.pressure);
       step(tuning.timeStep);
       count.current++;
+
+      const bodies = stitchRefs.current;
+      if (!was.current) was.current = new Float32Array(bodies.length * 3);
+      const before = was.current;
+
       let motion = 0;
-      for (const ref of stitchRefs.current) {
-        const v = ref.current!.linvel();
+      let moved = 0;
+      for (let index = 0; index < bodies.length; index++) {
+        const body = bodies[index]!.current!;
+        const v = body.linvel();
         motion += Math.abs(v.x) + Math.abs(v.y) + Math.abs(v.z);
+
+        /*
+         * And how far it actually went, which is the question a rest
+         * detector is really asking. Velocity is only a guess at it: a hat
+         * can carry a lot of small velocities that cancel and go nowhere,
+         * and it can creep somewhere on very little.
+         */
+        const at = body.translation();
+        const base = index * 3;
+        moved += Math.hypot(
+          at.x - before[base],
+          at.y - before[base + 1],
+          at.z - before[base + 2],
+        );
+        before[base] = at.x;
+        before[base + 1] = at.y;
+        before[base + 2] = at.z;
       }
-      const meanMotion = motion / stitchRefs.current.length;
+      const meanMotion = motion / bodies.length;
+      const meanMoved = count.current === 1 ? Infinity : moved / bodies.length;
       /*
        * Progress, for scripts/settle-hats.mjs, which is the only thing that
        * ever runs this: a step over ten thousand bodies takes a second or two,
@@ -94,6 +122,8 @@ export default function Settler({
       (window as unknown as { __settleProgress?: unknown }).__settleProgress = {
         steps: count.current,
         motion: meanMotion,
+        /** Mean distance a stitch travelled this step, in stitch widths. */
+        moved: meanMoved / adjacentStitchDistance,
       };
       if (rest.current(meanMotion)) {
         complete.current = true;

@@ -147,6 +147,13 @@ const HatModel: React.FC<HatModelProps> = ({
        */
       gauge: (at: Point[]) =>
         measureGauge(stitches, rounds, at, adjacentStitchDistance / roundHeight),
+      /*
+       * Where every stitch is, right now, mid-settle. For scripts/trace.mjs,
+       * which watches a hat settle and asks when it stopped changing shape -
+       * a different question from when it stopped moving, and the one a rest
+       * detector is really for.
+       */
+      now: () => (window as unknown as { __livePositions?: () => Point[] }).__livePositions?.(),
       /** The same hat pulled out to its measurements first. */
       blocked: (at: Point[], amount = 1) =>
         measureGauge(

@@ -63,6 +63,16 @@ export default function StitchPhysics({
     [stitches],
   );
 
+  /*
+   * Where everything is, for scripts/trace.mjs. Harmless the rest of the
+   * time: it is a closure over refs that already exist, and nothing calls it.
+   */
+  (window as unknown as { __livePositions?: () => Point[] }).__livePositions =
+    () =>
+      stitchRefs.current.map(
+        (ref, id) => ref.current?.translation() ?? stitches[id]?.position,
+      );
+
   const colours = useMemo(
     () =>
       new Float32Array(
