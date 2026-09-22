@@ -83,10 +83,11 @@ export interface Chart {
  * Where a shade's colour came from.
  *
  * "library" is the yarn library - the spinner's own shop, sampled from their
- * own photograph of the wool. Which is the best anyone outside a dye house
- * has, and, more to the point, the same method for every shade on the site:
- * before it, the same Uradale Graeff was three different colours in three
- * different hats, because each had been guessed at separately.
+ * own photograph of the wool and corrected for the shadow between its
+ * strands. Which is the best anyone outside a dye house has, and, more to the
+ * point, the same method for every shade on the site: before it, the same
+ * Uradale Graeff was three different colours in three different hats, because
+ * each had been guessed at separately.
  *
  * "approximate" is a considered stand-in, for the two spinners the library
  * does not reach - Foula Wool, and the handspun in 2021's fifth colourway,

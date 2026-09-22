@@ -276,7 +276,7 @@ const HatPage: React.FC<{
         </p>
         <p className="quiet">
           The colours come from the spinners' own photographs of the wool, so
-          they are close rather than exact, and run a little dark.
+          they are close rather than exact.
           {anyApproximate
             ? " Two of these spinners do not sell online in a form that can be" +
               " read, so their shades are considered stand-ins."

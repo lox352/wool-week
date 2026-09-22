@@ -10,14 +10,17 @@ import library from "./shetland-yarns.json";
  * colour wherever it appears rather than one colour per hat; and a knitter
  * choosing their own can pick out of the whole of it.
  *
- * The colours are estimates sampled from the spinners' product photographs,
- * which is the best anyone outside a dye house has. A photograph of a ball of
- * wool is partly the shadow between its strands, so they run darker than the
- * wool does, and unevenly: some ranges are lit better than others. It is
- * still one method applied to all of them, which is more than the site had
- * before - the same Uradale Graeff was three different colours in three
- * different hats. Where a shade matters, the wool in your hands wins: see the
- * yarn picker.
+ * The colours are estimates sampled from the spinners' product photographs -
+ * the best anyone outside a dye house has - and then corrected, because a
+ * photograph of a ball of wool is partly the shadow between its strands and
+ * comes out darker than the wool. The correction is a lightness one and
+ * leaves the hue alone: across the whole library it lifts shades named white
+ * from a mean of 182 to 221 and leaves shades named black at 62, and mean
+ * saturation moves by three thousandths. Raw, Jamieson & Smith's Optic White
+ * sampled as a mid brown.
+ *
+ * They are still estimates, and a photograph is not a dye lot. Where a shade
+ * matters, the wool in your hands wins: see the yarn picker.
  *
  * Two spinners in these patterns are not here at all, because they do not
  * sell online in a form that can be read: Foula Wool and the handspun in

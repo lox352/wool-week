@@ -47,6 +47,73 @@ describe("the yarn library", () => {
   });
 });
 
+/**
+ * Some shades say what colour they are. Uradale name their undyed wool
+ * "Graeff (Shetland black)", "Laebrak (dark grey)", "Flukkra (natural
+ * white)", which is as near to a known answer as a photograph of wool gets -
+ * so it is worth asking the library whether it agrees with them.
+ *
+ * Four do not, and they are listed rather than ignored. All four are the
+ * sample itself rather than the shadow correction applied to it: a lightness
+ * correction cannot turn a grey blue, and two of these are blue. When a
+ * better reading of Uradale's photographs turns up this list should shrink,
+ * and the test says so by failing if it does.
+ */
+const disagrees = [
+  "Graeff (Shetland black)", // #5f5555, a mid grey
+  "Laebrak (dark grey)", // #a7c7e5, a light blue
+  "Moorit (Shetland brown)", // #a09d9a, neutral
+  "Shoormal (mid grey)", // #bbd4ec, a light blue
+];
+
+describe("shades that name their own colour", () => {
+  const lum = (hex: string) => {
+    const n = parseInt(hex.slice(1), 16);
+    return (
+      0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)
+    );
+  };
+  const neutral = (hex: string) => {
+    const n = parseInt(hex.slice(1), 16);
+    const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    return Math.max(r, g, b) - Math.min(r, g, b) < 14;
+  };
+
+  it("are the colour they say, bar four Uradale naturals", () => {
+    const wrong: string[] = [];
+    Object.values(wools()).forEach((wool) => {
+      const says = /\(([^)]+)\)/.exec(wool.name)?.[1]?.toLowerCase();
+      if (!says) return;
+      const light = lum(wool.hex);
+      const ok =
+        says.includes("black") ? light < 70
+        : says.includes("white") ? light > 200
+        : says.includes("grey") ? neutral(wool.hex)
+        : says.includes("brown") ? !neutral(wool.hex)
+        : true;
+      if (!ok && !wrong.includes(wool.name)) wrong.push(wool.name);
+    });
+    expect(wrong.sort()).toEqual(disagrees);
+  });
+
+  it("lift the whites without lifting the blacks", () => {
+    /*
+     * What the shadow correction is for, checked in the aggregate rather than
+     * shade by shade: a photograph of wool is partly the gaps between its
+     * strands, so a raw sample runs dark, and correcting it must not simply
+     * wash everything out.
+     */
+    const mean = (of: (w: { name: string; hex: string }) => boolean) => {
+      const hit = Object.values(wools()).filter(of);
+      return hit.reduce((sum, w) => sum + lum(w.hex), 0) / hit.length;
+    };
+    const named = (word: string) => (w: { name: string }) =>
+      new RegExp(`\\b${word}\\b`, "i").test(w.name);
+    expect(mean(named("white"))).toBeGreaterThan(200);
+    expect(mean(named("black"))).toBeLessThan(90);
+  });
+});
+
 describe("what the hats are knitted in", () => {
   hats.forEach((hat) => {
     it(`${hat.id} quotes the library correctly`, () => {

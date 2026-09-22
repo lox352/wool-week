@@ -220,13 +220,22 @@ two different colours. That last one is the point of the library. Before it,
 every colourway had been guessed at on its own, and Uradale's Graeff was three
 different colours in three different hats.
 
-The colours are estimates sampled from the spinners' product photographs, which
-is the best anyone outside a dye house has. They run darker than the wool does,
-because a photograph of a ball of wool is partly the shadow between its
-strands, and unevenly so: Jamieson's Spindrift photographs are lit well and
-Jamieson & Smith's Shetland Aran Worsted are not. Against that: it is one
-method for all of them, it names shades the way the shop does - the 2025
-pattern's "Shade 96" is Pale Lemon - and it caught real errors, among them a
+The colours are estimates sampled from the spinners' product photographs -
+the best anyone outside a dye house has - and then corrected. A photograph of
+a ball of wool is partly the shadow between its strands, so a raw sample comes
+out darker than the wool, and unevenly: Jamieson's Spindrift photographs are
+lit well and Jamieson & Smith's Shetland Aran Worsted are not, badly enough
+that its Optic White sampled as a mid brown and the Baa-ble Hat's second
+colourway drew as a beige sheep on a near-black sky.
+
+The correction is a lightness one that leaves the hue alone, and it holds up
+against the shades whose colour their name already gives: across the library
+it lifts shades named white from a mean luminance of 182 to 221, leaves shades
+named black at 62, and moves mean saturation by three thousandths. The palette
+keeps the raw sample alongside it, so the two can always be compared.
+
+The library also names shades the way the shop does - the 2025 pattern's
+"Shade 96" is Pale Lemon - and building it caught real errors, among them a
 Jamieson & Smith dark red that had been recorded as an orange.
 
 Two spinners are not in the library, because neither sells online in a form
