@@ -1,22 +1,16 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { hatById } from "../data/hats";
-import { ballsFor, SlotId } from "../data/hats/types";
+import { SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
-import {
-  distinctShades,
-  paletteOf,
-  inkOn,
-  yarnFor,
-  type Overrides,
-} from "../knitting/palette";
+import { ballsOf, paletteOf, yarnFor, type Overrides } from "../knitting/palette";
 import { totals } from "../knitting/progress";
 import { bareIdFor, knittingParam, startProject } from "../helpers/projects";
 import PageLayout from "./ui/PageLayout";
 import Button from "./ui/Button";
 import HatModel from "./HatModel";
 import Chart from "../knitting/Chart";
-import YarnEditor from "./YarnEditor";
+import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import "./Hat.css";
 
@@ -98,18 +92,22 @@ const HatPage: React.FC<{
     [colourway, own, hat],
   );
   const counts = totals(index, 0);
-  const shades = distinctShades(colourway, own);
-  const anyApproximate = shades.some((entry) => entry.yarn.approximate);
-  const yours = Object.keys(own).length > 0;
+  const anyApproximate = ballsOf(colourway, size.id, own).some(
+    (ball) => ball.yarn.approximate,
+  );
 
-  /** Whether the yarn-by-yarn editor is showing. */
-  const [choosing, setChoosing] = useState(false);
+  /*
+   * A ball of wool does every yarn of the pattern it is put in, so choosing
+   * one sets them together. See WoolList.
+   */
   const choose = useCallback(
-    (slot: SlotId, chosen: Chosen | undefined) =>
+    (slots: SlotId[], chosen: Chosen | undefined) =>
       setOwn((current) => {
         const next = { ...current };
-        if (chosen) next[slot] = chosen;
-        else delete next[slot];
+        slots.forEach((slot) => {
+          if (chosen) next[slot] = chosen;
+          else delete next[slot];
+        });
         return next;
       }),
     [setOwn],
@@ -198,71 +196,17 @@ const HatPage: React.FC<{
               </button>
             );
           })}
-          {/*
-            Not a colourway of the pattern's: whatever is showing, with the
-            wool you have put in it. It sits with the others because that is
-            where someone looks for it.
-          */}
-          <button
-            type="button"
-            className={`colourway-option${choosing || yours ? " is-chosen" : ""}`}
-            aria-pressed={choosing || yours}
-            // Nothing changed yet, so tapping it again just puts it away.
-            onClick={() => setChoosing((open) => yours || !open)}
-          >
-            <span className="colourway-swatches" aria-hidden="true">
-              {colourway.shades.map((shade) => (
-                <span
-                  key={shade.slot}
-                  style={{ background: yarnFor(palette, shade.slot).hex }}
-                />
-              ))}
-            </span>
-            <strong>Your own colours</strong>
-            <span className="quiet">
-              {yours
-                ? `${Object.keys(own).length} of your own`
-                : "Yarn by yarn"}
-            </span>
-          </button>
         </div>
 
-        <h3>What to buy</h3>
-        <ul className="shade-list">
-          {shades.map((entry) => (
-            <li key={`${entry.yarn.name}-${entry.slots.join()}`}>
-              <span
-                className="shade-chip"
-                style={{
-                  background: entry.yarn.hex,
-                  color: inkOn(entry.yarn.hex),
-                }}
-              >
-                {entry.slots.join(" + ")}
-              </span>
-              <span>
-                <strong>{entry.yarn.name}</strong>
-                {entry.yarn.code ? ` (${entry.yarn.code})` : ""} ·{" "}
-                {Math.max(
-                  ...entry.slots.map((slot) =>
-                    ballsFor(colourway, slot as SlotId, size.id),
-                  ),
-                )}{" "}
-                ball
-                {Math.max(
-                  ...entry.slots.map((slot) =>
-                    ballsFor(colourway, slot as SlotId, size.id),
-                  ),
-                ) === 1
-                  ? ""
-                  : "s"}
-                {entry.yarn.approximate && (
-                  <span className="quiet"> · colour approximate</span>
-                )}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <h3>Your wool</h3>
+        <WoolList
+          colourway={colourway}
+          sizeId={size.id}
+          overrides={own}
+          onChange={choose}
+          onRestoreAll={() => setOwn({})}
+        />
+
         <p className="quiet">
           {colourway.brand} {colourway.yarn}
           {colourway.ballMetres !== undefined &&
@@ -282,33 +226,7 @@ const HatPage: React.FC<{
               " read, so their shades are considered stand-ins."
             : ""}
         </p>
-
-        {(choosing || yours) && (
-          <>
-            <h3>Your wool</h3>
-            <p className="quiet">
-              Any of these can be the ball actually in your hands - out of the
-              whole Shetland library, or any colour you like.
-            </p>
-            <YarnEditor
-              slots={colourway.shades.map((shade) => shade.slot)}
-              palette={palette}
-              overrides={own}
-              onChange={choose}
-              suggest={colourway.wool}
-            />
-            {yours && (
-              <p>
-                <Button variant="quiet" onClick={() => setOwn({})}>
-                  Back to {colourway.name} throughout
-                </Button>
-              </p>
-            )}
-          </>
-        )}
       </section>
-
-
 
       <section className="section">
         <h2>Size</h2>

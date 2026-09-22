@@ -1,4 +1,11 @@
-import { Chart, Colourway, Shade, SlotId, partKey } from "../data/hats/types";
+import {
+  ballsFor,
+  Chart,
+  Colourway,
+  Shade,
+  SlotId,
+  partKey,
+} from "../data/hats/types";
 import type { WoolId } from "../data/yarns";
 import { RGB } from "../types/RGB";
 
@@ -113,26 +120,51 @@ export const inkOn = (hex: string): string => {
   return (r * 299 + g * 587 + b * 114) / 1000 > 145 ? "#1f1d1b" : "#ffffff";
 };
 
+/** One ball of wool: which yarns of the pattern it does, and how many to buy. */
+export interface Ball {
+  yarn: Yarn;
+  slots: SlotId[];
+  /** For the size asked about; one where the colourway does not say. */
+  balls: number;
+}
+
 /**
- * One entry per distinct shade, for the shopping list.
+ * The wool a colourway is knitted in, a ball at a time.
  *
- * A colourway may use one ball of wool in several slots - the Uradale
- * Aal Ower Toorie puts five yarns where the other two colourways put eight -
- * and nobody wants to be told to buy Grall three times.
+ * A colourway may put one ball in several of the pattern's yarns - the Uradale
+ * Aal Ower Toorie runs Graeff in A, C and G and Glansin in D and H, five balls
+ * doing the work of eight yarns - and nobody wants to be told to buy Graeff
+ * three times. So slots sharing a wool come back as one entry, which is what
+ * the page lists, counts and changes: a row is a ball.
+ *
+ * How many of that ball to buy is the largest the colourway asks of any of its
+ * yarns rather than their sum, because the pattern records the count against
+ * the first yarn using that wool and leaves the rest to default. Two balls of
+ * Graeff covers A, C and G together.
  */
-export const distinctShades = (
+export const ballsOf = (
   colourway: Colourway,
+  sizeId: string,
   overrides: Overrides = {},
-): { yarn: Yarn; slots: SlotId[] }[] => {
+): Ball[] => {
   const palette = paletteOf(colourway, overrides);
-  const out: { yarn: Yarn; slots: SlotId[] }[] = [];
+  const out: Ball[] = [];
   colourway.shades.forEach((shade) => {
     const yarn = palette[shade.slot] ?? asYarn(shade);
-    const seen = out.find(
-      (entry) => entry.yarn.name === yarn.name && entry.yarn.hex === yarn.hex,
+    // The same wool, by its library id where there is one and by what it
+    // looks like where there is not.
+    const seen = out.find((entry) =>
+      entry.yarn.wool || yarn.wool
+        ? entry.yarn.wool === yarn.wool
+        : entry.yarn.name === yarn.name && entry.yarn.hex === yarn.hex,
     );
     if (seen) seen.slots.push(shade.slot);
-    else out.push({ yarn, slots: [shade.slot] });
+    else out.push({ yarn, slots: [shade.slot], balls: 0 });
   });
-  return out;
+  return out.map((entry) => ({
+    ...entry,
+    balls: Math.max(
+      ...entry.slots.map((slot) => ballsFor(colourway, slot, sizeId)),
+    ),
+  }));
 };

@@ -1,13 +1,13 @@
-.yarn-editor {
+.wool-list {
   list-style: none;
-  margin: 1rem 0 1.25rem;
+  margin: 0.75rem 0 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
-.yarn-editor-row {
+.wool-row {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -24,25 +24,34 @@
   padding: 0.4rem 0.6rem;
 }
 
-.yarn-editor-row:hover,
-.yarn-editor-row:focus-visible {
+.wool-row:hover,
+.wool-row:focus-visible {
   border-color: var(--crimson);
 }
 
-.yarn-editor-row .shade-chip {
+.wool-row .shade-chip {
   flex: none;
 }
 
-.yarn-editor-name {
+.wool-row-what {
   flex: 1 1 auto;
   min-width: 0;
   font-size: 0.92rem;
   line-height: 1.3;
 }
 
-.yarn-editor-change {
+.wool-row-count {
+  display: block;
+  font-size: 0.82rem;
+}
+
+.wool-row-change {
   flex: none;
   font-size: 0.85rem;
   color: var(--crimson);
   text-decoration: underline;
+}
+
+.wool-list-restore {
+  margin: 0.75rem 0 0;
 }

@@ -26,8 +26,8 @@ export interface Chosen {
 
 interface YarnPickerProps {
   open: boolean;
-  /** Which yarn of the pattern is being replaced, e.g. "C". */
-  slot: string;
+  /** Which yarn of the pattern is being replaced: "Yarn C", or "Yarns A, C and G". */
+  label: string;
   /** What it is now, whether from the pattern or already chosen. */
   current: { name: string; code?: string; hex: string; wool?: WoolId };
   /** Where to start looking: the yarn the colourway is written in. */
@@ -54,7 +54,7 @@ const load = (): Promise<Library> => {
 
 const YarnPicker: React.FC<YarnPickerProps> = ({
   open,
-  slot,
+  label,
   current,
   suggest,
   onChoose,
@@ -125,11 +125,11 @@ const YarnPicker: React.FC<YarnPickerProps> = ({
   };
 
   return (
-    <dialog className="yarn-picker" ref={dialog} aria-label={`Wool for yarn ${slot}`}>
+    <dialog className="yarn-picker" ref={dialog} aria-label={`Wool for ${label}`}>
       <div className="yarn-picker-head">
         <div>
           <h2>
-            Yarn {slot}
+            {label}
             <span className="quiet">
               {" "}
               · now {current.name}

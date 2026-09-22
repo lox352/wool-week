@@ -17,7 +17,7 @@ import ProgressRing from "./ProgressRing";
 import HatModel from "./HatModel";
 import Chart from "../knitting/Chart";
 import KnittingPanel from "./KnittingPanel";
-import YarnEditor from "./YarnEditor";
+import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import "./Project.css";
 
@@ -69,17 +69,25 @@ const Project: React.FC = () => {
     );
   }, []);
 
-  const setShade = useCallback((slot: SlotId, chosen: Chosen | undefined) => {
+  const setShade = useCallback((slots: SlotId[], chosen: Chosen | undefined) => {
     setProject((current) => {
       if (!current) return current;
       const shades = { ...current.shades };
-      if (chosen) shades[slot] = chosen;
-      else delete shades[slot];
+      slots.forEach((slot) => {
+        if (chosen) shades[slot] = chosen;
+        else delete shades[slot];
+      });
       return writeProject({
         ...current,
         shades: Object.keys(shades).length > 0 ? shades : undefined,
       });
     });
+  }, []);
+
+  const restoreShades = useCallback(() => {
+    setProject((current) =>
+      current ? writeProject({ ...current, shades: undefined }) : current,
+    );
   }, []);
 
   if (!project || !hat) {
@@ -109,6 +117,7 @@ const Project: React.FC = () => {
       canUndo={previous !== undefined}
       setColourway={setColourway}
       setShade={setShade}
+      restoreShades={restoreShades}
     />
   );
 };
@@ -122,7 +131,8 @@ const ProjectView: React.FC<{
   undo: () => void;
   canUndo: boolean;
   setColourway: (id: string) => void;
-  setShade: (slot: SlotId, chosen: Chosen | undefined) => void;
+  setShade: (slots: SlotId[], chosen: Chosen | undefined) => void;
+  restoreShades: () => void;
 }> = ({
   hatId,
   project,
@@ -133,6 +143,7 @@ const ProjectView: React.FC<{
   canUndo,
   setColourway,
   setShade,
+  restoreShades,
 }) => {
   const hat = hatById(hatId)!;
   const { stitches, rounds, roundHeight, roundLabels, index } = useHat(hat);
@@ -211,32 +222,43 @@ const ProjectView: React.FC<{
 
           <section className="section">
             <h2>Your wool</h2>
-            <p className="quiet">
-              Set any of these to the ball actually in your hands - out of the
-              whole Shetland library, or any colour you like - and the chart
-              and the hat will follow.
-            </p>
-            <YarnEditor
-              slots={colourway.shades.map((shade) => shade.slot)}
-              palette={palette}
+            {/*
+              The pattern's own colourways first, because they are where most
+              people start, then the wool itself. Choosing one sets every yarn
+              at once; a row below changes any of them afterwards.
+            */}
+            <div className="chooser">
+              {hat.colourways.map((option) => {
+                const optionPalette = paletteOf(option, {}, hat.charts);
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className={`colourway-option${option.id === colourway.id ? " is-chosen" : ""}`}
+                    aria-pressed={option.id === colourway.id}
+                    onClick={() => setColourway(option.id)}
+                  >
+                    <span className="colourway-swatches" aria-hidden="true">
+                      {option.shades.map((shade) => (
+                        <span
+                          key={shade.slot}
+                          style={{ background: yarnFor(optionPalette, shade.slot).hex }}
+                        />
+                      ))}
+                    </span>
+                    <strong>{option.name}</strong>
+                    <span className="quiet">{option.brand}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <WoolList
+              colourway={colourway}
+              sizeId={project.sizeId}
               overrides={project.shades ?? {}}
               onChange={setShade}
-              suggest={colourway.wool}
+              onRestoreAll={restoreShades}
             />
-            <div className="chooser">
-              {hat.colourways.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`size-option${option.id === colourway.id ? " is-chosen" : ""}`}
-                  aria-pressed={option.id === colourway.id}
-                  onClick={() => setColourway(option.id)}
-                >
-                  <strong>{option.name}</strong>
-                  <span className="quiet">{option.brand}</span>
-                </button>
-              ))}
-            </div>
           </section>
         </>
       )}
