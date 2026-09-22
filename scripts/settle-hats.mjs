@@ -183,9 +183,9 @@ for (const hatId of hatIds) {
     if (!progress || progress.steps === reported) return;
     reported = progress.steps;
     say(
-      `  ${hatId}: ${progress.steps} steps, motion ` +
-        `${progress.motion.toFixed(3)} (resting under 0.15), ` +
-        `${((Date.now() - started) / 1000).toFixed(0)}s`,
+      `  ${hatId}: ${progress.steps} steps, moved ` +
+        `${progress.moved.toFixed(5)} of a stitch (rests under ` +
+        `${restMovement}), ${((Date.now() - started) / 1000).toFixed(0)}s`,
     );
   }, 5_000);
 
