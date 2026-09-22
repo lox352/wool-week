@@ -62,6 +62,13 @@ python3 scripts/extract_chart.py SWW15.pdf --page 3 --vector 0 --ruled \
     --key A B C D k2tog \
     --charts A:60x45 --out src/data/hats/sww15-baa-ble-hat.charts.json
 
+# SWW20, Katie's Kep - the same leaflet design as SWW21, with a key set as
+# two interleaved columns: a yarn, then a symbol, then the next yarn.
+python3 scripts/extract_chart.py SWW20.pdf --page 3 --vector 0 \
+    --key A knit B purl C k2tog D sk2p E \
+    --charts A:4x8 B:24x40 C:24x23 \
+    --out src/data/hats/sww20-katies-kep.charts.json
+
 # SWW18, Merrie Dancers Toorie - charts drawn as outlines, with the yarn
 # printed as a number in each cell.
 python3 scripts/extract_chart.py SWW18.pdf --page 3 --vector all \
@@ -123,6 +130,22 @@ chart's verticals run the height of the whole grid. And one cell of this chart
 is shaded 15% grey where its neighbours are 25%; a shade plainly nearer one
 yarn than any other is read as that yarn, with a note, and one that could be
 either is still an error.
+
+### Charts printed on a tinted panel
+
+A panel is one big rectangle, and a rectangle read as a run of cells - which
+is what a word processor's shading has to be, above - comes out as thousands
+of stitches covering the whole page. On SWW20's page that buried every swatch
+in the key, and the same design in SWW21 had stopped extracting for the same
+reason.
+
+So runs are read only where the chart is a table, which is what `--ruled`
+already meant; everywhere else a page-layout program draws each cell on its
+own and the one big rectangle is the panel. A key swatch is never a run under
+either rule, because a swatch stands for one yarn and is one cell.
+
+Every chart already committed still comes out of the tool cell for cell after
+that change - all nineteen of them, which is what the commands above are for.
 
 ### Charts that name their yarns rather than colouring them
 
@@ -203,6 +226,13 @@ count the published pattern prints out loud:
   the decrease round, 8 at the crown.
 - **Da Crofter's Kep** — cast on 136, 168 after the increase round, 144 after
   the crown chart's own first row, 12 at the crown.
+- **Katie's Kep** — the same four: cast on 136, 168, 144 on the crown chart's
+  first row, 12 at the crown. Its charts carry no colour, only five greys, so
+  they are checked a second way: every row prints its contrast yarn as a
+  letter down the right-hand edge, and all seventy-one rows of the three
+  charts agree with the greys the extractor read. Two of them are named in the
+  written instructions as well - "join in yarn B" at chart A, "join in yarn D"
+  at chart C - which anchors the letters to prose.
 
 A chart misread by a single cell breaks one of those, so it fails the build.
 

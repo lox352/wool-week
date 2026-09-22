@@ -194,6 +194,64 @@ describe("the counts the patterns print", () => {
     expect(leaning).toHaveLength(11);
   });
 
+  it("Katie's Kep: 136 sts, 168 after the increase, 144, 12 at the crown", () => {
+    const hat = hatById("sww20-katies-kep")!;
+    const { rounds } = buildHat(hat);
+    const sizes = rounds.map((round) => round.length);
+
+    expect(sizes[0]).toBe(136);
+    // "Cast on 136 sts", then all eight rows of chart A over the same.
+    expect(sizes.slice(0, 9).every((n) => n === 136)).toBe(true);
+    // "Inc round: K5, m1, (k4, m1) to last 7 sts, k7. 168 sts"
+    expect(sizes[9]).toBe(168);
+    // "Working the 24 st repeat 7 times in total across the round", x40.
+    expect(sizes.slice(9, 9 + 1 + 40).every((n) => n === 168)).toBe(true);
+    // "Join in yarn D and begin working from row 1 of chart C ... 144 sts",
+    // which chart C does on its own first row rather than in a round of its
+    // own - the same construction as Da Crofter's Kep the year after.
+    expect(sizes[9 + 1 + 40]).toBe(144);
+    // "Continue ... until all 23 rows of chart are complete. 12 sts."
+    expect(sizes[sizes.length - 1]).toBe(12);
+    expect(sizes.length).toBe(1 + 8 + 1 + 40 + 23);
+  });
+
+  it("Katie's Kep: its charts say which yarn on every row, and agree", () => {
+    /*
+     * The charts are printed in five greys, and every row also carries its
+     * contrast yarn as a letter down the right-hand edge. The letters were
+     * read by eye off the page and the greys by the extractor, so the two
+     * have to agree - which is the check on a chart read out of a drawing
+     * with no colour in it. "The background is worked entirely in yarn A",
+     * says the pattern, so a row has at most one other yarn in it.
+     */
+    const hat = hatById("sww20-katies-kep")!;
+    const contrastOf = (id: string) =>
+      hat.charts
+        .find((chart) => chart.id === id)!
+        .rows.map((row) => {
+          const others = [...new Set(row.map((cell) => cell.slot))]
+            .filter((slot) => slot !== "A")
+            .sort();
+          expect(others.length).toBeLessThanOrEqual(1);
+          return others[0] ?? "-";
+        })
+        .join("");
+
+    // Read off the page, row 1 first. Chart A's rib, three rows a yarn.
+    expect(contrastOf("A")).toBe("BBBCCDDD");
+    // The body: bands of three, parted by plain rounds of the ground.
+    expect(contrastOf("B")).toBe(
+      "--EEE-BBBDDDBBB-EEE--CCC-DDDBBBDDD-CCC--",
+    );
+    // And the crown, which opens on D as the instructions say it does.
+    expect(contrastOf("C")).toBe("DDDDDBBBBBCCCCEEEEDDDDD");
+
+    // The two the written instructions name, so the greys are anchored to
+    // prose and not only to the letters beside them.
+    expect(contrastOf("A")[0]).toBe("B");
+    expect(contrastOf("C")[0]).toBe("D");
+  });
+
   it("Birsie Beanny: 128 sts, 160 for the lettering, 128, 192, 12 at the crown", () => {
     const hat = hatById("sww26-birsie-beanny")!;
     const { rounds } = buildHat(hat);

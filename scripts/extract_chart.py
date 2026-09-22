@@ -822,7 +822,7 @@ def key_column(swatches, wanted, size):
 
 
 def read_key(pdf, page, vector_index, order=None, cell=None,
-             marks=False):
+             marks=False, ruled=False):
     """The key's palette and symbol templates.
 
     A key usually names itself - "Yarn A" beside a swatch ties a fill to a
@@ -834,7 +834,15 @@ def read_key(pdf, page, vector_index, order=None, cell=None,
     stream = chart_stream(pdf, vector_index)
     # A key drawn beside a chart whose cells are not shaded is the only thing
     # on the page that *is* a cell, so it is looked for at the chart's size.
-    cells = cells_in(stream, (cell * 0.85, cell * 1.15) if cell else None)
+    # As runs only where the chart is a table, which is the one drawing that
+    # shades several cells with one rectangle - and whose key is set into the
+    # same table. Anywhere else a swatch stands for one yarn and is one cell,
+    # so a rectangle covering several is the panel behind the key rather than
+    # a row of it, and a leaflet that prints its charts on a tinted panel
+    # draws exactly that: read as runs it buries every swatch on the page.
+    cells = cells_in(
+        stream, (cell * 0.85, cell * 1.15) if cell else None, runs=ruled
+    )
     size = cell or collections.Counter(
         round(c[2], 1) for c in cells
     ).most_common(1)[0][0]
@@ -991,7 +999,12 @@ def extract(pdf, page, vector_index, slots, templates, ruled=False,
         cells = cells_in(stream, outlines=True, cell=cell, wanted=wanted)
         size = cell
     else:
-        cells = cells_in(stream, cell_span(stream), ruled)
+        # Runs only where the chart is a table. A word processor shades by
+        # run and leaves a plain stitch undrawn, so there a rectangle stands
+        # for the several cells it covers; a page-layout program draws every
+        # cell on its own, and its one big rectangle is the panel the charts
+        # are printed on, which is not 3,000 stitches.
+        cells = cells_in(stream, cell_span(stream), ruled, runs=ruled)
         size = collections.Counter(
             round(c[2], 1) for c in cells
         ).most_common(1)[0][0]
@@ -1113,6 +1126,7 @@ def main():
         args.key,
         args.cell,
         args.marks,
+        args.ruled,
     )
     charts = extract(args.pdf, args.page, args.vector, slots, templates,
                      args.ruled, args.cell, wanted, args.marks)
