@@ -1,15 +1,22 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { hatById } from "../data/hats";
 import { ballsFor, SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
-import { distinctShades, paletteOf, inkOn, yarnFor } from "../knitting/palette";
+import {
+  distinctShades,
+  paletteOf,
+  inkOn,
+  yarnFor,
+  type Overrides,
+} from "../knitting/palette";
 import { totals } from "../knitting/progress";
 import { bareIdFor, knittingParam, startProject } from "../helpers/projects";
 import PageLayout from "./ui/PageLayout";
 import Button from "./ui/Button";
 import HatModel from "./HatModel";
 import Chart from "../knitting/Chart";
+import YarnPicker, { type Chosen } from "./YarnPicker";
 import "./Hat.css";
 
 /**
@@ -28,6 +35,12 @@ const Hat: React.FC = () => {
 
   const [sizeId, setSizeId] = useState(hat?.sizes[1]?.id ?? hat?.sizes[0]?.id ?? "");
   const [colourwayId, setColourwayId] = useState(hat?.colourways[0]?.id ?? "");
+  /*
+   * The wool a knitter has chosen for themselves. Held beside the colourway
+   * rather than instead of it, so that "your own colours" starts from
+   * whichever colourway is showing and changes only what you change.
+   */
+  const [own, setOwn] = useState<Overrides>({});
 
   if (!hat) {
     return (
@@ -39,8 +52,19 @@ const Hat: React.FC = () => {
     );
   }
 
-  return <HatPage key={hat.id} hatId={hat.id} sizeId={sizeId} setSizeId={setSizeId}
-    colourwayId={colourwayId} setColourwayId={setColourwayId} navigate={navigate} />;
+  return (
+    <HatPage
+      key={hat.id}
+      hatId={hat.id}
+      sizeId={sizeId}
+      setSizeId={setSizeId}
+      colourwayId={colourwayId}
+      setColourwayId={setColourwayId}
+      own={own}
+      setOwn={setOwn}
+      navigate={navigate}
+    />
+  );
 };
 
 const HatPage: React.FC<{
@@ -49,18 +73,46 @@ const HatPage: React.FC<{
   setSizeId: (id: string) => void;
   colourwayId: string;
   setColourwayId: (id: string) => void;
+  own: Overrides;
+  setOwn: React.Dispatch<React.SetStateAction<Overrides>>;
   navigate: ReturnType<typeof useNavigate>;
-}> = ({ hatId, sizeId, setSizeId, colourwayId, setColourwayId, navigate }) => {
+}> = ({
+  hatId,
+  sizeId,
+  setSizeId,
+  colourwayId,
+  setColourwayId,
+  own,
+  setOwn,
+  navigate,
+}) => {
   const hat = hatById(hatId)!;
   const { stitches, rounds, roundHeight, roundLabels, index } = useHat(hat);
 
   const size = hat.sizes.find((s) => s.id === sizeId) ?? hat.sizes[0];
   const colourway =
     hat.colourways.find((c) => c.id === colourwayId) ?? hat.colourways[0];
-  const palette = useMemo(() => paletteOf(colourway, {}, hat.charts), [colourway, hat]);
+  const palette = useMemo(
+    () => paletteOf(colourway, own, hat.charts),
+    [colourway, own, hat],
+  );
   const counts = totals(index, 0);
-  const shades = distinctShades(colourway);
+  const shades = distinctShades(colourway, own);
   const anyApproximate = shades.some((entry) => entry.yarn.approximate);
+  const yours = Object.keys(own).length > 0;
+
+  /** Which yarn's wool is being chosen, if any. */
+  const [picking, setPicking] = useState<SlotId | undefined>();
+  const choose = useCallback(
+    (slot: SlotId, chosen: Chosen | undefined) =>
+      setOwn((current) => {
+        const next = { ...current };
+        if (chosen) next[slot] = chosen;
+        else delete next[slot];
+        return next;
+      }),
+    [setOwn],
+  );
 
   return (
     <PageLayout
@@ -71,7 +123,7 @@ const HatPage: React.FC<{
         <Button
           variant="primary"
           onClick={() => {
-            const project = startProject(hat.id, size.id, colourway.id);
+            const project = startProject(hat.id, size.id, colourway.id, own);
             navigate(`/project/${bareIdFor(project.id)}?${knittingParam}=1`);
           }}
         >
@@ -145,21 +197,45 @@ const HatPage: React.FC<{
               </button>
             );
           })}
+          {/*
+            Not a colourway of the pattern's: whatever is showing, with the
+            wool you have put in it. It sits with the others because that is
+            where someone looks for it.
+          */}
+          <button
+            type="button"
+            className={`colourway-option${yours ? " is-chosen" : ""}`}
+            aria-pressed={yours}
+            onClick={() => setPicking(hat.slots[0])}
+          >
+            <span className="colourway-swatches" aria-hidden="true">
+              {hat.slots.map((slot) => (
+                <span key={slot} style={{ background: yarnFor(palette, slot).hex }} />
+              ))}
+            </span>
+            <strong>Your own colours</strong>
+            <span className="quiet">
+              {yours ? `${Object.keys(own).length} changed` : "Pick your wool"}
+            </span>
+          </button>
         </div>
 
         <h3>What to buy</h3>
         <ul className="shade-list">
           {shades.map((entry) => (
             <li key={`${entry.yarn.name}-${entry.slots.join()}`}>
-              <span
-                className="shade-chip"
+              <button
+                type="button"
+                className="shade-chip shade-chip-button"
                 style={{
                   background: entry.yarn.hex,
                   color: inkOn(entry.yarn.hex),
                 }}
+                title={`Choose the wool for yarn ${entry.slots.join(" and ")}`}
+                onClick={() => setPicking(entry.slots[0])}
               >
                 {entry.slots.join(" + ")}
-              </span>
+              </button>
               <span>
                 <strong>{entry.yarn.name}</strong>
                 {entry.yarn.code ? ` (${entry.yarn.code})` : ""} ·{" "}
@@ -194,15 +270,34 @@ const HatPage: React.FC<{
             {colourway.url.replace(/^https?:\/\//, "")}
           </a>
         </p>
-        {anyApproximate && (
-          <p className="notice">
-            This pattern prints its charts in plain greys and leaves the colour
-            to the materials list, so some shades here are considered
-            stand-ins. The names and numbers are exactly as published; you can
-            set the colours to match your own wool once you have started.
+        <p className="quiet">
+          The colours come from the spinners' own photographs of the wool, so
+          they are close rather than exact, and run a little dark. Tap a
+          yarn's letter to put the ball actually in your hands in its place.
+          {anyApproximate
+            ? " Two of these spinners do not sell online in a form that can be" +
+              " read, so their shades are considered stand-ins."
+            : ""}
+        </p>
+        {yours && (
+          <p>
+            <Button variant="quiet" onClick={() => setOwn({})}>
+              Back to {colourway.name} throughout
+            </Button>
           </p>
         )}
       </section>
+
+      {picking && (
+        <YarnPicker
+          open
+          slot={picking}
+          current={yarnFor(palette, picking)}
+          suggest={colourway.wool}
+          onChoose={(chosen) => choose(picking, chosen)}
+          onClose={() => setPicking(undefined)}
+        />
+      )}
 
       <section className="section">
         <h2>Size</h2>

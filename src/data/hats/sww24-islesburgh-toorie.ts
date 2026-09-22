@@ -7,9 +7,8 @@ import charts from "./sww24-islesburgh-toorie.charts.json";
  * This pattern prints its charts in plain greys, one per yarn slot, and
  * leaves the colour to the materials list - which is exactly the model the
  * site is built on, but it does mean there is no colour in the file to read.
- * So the shade names and numbers below are as published and the colours are
- * considered stand-ins, marked "approximate" and open to correction. The
- * pattern's own greys are offered as a fourth colourway, and those are exact.
+ * So the shade names and numbers below are as published, and their colours
+ * come out of the yarn library - see data/yarns.
  */
 
 const chartsOf = (): Chart[] =>
@@ -71,6 +70,7 @@ const sww24: HatPattern = {
   colourways: [
     {
       id: "jamiesons",
+      wool: "jamieson-s-of-shetland-spindrift",
       name: "Colourway 1",
       brand: "Jamieson's of Shetland",
       yarn: "2ply Jumper Weight (Spindrift)",
@@ -79,15 +79,21 @@ const sww24: HatPattern = {
       ballGrams: 25,
       balls: { A: { small: 1, medium: 1, large: 2 }, B: 1, C: 1, D: 1, E: 1 },
       shades: [
-        { slot: "A", name: "Potpourri", code: "603", hex: "#a98fa6", source: "approximate" },
-        { slot: "B", name: "Purple Heather", code: "239", hex: "#55405e", source: "approximate" },
-        { slot: "C", name: "Foxglove", code: "273", hex: "#9a6f8c", source: "approximate" },
-        { slot: "D", name: "Prairie", code: "812", hex: "#b9b394", source: "approximate" },
-        { slot: "E", name: "Earth", code: "227", hex: "#6a5c3e", source: "approximate" },
+        { slot: "A", name: "Pot-Pourri", code: "603", hex: "#91767a", source: "library",
+          wool: "jamieson-s-of-shetland-spindrift-603" },
+        { slot: "B", name: "Purple Heather", code: "239", hex: "#412329", source: "library",
+          wool: "jamieson-s-of-shetland-spindrift-239" },
+        { slot: "C", name: "Foxglove", code: "273", hex: "#684159", source: "library",
+          wool: "jamieson-s-of-shetland-spindrift-273" },
+        { slot: "D", name: "Prairie", code: "812", hex: "#394d2a", source: "library",
+          wool: "jamieson-s-of-shetland-spindrift-812" },
+        { slot: "E", name: "Earth", code: "227", hex: "#28261e", source: "library",
+          wool: "jamieson-s-of-shetland-spindrift-227" },
       ],
     },
     {
       id: "jamieson-smith",
+      wool: "jamieson-smith-2ply-jumper-weight",
       name: "Colourway 2",
       brand: "Jamieson & Smith",
       yarn: "2ply Jumper Weight",
@@ -96,15 +102,21 @@ const sww24: HatPattern = {
       ballGrams: 25,
       balls: { A: { small: 1, medium: 1, large: 2 }, B: 1, C: 1, D: 1, E: 1 },
       shades: [
-        { slot: "A", name: "Shade 36", code: "36", hex: "#2a2545", source: "approximate" },
-        { slot: "B", name: "Shade 8", code: "8", hex: "#e58aa0", source: "approximate" },
-        { slot: "C", name: "Shade 73", code: "73", hex: "#ef8b33", source: "approximate" },
-        { slot: "D", name: "Shade 14", code: "14", hex: "#9dbfdd", source: "approximate" },
-        { slot: "E", name: "Shade 131", code: "131", hex: "#41479f", source: "approximate" },
+        { slot: "A", name: "Dark Navy", code: "36", hex: "#121115", source: "library",
+          wool: "jamieson-smith-2ply-jumper-weight-36" },
+        { slot: "B", name: "Bright Pink", code: "8", hex: "#c24345", source: "library",
+          wool: "jamieson-smith-2ply-jumper-weight-8" },
+        { slot: "C", name: "Bright Orange", code: "73", hex: "#9a3005", source: "library",
+          wool: "jamieson-smith-2ply-jumper-weight-73" },
+        { slot: "D", name: "Light Blue", code: "14", hex: "#6e8c9e", source: "library",
+          wool: "jamieson-smith-2ply-jumper-weight-14" },
+        { slot: "E", name: "Purpley Blue", code: "131", hex: "#384073", source: "library",
+          wool: "jamieson-smith-2ply-jumper-weight-131" },
       ],
     },
     {
       id: "uradale",
+      wool: "uradale-yarns-2ply-jumper-weight",
       name: "Colourway 3",
       brand: "Uradale",
       yarn: "2ply Jumper Weight, organic",
@@ -115,28 +127,16 @@ const sww24: HatPattern = {
       shades: [
         // Three of these are exact: the 2025 pattern draws its charts in real
         // colour and uses the same undyed Uradale shades.
-        { slot: "A", name: "Moorit", hex: "#6b472b", source: "pattern" },
-        { slot: "B", name: "Glansin", hex: "#bdbdba", source: "pattern" },
-        { slot: "C", name: "Beremeal", hex: "#9d8a6c", source: "approximate" },
-        { slot: "D", name: "Aetmeal", hex: "#c9bfa6", source: "approximate" },
-        { slot: "E", name: "Flukkra", hex: "#ffffff", source: "pattern" },
-      ],
-    },
-    {
-      id: "as-printed",
-      name: "As printed",
-      brand: "The pattern's own chart",
-      yarn: "The greys the charts are drawn in, exactly as published",
-      url: "https://www.shetlandwoolweek.com/",
-      ballMetres: 105,
-      ballGrams: 25,
-      balls: { A: 2, B: 1, C: 1, D: 1, E: 1 },
-      shades: [
-        { slot: "A", name: "Yarn A", hex: "#ffffff", source: "pattern" },
-        { slot: "B", name: "Yarn B", hex: "#bdbdba", source: "pattern" },
-        { slot: "C", name: "Yarn C", hex: "#6e6b63", source: "pattern" },
-        { slot: "D", name: "Yarn D", hex: "#82807a", source: "pattern" },
-        { slot: "E", name: "Yarn E", hex: "#57544a", source: "pattern" },
+        { slot: "A", name: "Moorit (Shetland brown)", hex: "#565352", source: "library",
+          wool: "uradale-yarns-2ply-jumper-weight-moorit-shetland-brown" },
+        { slot: "B", name: "Glansin (light grey)", hex: "#c2c2c1", source: "library",
+          wool: "uradale-yarns-2ply-jumper-weight-glansin-light-grey" },
+        { slot: "C", name: "Beremeal (mid fawn)", hex: "#a79ea0", source: "library",
+          wool: "uradale-yarns-2ply-jumper-weight-beremeal-mid-fawn" },
+        { slot: "D", name: "Aetmeal (light fawn)", hex: "#c0b9af", source: "library",
+          wool: "uradale-yarns-2ply-jumper-weight-aetmeal-light-fawn" },
+        { slot: "E", name: "Flukkra (natural white)", hex: "#cdcfc1", source: "library",
+          wool: "uradale-yarns-2ply-jumper-weight-flukkra-natural-white" },
       ],
     },
   ],

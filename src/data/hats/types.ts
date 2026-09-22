@@ -12,6 +12,8 @@
  * changing colourway never touches the knitting.
  */
 
+import type { WoolId } from "../yarns";
+
 export type SlotId = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H";
 
 /** A mark printed in a cell, on top of its colour. */
@@ -78,29 +80,34 @@ export interface Chart {
 }
 
 /**
- * How much to trust a shade's colour.
+ * Where a shade's colour came from.
  *
- * "pattern" was read out of the pattern's own charts, which draw each yarn in
- * its real colour, so it is exact. "approximate" is a considered stand-in:
- * some patterns - SWW24 among them - print their charts in plain greys and
- * leave the colourway to the materials list, so there is no colour in the file
- * to read. The shade's name and number are still exactly as published, and the
- * colour is yours to correct.
+ * "library" is the yarn library - the spinner's own shop, sampled from their
+ * own photograph of the wool. Which is the best anyone outside a dye house
+ * has, and, more to the point, the same method for every shade on the site:
+ * before it, the same Uradale Graeff was three different colours in three
+ * different hats, because each had been guessed at separately.
+ *
+ * "approximate" is a considered stand-in, for the two spinners the library
+ * does not reach - Foula Wool, and the handspun in 2021's fifth colourway,
+ * neither of which sells online in a form that can be read. The shade's name
+ * is exactly as the pattern publishes it and the colour is yours to correct.
  */
-export type ShadeSource = "pattern" | "approximate";
+export type ShadeSource = "library" | "approximate";
 
 export interface Shade {
   slot: SlotId;
+  /**
+   * Which wool in the library this is - see data/yarns. Its name, number and
+   * colour are all copied out of the library rather than looked up, so that
+   * nothing has to load nine hundred shades to draw a hat; a test keeps the
+   * copy honest.
+   */
+  wool?: WoolId;
   name: string;
-  /** The brand's own shade number, where it has one. */
+  /** The spinner's own shade number, where they use one. */
   code?: string;
   hex: string;
-  /**
-   * Where the colour came from. "pattern" means it was read out of the
-   * pattern's own charts, which is exact; "shade-card" means it was taken
-   * from the spinner's published shade card, which is a photograph of wool
-   * and so is close rather than exact.
-   */
   source: ShadeSource;
 }
 
@@ -110,6 +117,12 @@ export interface Colourway {
   name: string;
   brand: string;
   yarn: string;
+  /**
+   * Which range of the yarn library it is knitted in - see data/yarns. What
+   * it is for is the picker: somebody swapping a shade nearly always wants
+   * another shade of the same yarn, so that is what opens.
+   */
+  wool?: string;
   url: string;
   /**
    * Metres and grams in one ball, for the shopping list.

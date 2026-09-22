@@ -18,8 +18,11 @@ how to remove a year.
   you have knitted is in colour; what is ahead is pale.
 - **Colourways from the patterns themselves.** Each hat is stored once in yarn
   slots, and a colourway says which real shade goes in each - which is exactly
-  how the patterns are written. Any shade can be overridden with the wool
-  actually in your hands.
+  how the patterns are written.
+- **Your own wool.** Every shade is pinned to a library of 998 colours from the
+  five Shetland spinners these patterns use, and any yarn of any hat can be
+  swapped for another out of it - or for any colour at all, for the ball whose
+  band went in the bin. The chart and the hat follow at once.
 - **A knitting mode** built for someone holding needles: the round, the stitch
   within it, and how many of this colour before you change.
 

@@ -1,4 +1,5 @@
 import { Chart, Colourway, Shade, SlotId, partKey } from "../data/hats/types";
+import type { WoolId } from "../data/yarns";
 import { RGB } from "../types/RGB";
 
 /**
@@ -13,19 +14,37 @@ import { RGB } from "../types/RGB";
 export interface Yarn {
   name: string;
   hex: string;
-  /** True when the colour is a considered stand-in rather than published. */
+  /**
+   * True when the colour is a considered stand-in rather than one read off
+   * the spinner's own shade. Only the two yarns the library does not reach -
+   * see data/yarns - and never a colour a knitter has set themselves, which
+   * is by definition the right one.
+   */
   approximate: boolean;
   code?: string;
+  /** Which wool of the library it is, where it is one. */
+  wool?: WoolId;
 }
 
 export type Palette = Record<string, Yarn>;
 
-export type Overrides = Partial<Record<SlotId, { name?: string; hex?: string }>>;
+/**
+ * The wool a knitter has put in a slot in place of the pattern's own.
+ *
+ * A whole entry rather than a colour, because what is chosen is a ball of
+ * wool and not a hex: it has a name and a shade number to buy it by, and the
+ * library id to find it again. A colour on its own is still allowed, for the
+ * ball whose band went in the bin.
+ */
+export type Overrides = Partial<
+  Record<SlotId, { wool?: WoolId; name?: string; code?: string; hex?: string }>
+>;
 
 const asYarn = (shade: Shade): Yarn => ({
   name: shade.name,
   hex: shade.hex,
   code: shade.code,
+  wool: shade.wool,
   approximate: shade.source === "approximate",
 });
 
@@ -40,10 +59,11 @@ export const paletteOf = (
     const base = asYarn(shade);
     out[shade.slot] = override
       ? {
-          ...base,
           name: override.name ?? base.name,
+          code: override.wool || override.hex ? override.code : base.code,
           hex: override.hex ?? base.hex,
-          approximate: override.hex ? false : base.approximate,
+          wool: override.wool,
+          approximate: false,
         }
       : base;
   });
@@ -102,14 +122,17 @@ export const inkOn = (hex: string): string => {
  */
 export const distinctShades = (
   colourway: Colourway,
+  overrides: Overrides = {},
 ): { yarn: Yarn; slots: SlotId[] }[] => {
+  const palette = paletteOf(colourway, overrides);
   const out: { yarn: Yarn; slots: SlotId[] }[] = [];
   colourway.shades.forEach((shade) => {
+    const yarn = palette[shade.slot] ?? asYarn(shade);
     const seen = out.find(
-      (entry) => entry.yarn.name === shade.name && entry.yarn.hex === shade.hex,
+      (entry) => entry.yarn.name === yarn.name && entry.yarn.hex === yarn.hex,
     );
     if (seen) seen.slots.push(shade.slot);
-    else out.push({ yarn: asYarn(shade), slots: [shade.slot] });
+    else out.push({ yarn, slots: [shade.slot] });
   });
   return out;
 };

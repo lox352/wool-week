@@ -4,3 +4,15 @@
 .hat-about p:last-child {
   margin-bottom: 0;
 }
+
+/* The letter chip on the shopping list opens the wool picker. */
+.shade-chip-button {
+  font: inherit;
+  border: 1px solid rgb(31 29 27 / 0.18);
+  cursor: pointer;
+}
+
+.shade-chip-button:hover {
+  outline: 2px solid var(--crimson);
+  outline-offset: 1px;
+}

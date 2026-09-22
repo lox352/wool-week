@@ -208,30 +208,34 @@ A chart misread by a single cell breaks one of those, so it fails the build.
 
 ## Colours
 
-Yarn colours carry a `source` saying how far to trust them.
+Every shade on the site comes out of one place: `src/data/yarns`, a library of
+998 shades from the five Shetland spinners these patterns are written in -
+Jamieson's of Shetland, Jamieson & Smith, Uradale, Laxdale and Aister 'oo' -
+read off their own shops, with a colour, a shade number and a link to buy it.
 
-**`"pattern"` — exact.** SWW25 prints its charts three times over, once per
-colourway, in the real shades, so every one of its 24 colours was read straight
-out of the file. Its third colourway uses five yarns where the other two use
-eight, so several slots share a shade; that is the colourway's doing, and the
-mapping was derived by comparing the three pages cell by cell rather than
-assumed.
+A hat's shade names it by id and copies its name, number and colour inline, so
+that drawing a hat never loads the library; `src/data/yarns/yarns.test.ts`
+checks every copy against the original, and that no two hats give the same wool
+two different colours. That last one is the point of the library. Before it,
+every colourway had been guessed at on its own, and Uradale's Graeff was three
+different colours in three different hats.
 
-**`"approximate"` — a considered stand-in.** SWW24 prints its charts in plain
-greys, one per yarn slot, and leaves the colour to the materials list. That is
-the model this whole site is built on, but it does mean there is no colour in
-the file to read. So:
+The colours are estimates sampled from the spinners' product photographs, which
+is the best anyone outside a dye house has. They run darker than the wool does,
+because a photograph of a ball of wool is partly the shadow between its
+strands, and unevenly so: Jamieson's Spindrift photographs are lit well and
+Jamieson & Smith's Shetland Aran Worsted are not. Against that: it is one
+method for all of them, it names shades the way the shop does - the 2025
+pattern's "Shade 96" is Pale Lemon - and it caught real errors, among them a
+Jamieson & Smith dark red that had been recorded as an orange.
 
-- the shade names, numbers, brands and links are exactly as published;
-- the colours are stand-ins, flagged as such in the interface;
-- its own greys are offered as a fourth colourway, "As printed", and those are
-  exact;
-- three Uradale shades (Moorit, Glansin, Flukkra) are exact, because the 2025
-  pattern draws the same undyed shades in colour.
+Two spinners are not in the library, because neither sells online in a form
+that can be read: Foula Wool, and the handspun in 2021's fifth colourway. Those
+sixteen shades carry `source: "approximate"` and keep considered stand-ins.
+Everything else carries `source: "library"`.
 
-Sampling the pattern's photographs was tried and abandoned: the group shot is
-dim enough that the natural-shades hat clusters to a blue-grey, which would
-have been worse than saying "approximate".
+Sampling the patterns' own photographs was tried and abandoned: the group shots
+are dim enough that a natural-shades hat clusters to a blue-grey.
 
 Anyone knitting can set any shade to the wool actually in their hands, which is
 the right answer regardless — a shade card is a photograph of wool too.

@@ -17,9 +17,8 @@ import charts from "./sww15-baa-ble-hat.charts.json";
  * each cell is - see PATTERNS.md, and the --ruled flag.
  *
  * Its charts are printed in plain greys, like 2021's, 2022's and 2024's, so
- * the shade names are exactly as published and the colours are stand-ins,
- * marked "approximate". The greys themselves are offered as a third colourway
- * and those are exact.
+ * there is no colour in the file to read. The shades are the two the pattern
+ * names, and their colours come out of the yarn library - see data/yarns.
  *
  * One chart, worked twice a round, and it does everything: 45 rows taking 120
  * stitches to 10, with the sheep in the middle and the decreases from row 26.
@@ -66,47 +65,43 @@ const sww15: HatPattern = {
   colourways: [
     {
       id: "jamiesons",
+      wool: "jamieson-s-of-shetland-heather-aran",
       name: "Jamieson's Heather Aran",
       brand: "Jamieson's of Shetland",
       yarn: "Heather Aran",
       url: "https://www.jamiesonsofshetland.co.uk",
       ballGrams: 50,
       shades: [
-        { slot: "A", name: "Autumn", hex: "#8a4a2a", source: "approximate" },
-        { slot: "B", name: "Natural White", hex: "#f2ece1", source: "approximate" },
-        { slot: "C", name: "Natural Black", hex: "#2b2825", source: "approximate" },
-        { slot: "D", name: "Highland Mist", hex: "#9aa3a8", source: "approximate" },
+        { slot: "A", name: "Autumn", code: "998", hex: "#69543a", source: "library",
+          wool: "jamieson-s-of-shetland-heather-aran-998" },
+        { slot: "B", name: "Natural White", code: "104", hex: "#e8e4d2", source: "library",
+          wool: "jamieson-s-of-shetland-heather-aran-104" },
+        { slot: "C", name: "Shetland Black", code: "101", hex: "#24211d", source: "library",
+          wool: "jamieson-s-of-shetland-heather-aran-101" },
+        { slot: "D", name: "Highland Mist", code: "1390", hex: "#7c868a", source: "library",
+          wool: "jamieson-s-of-shetland-heather-aran-1390" },
       ],
       balls: { A: 1, B: 1, C: 1, D: 1 },
     },
     {
       id: "jamieson-smith",
+      wool: "jamieson-smith-shetland-aran-worsted",
       name: "Jamieson & Smith Worsted Aran",
       brand: "Jamieson & Smith",
       yarn: "Worsted Aran",
       url: "https://www.shetlandwoolbrokers.co.uk",
       ballGrams: 50,
       shades: [
-        { slot: "A", name: "Peat", hex: "#5a4a3a", source: "approximate" },
-        { slot: "B", name: "Snaa White", hex: "#f4f1ea", source: "approximate" },
-        { slot: "C", name: "Coll Black", hex: "#26241f", source: "approximate" },
-        { slot: "D", name: "Silver Grey", hex: "#b6b7b2", source: "approximate" },
+        { slot: "A", name: "Peat", hex: "#301a18", source: "library",
+          wool: "jamieson-smith-shetland-aran-worsted-peat" },
+        { slot: "B", name: "Snaa White", hex: "#a39d81", source: "library",
+          wool: "jamieson-smith-shetland-aran-worsted-snaa-white" },
+        { slot: "C", name: "Coll Black", hex: "#1d1d1d", source: "library",
+          wool: "jamieson-smith-shetland-aran-worsted-coll-black" },
+        { slot: "D", name: "Silver Grey", hex: "#433f39", source: "library",
+          wool: "jamieson-smith-shetland-aran-worsted-silver-grey" },
       ],
       balls: { A: 2, B: 1, C: 1, D: 1 },
-    },
-    {
-      id: "as-printed",
-      name: "As printed",
-      brand: "Shetland Wool Week",
-      yarn: "the pattern's own greys",
-      url: "https://www.shetlandwoolweek.com/",
-      shades: [
-        { slot: "A", name: "Shade A", hex: "#808080", source: "pattern" },
-        { slot: "B", name: "Shade B", hex: "#ffffff", source: "pattern" },
-        { slot: "C", name: "Shade C", hex: "#1c1c12", source: "pattern" },
-        { slot: "D", name: "Shade D", hex: "#bfbfbf", source: "pattern" },
-      ],
-      balls: { A: 1, B: 1, C: 1, D: 1 },
     },
   ],
 

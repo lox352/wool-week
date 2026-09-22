@@ -17,6 +17,7 @@ import ProgressRing from "./ProgressRing";
 import HatModel from "./HatModel";
 import Chart from "../knitting/Chart";
 import KnittingPanel from "./KnittingPanel";
+import YarnPicker, { type Chosen } from "./YarnPicker";
 import "./Project.css";
 
 /**
@@ -67,15 +68,17 @@ const Project: React.FC = () => {
     );
   }, []);
 
-  const setShade = useCallback((slot: SlotId, hex: string) => {
-    setProject((current) =>
-      current
-        ? writeProject({
-            ...current,
-            shades: { ...current.shades, [slot]: { hex } },
-          })
-        : current,
-    );
+  const setShade = useCallback((slot: SlotId, chosen: Chosen | undefined) => {
+    setProject((current) => {
+      if (!current) return current;
+      const shades = { ...current.shades };
+      if (chosen) shades[slot] = chosen;
+      else delete shades[slot];
+      return writeProject({
+        ...current,
+        shades: Object.keys(shades).length > 0 ? shades : undefined,
+      });
+    });
   }, []);
 
   if (!project || !hat) {
@@ -118,7 +121,7 @@ const ProjectView: React.FC<{
   undo: () => void;
   canUndo: boolean;
   setColourway: (id: string) => void;
-  setShade: (slot: SlotId, hex: string) => void;
+  setShade: (slot: SlotId, chosen: Chosen | undefined) => void;
 }> = ({
   hatId,
   project,
@@ -143,6 +146,9 @@ const ProjectView: React.FC<{
 
   const counts = totals(index, project.progress);
   const position = positionOf(stitches, project.progress, index);
+
+  /** Which yarn's wool is being chosen, if any. */
+  const [picking, setPicking] = useState<SlotId | undefined>();
 
   return (
     <PageLayout
@@ -208,15 +214,20 @@ const ProjectView: React.FC<{
           <section className="section">
             <h2>Your wool</h2>
             <p className="quiet">
-              Set any of these to the shade actually in your hands, and the
-              chart and the hat will follow.
+              Set any of these to the ball actually in your hands - out of the
+              whole Shetland library, or any colour you like - and the chart
+              and the hat will follow.
             </p>
             <ul className="yarn-editor">
               {hat.slots.map((slot) => {
                 const yarn = yarnFor(palette, slot);
                 return (
                   <li key={slot}>
-                    <label>
+                    <button
+                      type="button"
+                      className="yarn-editor-row"
+                      onClick={() => setPicking(slot)}
+                    >
                       <span
                         className="shade-chip"
                         style={{ background: yarn.hex, color: inkOn(yarn.hex) }}
@@ -229,14 +240,12 @@ const ProjectView: React.FC<{
                         {yarn.approximate && (
                           <span className="quiet"> · approximate</span>
                         )}
+                        {project.shades?.[slot] && (
+                          <span className="quiet"> · yours</span>
+                        )}
                       </span>
-                      <input
-                        type="color"
-                        value={yarn.hex}
-                        aria-label={`Colour for yarn ${slot}`}
-                        onChange={(event) => setShade(slot, event.target.value)}
-                      />
-                    </label>
+                      <span className="quiet">Change</span>
+                    </button>
                   </li>
                 );
               })}
@@ -257,6 +266,17 @@ const ProjectView: React.FC<{
             </div>
           </section>
         </>
+      )}
+
+      {picking && (
+        <YarnPicker
+          open
+          slot={picking}
+          current={yarnFor(palette, picking)}
+          suggest={colourway.wool}
+          onChoose={(chosen) => setShade(picking, chosen)}
+          onClose={() => setPicking(undefined)}
+        />
       )}
 
       <section className="section">

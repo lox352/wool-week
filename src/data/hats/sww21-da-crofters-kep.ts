@@ -9,11 +9,15 @@ import charts from "./sww21-da-crofters-kep.charts.json";
  * leaves 24, so the 168 the body carries becomes the 144 the pattern prints
  * on row 1 rather than in a separate round.
  *
- * Its charts are printed in plain greys, like 2022's and 2024's, so the shade
- * names and numbers are exactly as published and the colours are considered
- * stand-ins, marked "approximate". The greys themselves are offered as a
- * sixth colourway and those are exact, as are Uradale's Moorit and Flukkra,
- * which the 2025 pattern prints in colour.
+ * Its charts are printed in plain greys, like 2022's and 2024's, so there is
+ * no colour in the file to read; the shades come out of the yarn library
+ * instead - see data/yarns. Two of its five colourways are not in the
+ * library, because neither Foula Wool nor the handspun sells online in a form
+ * that can be read, and those keep considered stand-ins.
+ *
+ * Its second colourway is the only one on the site knitted in two yarns at
+ * once: yarn A is Jamieson & Smith's Shetland Supreme, B to F their ordinary
+ * 2ply Jumper Weight, which is how the pattern prints it.
  */
 
 const chartsOf = (): Chart[] =>
@@ -76,6 +80,7 @@ const sww21: HatPattern = {
   colourways: [
     {
       id: "jamiesons",
+      wool: "jamieson-s-of-shetland-spindrift",
       name: "Colourway 1",
       brand: "Jamieson's of Shetland",
       yarn: "Spindrift",
@@ -83,17 +88,24 @@ const sww21: HatPattern = {
       ballMetres: 105,
       ballGrams: 25,
       shades: [
-        { slot: "A", name: "Eclipse", code: "707", hex: "#23283a", source: "approximate" },
-        { slot: "B", name: "Fjord", code: "170", hex: "#6c86a3", source: "approximate" },
-        { slot: "C", name: "Twilight", code: "175", hex: "#6b6f92", source: "approximate" },
-        { slot: "D", name: "Pacific", code: "763", hex: "#3f6d9e", source: "approximate" },
-        { slot: "E", name: "Blueberry", code: "294", hex: "#3c4470", source: "approximate" },
-        { slot: "F", name: "Mist", code: "180", hex: "#b8c3cc", source: "approximate" },
+        { slot: "A", name: "Eclipse", code: "707", hex: "#1f1e2b", source: "library",
+          wool: "jamieson-s-of-shetland-spindrift-707" },
+        { slot: "B", name: "Fjord", code: "170", hex: "#5b5f71", source: "library",
+          wool: "jamieson-s-of-shetland-spindrift-170" },
+        { slot: "C", name: "Twilight", code: "175", hex: "#646a76", source: "library",
+          wool: "jamieson-s-of-shetland-spindrift-175" },
+        { slot: "D", name: "Pacific", code: "763", hex: "#424b56", source: "library",
+          wool: "jamieson-s-of-shetland-spindrift-763" },
+        { slot: "E", name: "Blueberry", code: "294", hex: "#342632", source: "library",
+          wool: "jamieson-s-of-shetland-spindrift-294" },
+        { slot: "F", name: "Mist", code: "180", hex: "#999396", source: "library",
+          wool: "jamieson-s-of-shetland-spindrift-180" },
       ],
       balls: { A: 2, B: 1, C: 1, D: 1, E: 1, F: 1 },
     },
     {
       id: "jamieson-smith",
+      wool: "jamieson-smith-2ply-jumper-weight",
       name: "Colourway 2",
       brand: "Jamieson & Smith",
       // Two yarns in one colourway: yarn A is Shetland Supreme, at 172m per
@@ -104,17 +116,24 @@ const sww21: HatPattern = {
       ballMetres: 115,
       ballGrams: 25,
       shades: [
-        { slot: "A", name: "Shade 2005", code: "2005", hex: "#2b2523", source: "approximate" },
-        { slot: "B", name: "Shade FC46", code: "FC46", hex: "#b5622a", source: "approximate" },
-        { slot: "C", name: "Shade 122", code: "122", hex: "#8a6a4a", source: "approximate" },
-        { slot: "D", name: "Shade FC38", code: "FC38", hex: "#d08a3a", source: "approximate" },
-        { slot: "E", name: "Shade 82", code: "82", hex: "#7a3b20", source: "approximate" },
-        { slot: "F", name: "Shade 32", code: "32", hex: "#d9cdb8", source: "approximate" },
+        { slot: "A", name: "Shetland Black", code: "2005", hex: "#2c2623",
+          source: "library", wool: "jamieson-smith-shetland-supreme-jumper-weight-2005" },
+        { slot: "B", name: "Dark Green Grey", code: "FC46", hex: "#3b382c",
+          source: "library", wool: "jamieson-smith-2ply-jumper-weight-fc46" },
+        { slot: "C", name: "Dark Mixed Orange", code: "122", hex: "#5c2913",
+          source: "library", wool: "jamieson-smith-2ply-jumper-weight-122" },
+        { slot: "D", name: "Orange Rust Mix", code: "FC38", hex: "#602211",
+          source: "library", wool: "jamieson-smith-2ply-jumper-weight-fc38" },
+        { slot: "E", name: "Dark Green", code: "82", hex: "#233735", source: "library",
+          wool: "jamieson-smith-2ply-jumper-weight-82" },
+        { slot: "F", name: "Bright Tan", code: "32", hex: "#864212", source: "library",
+          wool: "jamieson-smith-2ply-jumper-weight-32" },
       ],
       balls: { A: 2, B: 1, C: 1, D: 1, E: 1, F: 1 },
     },
     {
       id: "uradale",
+      wool: "uradale-yarns-2ply-jumper-weight",
       name: "Colourway 3",
       brand: "Uradale Yarns",
       yarn: "2ply Jumper Weight",
@@ -124,12 +143,18 @@ const sww21: HatPattern = {
       shades: [
         // Uradale's wool is undyed and the 2025 pattern prints Moorit and
         // Flukkra in colour, so those two are read from there.
-        { slot: "A", name: "Aetmeal", hex: "#c9bfa6", source: "approximate" },
-        { slot: "B", name: "Tormentil Heath", hex: "#b8913f", source: "approximate" },
-        { slot: "C", name: "Moss Heath", hex: "#8a8a5a", source: "approximate" },
-        { slot: "D", name: "Moorit", hex: "#6b472b", source: "pattern" },
-        { slot: "E", name: "Flukkra", hex: "#ffffff", source: "pattern" },
-        { slot: "F", name: "Moss", hex: "#6c7a4a", source: "approximate" },
+        { slot: "A", name: "Aetmeal (light fawn)", hex: "#c0b9af", source: "library",
+          wool: "uradale-yarns-2ply-jumper-weight-aetmeal-light-fawn" },
+        { slot: "B", name: "Tormentil Heath", hex: "#8e7236", source: "library",
+          wool: "uradale-yarns-2ply-jumper-weight-tormentil-heath" },
+        { slot: "C", name: "Moss Heath", hex: "#817b5c", source: "library",
+          wool: "uradale-yarns-2ply-jumper-weight-moss-heath" },
+        { slot: "D", name: "Moorit (Shetland brown)", hex: "#565352", source: "library",
+          wool: "uradale-yarns-2ply-jumper-weight-moorit-shetland-brown" },
+        { slot: "E", name: "Flukkra (natural white)", hex: "#cdcfc1", source: "library",
+          wool: "uradale-yarns-2ply-jumper-weight-flukkra-natural-white" },
+        { slot: "F", name: "Moss", hex: "#989b5c", source: "library",
+          wool: "uradale-yarns-2ply-jumper-weight-moss" },
       ],
       balls: { A: 2, B: 1, C: 1, D: 1, E: 1, F: 1 },
     },
@@ -166,22 +191,6 @@ const sww21: HatPattern = {
         { slot: "D", name: "Fawn", hex: "#b9a488", source: "approximate" },
         { slot: "E", name: "Moorit", hex: "#6b472b", source: "approximate" },
         { slot: "F", name: "Light Grey", hex: "#c2c0ba", source: "approximate" },
-      ],
-      balls: { A: 2, B: 1, C: 1, D: 1, E: 1, F: 1 },
-    },
-    {
-      id: "as-printed",
-      name: "As printed",
-      brand: "Shetland Wool Week",
-      yarn: "the pattern's own greys",
-      url: "https://www.shetlandwoolweek.com/",
-      shades: [
-        { slot: "A", name: "Yarn A", hex: "#ffffff", source: "pattern" },
-        { slot: "B", name: "Yarn B", hex: "#636361", source: "pattern" },
-        { slot: "C", name: "Yarn C", hex: "#a6a8a8", source: "pattern" },
-        { slot: "D", name: "Yarn D", hex: "#878787", source: "pattern" },
-        { slot: "E", name: "Yarn E", hex: "#c4c7c7", source: "pattern" },
-        { slot: "F", name: "Yarn F", hex: "#3b3b38", source: "pattern" },
       ],
       balls: { A: 2, B: 1, C: 1, D: 1, E: 1, F: 1 },
     },

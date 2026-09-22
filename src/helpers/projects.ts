@@ -108,6 +108,8 @@ export const startProject = (
   hatId: string,
   sizeId: string,
   colourwayId: string,
+  /** Any wool chosen before starting, on the hat's own page. */
+  shades: Overrides = {},
 ): Project =>
   writeProject({
     version: currentVersion,
@@ -115,6 +117,7 @@ export const startProject = (
     hatId,
     sizeId,
     colourwayId,
+    shades: Object.keys(shades).length > 0 ? shades : undefined,
     progress: 0,
     startedAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
