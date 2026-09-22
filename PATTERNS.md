@@ -61,6 +61,13 @@ python3 scripts/extract_chart.py SWW22.pdf --page 7 --vector 1 \
 python3 scripts/extract_chart.py SWW15.pdf --page 3 --vector 0 --ruled \
     --key A B C D k2tog \
     --charts A:60x45 --out src/data/hats/sww15-baa-ble-hat.charts.json
+
+# SWW18, Merrie Dancers Toorie - charts drawn as outlines, with the yarn
+# printed as a number in each cell.
+python3 scripts/extract_chart.py SWW18.pdf --page 3 --vector all \
+    --cell 6.615 --marks --key A A/purl B C D E A/s2kp E/s2kp \
+    --charts B:12x34 A:4x12 C:24x21 \
+    --out src/data/hats/sww18-merrie-dancers-toorie.charts.json
 ```
 
 Where a pattern's charts are split across pages, the pieces are merged into
@@ -113,6 +120,37 @@ chart's verticals run the height of the whole grid. And one cell of this chart
 is shaded 15% grey where its neighbours are 25%; a shade plainly nearer one
 yarn than any other is read as that yarn, with a note, and one that could be
 either is still an error.
+
+### Charts that name their yarns rather than colouring them
+
+2018's charts are not shaded at all, and `--marks` is for them. Every cell is
+paper; what is printed in it says both which yarn and what to do with it:
+nothing for the main colour knitted plain, a dot for a purl, a number for one
+of the four contrast yarns, a chevron for a centred decrease. So a key entry
+names a yarn and, where it is not a plain knit, a stitch: `A`, `A/purl`,
+`E/s2kp`.
+
+- **The numbers are read as text**, from the page's own characters rather than
+  from a picture of them. Marks can be told apart by looking: a dot, a chevron
+  and a shaded chevron are nothing like each other. Numbers cannot - a 2 and a
+  3 differ by seven squares of a nine by nine bitmap - and a chart that a
+  knitter follows is not the place to take that chance. A swatch in the key
+  with a number in it is what teaches the extractor which number is which
+  yarn, so the page still names its own palette.
+- **The cells come from the outlines.** With nothing shaded there is no
+  rectangle per cell, so `--cell` gives the size of one and the charts are the
+  shapes filled on that grid: two plain oblongs and, for the crown, a single
+  staircase drawn as one rectilinear polygon. Where the staircase steps in is
+  where a decrease is. A shape counts as a chart only if it is the size of one
+  the command line is expecting, which is what keeps the panel the whole page
+  is printed on out of it.
+- **`--vector all`** glues the page back together. This leaflet has been
+  through something that split it into eight hundred streams, one per grid
+  line, and no single one of them holds a chart.
+
+Its two sizes are not the same knitting - a DK version over 108 stitches and a
+4ply one over 120, with different chart repeats - and the site builds one hat
+per pattern, so it builds the 4ply. The hat's own file says so.
 
 It refuses to write a file whose arithmetic does not chain: a chart row holds
 the stitches *worked* in that round, so its length is the count afterwards and

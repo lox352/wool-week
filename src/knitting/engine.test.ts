@@ -160,6 +160,50 @@ describe("the counts the patterns print", () => {
     expect(leaning).toHaveLength(11);
   });
 
+  it("Merrie Dancers Toorie: 120 sts, 144 after the rib, 120, 10 at the crown", () => {
+    const hat = hatById("sww18-merrie-dancers-toorie")!;
+    const { rounds } = buildHat(hat);
+    const sizes = rounds.map((round) => round.length);
+
+    // "Using MC, cast on [108: 120] sts" - this is the 120, yarn weight 2.
+    expect(sizes[0]).toBe(120);
+    // A plain rib round, then all twelve rows of chart A, still 120.
+    expect(sizes.slice(0, 14).every((n) => n === 120)).toBe(true);
+    // "K2, kfb, (k3, kfb) 3 times, *k7, kfb, (k3, kfb) 3 times; rep from *
+    //  to last 5 sts, k5. 144 sts"
+    expect(sizes[14]).toBe(144);
+    // A plain round and chart B's thirty-four rows, all over 144.
+    expect(sizes.slice(14, 14 + 2 + 34).every((n) => n === 144)).toBe(true);
+    // "*K4, k2tog; rep from * to end. 120 sts"
+    expect(sizes[50]).toBe(120);
+    // "Break both threads and pass both through the remaining 10 sts."
+    expect(sizes[sizes.length - 1]).toBe(10);
+    expect(sizes.length).toBe(1 + 1 + 12 + 1 + 1 + 34 + 1 + 1 + 21);
+  });
+
+  it("Merrie Dancers Toorie: its charts name a yarn in every cell", () => {
+    const hat = hatById("sww18-merrie-dancers-toorie")!;
+    const at = (id: string) => hat.charts.find((chart) => chart.id === id)!;
+    // Chart A is the two-coloured rib: two stitches of a yarn, two purled in
+    // the main colour, on every one of its twelve rows.
+    expect(at("A").rows).toHaveLength(12);
+    at("A").rows.forEach((row) => {
+      expect(row).toHaveLength(4);
+      expect(row.filter((cell) => cell.symbol === "purl")).toHaveLength(2);
+      expect(row.filter((cell) => cell.slot === "A")).toHaveLength(2);
+    });
+    // Chart B is colourwork only - no decreases anywhere in it.
+    expect(at("B").rows.flat().some((cell) => cell.symbol)).toBe(false);
+    // Chart C takes twenty-four stitches to two on eleven centred decreases,
+    // which is the staircase the page draws as one filled outline.
+    const crown = at("C");
+    expect(crown.rows[0]).toHaveLength(24);
+    expect(crown.rows[crown.rows.length - 1]).toHaveLength(2);
+    expect(
+      crown.rows.flat().filter((cell) => cell.symbol === "s2kp"),
+    ).toHaveLength(11);
+  });
+
   it("Baa-ble Hat: 96 sts, 120 after the rib increase, 10 at the crown", () => {
     const hat = hatById("sww15-baa-ble-hat")!;
     const { rounds } = buildHat(hat);

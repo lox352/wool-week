@@ -83,7 +83,14 @@ export const rowConsumes = (row: ChartCell[]): number =>
  * keep going while more than six of the round below are still unworked.
  */
 const cost = (op: ShapingOp): number => {
-  if ("repeat" in op) return op.repeat.reduce((total, o) => total + cost(o), 0);
+  if ("repeat" in op) {
+    const each = op.repeat.reduce((total, o) => total + cost(o), 0);
+    // A repeat of a known number of times inside one that runs to a remainder
+    // costs all of them. 2018 writes "[k7, kfb, (k3, kfb) x 3] rep to last 5",
+    // where the inner three are twelve of the twenty stitches the outer one
+    // takes, and counting them once puts the increase round eight repeats out.
+    return "times" in op ? each * op.times : each;
+  }
   if (op.work === "m1") return 0;
   if (op.work === "k2tog") return 2;
   if (op.work === "s2kp" || op.work === "sk2p") return 3;

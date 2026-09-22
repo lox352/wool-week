@@ -84,7 +84,7 @@ def cell_span(stream):
     itself to the last decimal.
     """
     sizes = collections.Counter()
-    for _x, _y, width, height, _fill in painted(stream):
+    for _x, _y, width, height, _fill in painted(stream)[0]:
         if 3.0 < width < 30.0 and 3.0 < height < 30.0 \
                 and abs(height - width) < width * 0.25:
             sizes[round(width, 1)] += 1
@@ -98,7 +98,14 @@ def cell_span(stream):
 
 
 def painted(stream):
-    """Every filled rectangle on a page, in page points, as (x, y, w, h, rgb).
+    """What a page fills, in page points.
+
+    Two lists. The rectangles, as (x, y, w, h, rgb). And the outlines drawn
+    freehand - as (subpaths, rgb, even_odd) - which is how a chart whose cells
+    are not shaded one by one gets drawn: 2018 fills the whole of a crown
+    chart's staircase as a single rectilinear polygon and prints a number in
+    each of its cells, so the polygon is the only thing on the page that says
+    which cells there are.
 
     Rectangles are accumulated and painted on the paint operator rather than
     on sight, because a page may build a path of many and fill it in one go
@@ -122,8 +129,16 @@ def painted(stream):
     ctm = (1.0, 1.0, 0.0, 0.0)
     stack = []
     pending = []
+    subpaths = []
+    here = None
+    freehand = False
     numbers = []
     out = []
+    shapes = []
+
+    def at(where, x, y):
+        sx, sy, tx, ty = where
+        return (sx * x + tx, sy * y + ty)
 
     for token in tokens:
         if NUMBER.fullmatch(token):
@@ -158,6 +173,20 @@ def painted(stream):
                 fill = (grey, grey, grey)
         elif token == "re" and len(numbers) >= 4:
             pending.append((tuple(numbers[-4:]), ctm))
+            x, y, width, height = numbers[-4:]
+            subpaths.append([
+                at(ctm, x, y), at(ctm, x + width, y),
+                at(ctm, x + width, y + height), at(ctm, x, y + height),
+            ])
+        elif token == "m" and len(numbers) >= 2:
+            here = [at(ctm, *numbers[-2:])]
+            subpaths.append(here)
+            freehand = True
+        elif token == "l" and len(numbers) >= 2 and here is not None:
+            here.append(at(ctm, *numbers[-2:]))
+        elif token == "c" and len(numbers) >= 6 and here is not None:
+            # Only where a curve ends, which is all a rectilinear chart has.
+            here.append(at(ctm, *numbers[-2:]))
         elif token in ("f", "F", "f*", "b", "b*", "B", "B*"):
             for (x, y, width, height), where in pending:
                 sx, sy, tx, ty = where
@@ -166,15 +195,125 @@ def painted(stream):
                 out.append(
                     (left, low, abs(width * sx), abs(height * sy), fill)
                 )
-            pending = []
+            # A path of nothing but rectangles is already in `out`; only one
+            # drawn freehand has anything to add.
+            if freehand and subpaths:
+                shapes.append((subpaths, fill, token in ("f*", "b*", "B*")))
+            pending, subpaths, here, freehand = [], [], None, False
         elif token in ("S", "s", "n"):
-            pending = []
+            pending, subpaths, here, freehand = [], [], None, False
         numbers = []
 
+    return out, shapes
+
+
+def pitch_of(values, drawn):
+    """The step between neighbouring cells, from where they are drawn.
+
+    Every piece of a chart starts on a grid line, whether it is one cell
+    or eleven, so their edges taken together mark out the whole grid. The
+    commonest step between neighbouring edges is a single cell - commonest
+    rather than smallest, because one cell nudged half a point by rounding
+    would otherwise set the pitch for the whole page and leave every run
+    measuring a fraction of a stitch too wide.
+    """
+    edges = sorted(set(values))
+    gaps = [b - a for a, b in zip(edges, edges[1:]) if b - a > drawn * 0.4]
+    if not gaps:
+        return drawn
+    about = collections.Counter(round(g, 1) for g in gaps).most_common(1)[0][0]
+    near = [g for g in gaps if abs(g - about) < 0.15]
+    return sum(near) / len(near)
+
+
+def outline_grid(rectangles, shapes, cell, shapes_wanted):
+    """The grid of a chart drawn as outlines rather than as shaded cells.
+
+    2018's charts are not shaded at all: each is one filled outline in the
+    paper colour with a number printed in each of its cells, so the cells come
+    from the shape rather than from any rectangle. The pitch is therefore
+    taken from the shape's own corners, every one of which is on a cell
+    boundary.
+
+    A chart whose outline is a plain oblong is drawn as one rectangle rather
+    than as a path, so the rectangles that are the size of a chart the caller
+    is expecting count too. Asking the size is what keeps the panel the whole
+    page is printed on out of it: that is an oblong on the same grid as
+    everything else, and it is not a chart.
+    """
+    vertices = [p for subs, _fill, _rule in shapes for sub in subs for p in sub]
+    if len(vertices) < 8 or not cell:
+        return None
+    across = up = cell
+
+    whole = lambda v, step: abs(v / step - round(v / step)) < 0.1
+
+    def is_chart(subpaths):
+        points = [p for sub in subpaths for p in sub]
+        wide = max(p[0] for p in points) - min(p[0] for p in points)
+        high = max(p[1] for p in points) - min(p[1] for p in points)
+        return (whole(wide, across) and whole(high, up)
+                and (int(round(wide / across)), int(round(high / up)))
+                in shapes_wanted)
+
+    drawn = [s for s in shapes if is_chart(s[0])]
+    oblongs = [
+        ([[(x, y), (x + w, y), (x + w, y + h), (x, y + h)]], fill, False)
+        for x, y, w, h, fill in rectangles
+        if whole(w, across) and whole(h, up)
+        and (int(round(w / across)), int(round(h / up))) in shapes_wanted
+    ]
+    return [], [], across, across, up, drawn + oblongs
+
+
+def cells_of(shapes, across, up, size):
+    """The grid cells a filled outline covers, as (x, y, size, rgb).
+
+    A cell counts if the outline encloses the middle of it, which is what
+    makes a staircase come out as a staircase: the rule is the page's own
+    winding rule, so a shape drawn as one loop and a shape drawn as a loop
+    with a notch cut out of it both read the way they look.
+    """
+    out = []
+    for subpaths, fill, even_odd in shapes:
+        points = [p for sub in subpaths for p in sub]
+        if len(points) < 4:
+            continue
+        left = min(p[0] for p in points)
+        right = max(p[0] for p in points)
+        low = min(p[1] for p in points)
+        high = max(p[1] for p in points)
+        wide = int(round((right - left) / across))
+        tall = int(round((high - low) / up))
+        if wide < 1 or tall < 1 or wide * tall > 20000:
+            continue
+        for j in range(tall):
+            for i in range(wide):
+                x = left + (i + 0.5) * across
+                y = low + (j + 0.5) * up
+                if inside(subpaths, x, y, even_odd):
+                    out.append((left + i * across, low + j * up, size, fill))
     return out
 
 
-def grid_of(stream, span=None):
+def inside(subpaths, x, y, even_odd):
+    """Whether (x, y) is in the filled region, by the rule the page asked for."""
+    winding = 0
+    crossings = 0
+    for sub in subpaths:
+        for i in range(len(sub)):
+            (x0, y0), (x1, y1) = sub[i], sub[(i + 1) % len(sub)]
+            if (y0 > y) == (y1 > y):
+                continue
+            where = x0 + (y - y0) / (y1 - y0) * (x1 - x0)
+            if where <= x:
+                continue
+            crossings += 1
+            winding += 1 if y1 > y0 else -1
+    return crossings % 2 == 1 if even_odd else winding != 0
+
+
+def grid_of(stream, span=None, outlines=False, cell=None, wanted=None):
     """A page's drawing and the grid its chart cells sit on.
 
     Returns the page's rectangles, the ones a chart could be drawn out of,
@@ -196,7 +335,9 @@ def grid_of(stream, span=None):
     if span is None:
         span = (3.0, 30.0)
     smallest, largest = span
-    rectangles = painted(stream)
+    rectangles, shapes = painted(stream)
+    if outlines:
+        return outline_grid(rectangles, shapes, cell, wanted or set())
 
     square = [
         r for r in rectangles
@@ -214,30 +355,13 @@ def grid_of(stream, span=None):
     # Cells and runs alike, which is everything the chart is drawn out of.
     pieces = [r for r in rectangles if r[2] > size * 0.6 and r[3] > tall * 0.6]
 
-    def pitch_of(values, drawn):
-        """The step between neighbouring cells, from where they are drawn.
-
-        Every piece of a chart starts on a grid line, whether it is one cell
-        or eleven, so their edges taken together mark out the whole grid. The
-        commonest step between neighbouring edges is a single cell - commonest
-        rather than smallest, because one cell nudged half a point by rounding
-        would otherwise set the pitch for the whole page and leave every run
-        measuring a fraction of a stitch too wide.
-        """
-        edges = sorted(set(values))
-        gaps = [b - a for a, b in zip(edges, edges[1:]) if b - a > drawn * 0.4]
-        if not gaps:
-            return drawn
-        about = collections.Counter(round(g, 1) for g in gaps).most_common(1)[0][0]
-        near = [g for g in gaps if abs(g - about) < 0.15]
-        return sum(near) / len(near)
-
     across = pitch_of((round(r[0], 2) for r in pieces), size)
     up = pitch_of((round(r[1], 2) for r in pieces), tall)
-    return rectangles, pieces, size, across, up
+    return rectangles, pieces, size, across, up, []
 
 
-def cells_in(stream, span=None, ruled=False, runs=True):
+def cells_in(stream, span=None, ruled=False, runs=True, outlines=False,
+              cell=None, wanted=None):
     """A page's chart cells, as (x, y, size, rgb), one entry per stitch.
 
     `span` is the (smallest, largest) a cell may be, in points - see grid_of.
@@ -249,10 +373,12 @@ def cells_in(stream, span=None, ruled=False, runs=True):
     and handed back as the several cells it stands for, which leaves a chart
     drawn cell by cell exactly as it was.
     """
-    found = grid_of(stream, span)
+    found = grid_of(stream, span, outlines, cell, wanted)
     if not found:
         return []
-    rectangles, pieces, size, across, up = found
+    rectangles, pieces, size, across, up, shapes = found
+    if outlines:
+        return cells_of(shapes, across, up, size)
 
     out = []
     for x, y, width, height, fill in pieces:
@@ -290,7 +416,7 @@ def boxed_in(stream, cells):
     found = grid_of(stream)
     if not found:
         return []
-    rectangles, _pieces, _size, across, up = found
+    rectangles, _pieces, _size, across, up, _shapes = found
     sides = [(r[0], r[1]) for r in rectangles
              if r[2] < across * 0.25 and up * 0.8 < r[3] < up * 2.0]
 
@@ -603,7 +729,100 @@ def chart_rows(cells, size):
 # ------------------------------------------------------------------ extraction
 
 
-def read_key(pdf, page, vector_index, order=None):
+def text_boxes(pdf, page):
+    """Every word on a page, as (x, y, text), in page points.
+
+    Poppler resolves a subset font's own encoding, which a chart that names
+    its yarns by printing a number in each cell needs and nothing else here
+    does. The marks can be told apart by looking at them - a dot is not a
+    chevron - but a 2 and a 3 differ by seven squares of a nine by nine
+    bitmap, which is not a distance to trust a knitter's chart to.
+    """
+    out = subprocess.run(
+        ["pdftotext", "-f", str(page), "-l", str(page), "-bbox", pdf, "-"],
+        capture_output=True, text=True, check=True,
+    ).stdout
+    words = []
+    for x0, y0, x1, y1, text in re.findall(
+        r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">'
+        r"(.*?)</word>",
+        out,
+    ):
+        words.append((
+            (float(x0) + float(x1)) / 2,
+            PAGE_HEIGHT_PT - (float(y0) + float(y1)) / 2,
+            text,
+        ))
+    return words
+
+
+def digit_in(words, x, y, size):
+    """The single digit printed inside a cell, if there is one."""
+    for wx, wy, text in words:
+        if len(text) == 1 and text.isdigit() and x < wx < x + size and y < wy < y + size:
+            return text
+    return None
+
+
+def read_marked_key(named, size, rendered, digits):
+    """A key whose swatches say which yarn as well as which stitch.
+
+    2018's charts are not shaded at all. Every cell is paper, and what is
+    printed in it - nothing, a dot, a number, a chevron - says both which yarn
+    to use and what to do with it. So a key entry is named "A", or "A/purl",
+    or "E/s2kp": the yarn, and the stitch where it is not a plain knit.
+
+    A swatch with a number in it teaches that number. A swatch with nothing in
+    it is what an empty cell means. Everything else becomes a template to
+    match a cell's ink against, which is safe here because a dot, a chevron
+    and a shaded chevron are not remotely alike.
+    """
+    blank, by_digit, templates, meaning = None, {}, {}, {}
+    for text, (x, y, _cell_size, fill) in named:
+        slot, _, symbol = text.partition("/")
+        if not re.fullmatch(r"[A-H]", slot):
+            raise SystemExit(f"--marks wants every key entry to name a yarn; got {text!r}")
+        printed = digit_in(digits, x, y, size)
+        if printed is not None:
+            by_digit[printed] = slot
+            continue
+        bitmap = rendered.ink(x, y, size, fill, grid=9)
+        if ink_weight(bitmap) == 0:
+            blank = (slot, symbol or None)
+            continue
+        templates[text] = bitmap
+        meaning[text] = (slot, symbol or None)
+
+    if blank is None:
+        raise SystemExit("--marks wants a key entry for an empty cell")
+    if not by_digit:
+        raise SystemExit("--marks found no numbered swatches in the key")
+    return {"blank": blank, "digits": by_digit, "meaning": meaning}, templates
+
+
+def key_column(swatches, wanted, size):
+    """A key read as what it looks like: a column of evenly spaced swatches.
+
+    A page can have any number of things the size of a chart cell on it - a
+    leaflet's bullets, the corners of its boxes - and 2018's has eighty-three.
+    Only one set of them is a key, and a key is a column: the same left edge
+    all the way down, one step between each and the next.
+    """
+    by_left = collections.defaultdict(list)
+    for swatch in swatches:
+        by_left[round(swatch[0] / size)].append(swatch)
+    for run in by_left.values():
+        if len(run) != wanted:
+            continue
+        run.sort(key=lambda s: -s[1])
+        steps = [a[1] - b[1] for a, b in zip(run, run[1:])]
+        if max(steps) - min(steps) < size * 0.2:
+            return run
+    return None
+
+
+def read_key(pdf, page, vector_index, order=None, cell=None,
+             marks=False):
     """The key's palette and symbol templates.
 
     A key usually names itself - "Yarn A" beside a swatch ties a fill to a
@@ -613,8 +832,12 @@ def read_key(pdf, page, vector_index, order=None):
     `order` names the swatches top to bottom instead.
     """
     stream = chart_stream(pdf, vector_index)
-    cells = cells_in(stream)
-    size = collections.Counter(round(c[2], 1) for c in cells).most_common(1)[0][0]
+    # A key drawn beside a chart whose cells are not shaded is the only thing
+    # on the page that *is* a cell, so it is looked for at the chart's size.
+    cells = cells_in(stream, (cell * 0.85, cell * 1.15) if cell else None)
+    size = cell or collections.Counter(
+        round(c[2], 1) for c in cells
+    ).most_common(1)[0][0]
     rendered = RenderedPage(pdf, page)
     # Top to bottom, then left to right, because a key set as one line across
     # the foot of a chart has all its swatches at the same height.
@@ -626,6 +849,10 @@ def read_key(pdf, page, vector_index, order=None):
         boxed = sorted(boxed_in(stream, cells), key=order_by)
         if len(boxed) == len(order):
             swatches = boxed
+    if order and len(swatches) != len(order):
+        column = key_column(swatches, len(order), size)
+        if column:
+            swatches = column
 
     if order:
         if len(order) != len(swatches):
@@ -644,6 +871,9 @@ def read_key(pdf, page, vector_index, order=None):
             ]
             if near:
                 named.append((min(near, key=lambda l: l[0] - x)[2], swatch))
+
+    if marks:
+        return read_marked_key(named, size, rendered, digits=text_boxes(pdf, page))
 
     slots, templates = {}, {}
     for text, (x, y, cell_size, fill) in named:
@@ -722,6 +952,16 @@ def resolve_fills(cells, slots):
 
 
 def chart_stream(pdf, vector_index):
+    """The page's drawing.
+
+    Usually one content stream. Some PDFs have been through a tool that split
+    a page into a stream per object - 2018's leaflet has eight hundred of
+    them, one per grid line - and there "all" glues them back together, which
+    is safe because each is balanced and carries page coordinates.
+    """
+    if vector_index == "all":
+        return b"\n".join(streams(pdf))
+    vector_index = int(vector_index)
     found = [s for s in streams(pdf) if cell_span(s)]
     if vector_index >= len(found):
         raise SystemExit(
@@ -731,10 +971,30 @@ def chart_stream(pdf, vector_index):
     return found[vector_index]
 
 
-def extract(pdf, page, vector_index, slots, templates, ruled=False):
+def marked_cell(x, y, size, fill, words, key, templates, rendered):
+    """One cell of a chart that says in the cell which yarn to use."""
+    printed = digit_in(words, x, y, size)
+    if printed is not None:
+        slot = key["digits"].get(printed)
+        if slot is None:
+            raise SystemExit(f"a chart cell says {printed}, which the key does not")
+        return {"slot": slot}
+    name = classify(rendered.ink(x, y, size, fill, grid=9), templates, tolerance=20)
+    slot, symbol = key["meaning"][name] if name else key["blank"]
+    return {"slot": slot, "symbol": symbol} if symbol else {"slot": slot}
+
+
+def extract(pdf, page, vector_index, slots, templates, ruled=False,
+            cell=None, wanted=None, marks=False):
     stream = chart_stream(pdf, vector_index)
-    cells = cells_in(stream, cell_span(stream), ruled)
-    size = collections.Counter(round(c[2], 1) for c in cells).most_common(1)[0][0]
+    if cell:
+        cells = cells_in(stream, outlines=True, cell=cell, wanted=wanted)
+        size = cell
+    else:
+        cells = cells_in(stream, cell_span(stream), ruled)
+        size = collections.Counter(
+            round(c[2], 1) for c in cells
+        ).most_common(1)[0][0]
     rendered = RenderedPage(pdf, page)
 
     raw = blocks_of(cells, size)
@@ -769,9 +1029,10 @@ def extract(pdf, page, vector_index, slots, templates, ruled=False):
             merged.append(list(slab))
     merged.sort(key=lambda g: (-max(c[1] for c in g), min(c[0] for c in g)))
 
+    words = text_boxes(pdf, page) if marks else []
     # Only the chart's own cells: the key's symbol swatches are drawn in the
     # paper colour, which is not a yarn and has no slot.
-    by_fill = resolve_fills([c for g in merged for c in g], slots)
+    by_fill = {} if marks else resolve_fills([c for g in merged for c in g], slots)
 
     charts = []
     for group in merged:
@@ -780,6 +1041,10 @@ def extract(pdf, page, vector_index, slots, templates, ruled=False):
         for row in rows:
             out_row = []
             for x, y, cell_size, fill in row:
+                if marks:
+                    out_row.append(marked_cell(x, y, cell_size, fill, words,
+                                               slots, templates, rendered))
+                    continue
                 slot = by_fill.get(fill)
                 if slot is None:
                     raise SystemExit(
@@ -787,10 +1052,10 @@ def extract(pdf, page, vector_index, slots, templates, ruled=False):
                         "yarn in the key" % tuple(int(round(v * 255)) for v in fill)
                     )
                 symbol = classify(rendered.ink(x, y, cell_size, fill), templates)
-                cell = {"slot": slot}
+                out = {"slot": slot}
                 if symbol:
-                    cell["symbol"] = symbol
-                out_row.append(cell)
+                    out["symbol"] = symbol
+                out_row.append(out)
             out_rows.append(out_row)
         charts.append(out_rows)
 
@@ -808,8 +1073,9 @@ def main():
     parser.add_argument("pdf")
     parser.add_argument("--page", type=int, required=True,
                         help="1-based PDF page number, for rasterising the marks")
-    parser.add_argument("--vector", type=int, default=0,
-                        help="which chart-bearing content stream on that page")
+    parser.add_argument("--vector", default="0",
+                        help="which chart-bearing content stream on that page, "
+                             "or \"all\" for a page split into one per object")
     parser.add_argument("--charts", nargs="+", required=True,
                         help="expected charts in reading order, as ID:WIDTHxROWS")
     parser.add_argument("--key", nargs="+",
@@ -819,7 +1085,14 @@ def main():
     parser.add_argument("--key-page", type=int,
                         help="read the key from this page instead (a chart page "
                              "that carries no key borrows one)")
-    parser.add_argument("--key-vector", type=int)
+    parser.add_argument("--key-vector")
+    parser.add_argument("--cell", type=float,
+                        help="how big a cell is, in points, for a chart drawn "
+                             "as an outline rather than as shaded cells")
+    parser.add_argument("--marks", action="store_true",
+                        help="the cell says which yarn as well as which "
+                             "stitch, so key entries are named A, A/purl, "
+                             "E/s2kp and so on")
     parser.add_argument("--ruled", action="store_true",
                         help="the chart is a word-processor table, whose "
                              "gutters are cells with their borders taken off "
@@ -827,14 +1100,22 @@ def main():
     parser.add_argument("--out", required=True)
     args = parser.parse_args()
 
+    wanted = set()
+    for spec in args.charts:
+        _id, _, shape = spec.partition(":")
+        width, _, height = shape.partition("x")
+        wanted.add((int(width), int(height)))
+
     slots, templates = read_key(
         args.pdf,
         args.key_page if args.key_page is not None else args.page,
         args.key_vector if args.key_vector is not None else args.vector,
         args.key,
+        args.cell,
+        args.marks,
     )
     charts = extract(args.pdf, args.page, args.vector, slots, templates,
-                     args.ruled)
+                     args.ruled, args.cell, wanted, args.marks)
 
     if len(charts) != len(args.charts):
         raise SystemExit(
@@ -842,8 +1123,9 @@ def main():
             f"were expected: {[len(c[0]) for c in charts]} wide"
         )
 
+    palette = {} if args.marks else slots
     out = {"slots": {k: "#%02x%02x%02x" % tuple(int(round(v * 255)) for v in f)
-                     for k, f in sorted(slots.items())},
+                     for k, f in sorted(palette.items())},
            "charts": []}
 
     for spec, rows in zip(args.charts, charts):
