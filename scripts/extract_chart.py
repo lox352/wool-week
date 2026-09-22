@@ -44,7 +44,9 @@ import tempfile
 import zlib
 
 PAGE_HEIGHT_PT = 595.276
-RENDER_DPI = 300
+# Fine enough that a chart cell is tens of pixels across even on a leaflet
+# printed at A5, where a cell is about seven and a half points.
+RENDER_DPI = 600
 
 # ---------------------------------------------------------------- pdf streams
 
@@ -65,13 +67,50 @@ def streams(path):
 NUMBER = re.compile(r"-?\d*\.?\d+")
 
 
-def cells_in(stream):
+def from_cmyk(values):
+    cyan, magenta, yellow, black = values
+    return tuple(
+        round(max(0.0, min(1.0, (1 - channel) * (1 - black))), 2)
+        for channel in (cyan, magenta, yellow)
+    )
+
+
+def cell_span(stream):
+    """How big this page's chart cells are, from the page itself.
+
+    A chart is hundreds of squares all the same size, and almost nothing else
+    on a page is, so the commonest square size is the cell. Rounded to a tenth
+    of a point before counting, because a drawing program will not repeat
+    itself to the last decimal.
+    """
+    sizes = collections.Counter()
+    for _x, _y, width, _fill in cells_in(stream, span=(3.0, 30.0)):
+        sizes[round(width, 1)] += 1
+    if not sizes:
+        return None
+    cell, seen = sizes.most_common(1)[0]
+    if seen < 40:
+        return None
+    # Enough either side to catch the same cell drawn a hair larger or smaller.
+    return (cell * 0.85, cell * 1.15)
+
+
+def cells_in(stream, span=None):
     """Filled square-ish rectangles on a page, as (x, y, size, rgb).
 
     Rectangles are accumulated and painted on the paint operator rather than
     on sight, because a page may build a path of many and fill it in one go
     ("re re re ... f*") as readily as one at a time ("re f").
+
+    `span` is the (smallest, largest) a cell may be, in points. Left out, it
+    is worked out from the page - see cell_span - because a chart cell is
+    whatever size the leaflet it is printed in makes it: the same designer's
+    charts are 10.6pt on an A4 pattern and 7.6pt on an A5 one, and a range
+    that fits one silently finds nothing at all in the other.
     """
+    if span is None:
+        span = (3.0, 30.0)
+    smallest, largest = span
     text = stream.decode("latin-1")
     # Text blocks carry digits and slashes that would otherwise parse as geometry.
     text = re.sub(r"BT.*?ET", " ", text, flags=re.S)
@@ -97,11 +136,31 @@ def cells_in(stream):
         elif token == "g" and numbers:
             grey = round(numbers[-1], 2)
             fill = (grey, grey, grey)
+        elif token == "k" and len(numbers) >= 4:
+            fill = from_cmyk(numbers[-4:])
+        elif token in ("sc", "scn"):
+            # A colour set in a colour space rather than a device one, which
+            # is what a drawing program exports when it has been told about
+            # colour management: the same grey, said differently. How many
+            # numbers came with it is what says which space it is.
+            if len(numbers) >= 4:
+                fill = from_cmyk(numbers[-4:])
+            elif len(numbers) == 3:
+                fill = tuple(round(v, 2) for v in numbers)
+            elif len(numbers) == 1:
+                grey = round(numbers[0], 2)
+                fill = (grey, grey, grey)
         elif token == "re" and len(numbers) >= 4:
             pending.append(tuple(numbers[-4:]))
         elif token in ("f", "F", "f*", "b", "b*", "B", "B*"):
             for x, y, width, height in pending:
-                if 8.0 < width < 13.0 and 8.0 < abs(height) < 13.0:
+                if (
+                    smallest < width < largest
+                    and smallest < abs(height) < largest
+                    # Square-ish: a chart cell is, and a rule or a swatch of
+                    # background is not.
+                    and abs(abs(height) - width) < width * 0.25
+                ):
                     out.append((x, min(y, y + height), width, fill))
             pending = []
         elif token in ("S", "s", "n"):
@@ -214,22 +273,45 @@ class RenderedPage:
         i = (y * self.width + x) * 3
         return self.data[i], self.data[i + 1], self.data[i + 2]
 
-    def ink(self, x, y, size, fill, grid=7, inset=0.16):
-        """A grid x grid bitmap of where a cell differs from its own fill."""
+    def ink(self, x, y, size, fill, grid=7, inset=0.16, covered=0.22):
+        """A grid x grid bitmap of where a cell differs from its own fill.
+
+        Each square of the grid is looked at whole rather than poked once in
+        the middle. A knitting symbol is a hairline - a diagonal, a chevron -
+        and on a small chart a single sample lands on it or beside it more or
+        less by chance, which reads the same mark differently in the key and
+        in the chart and leaves the classifier with nothing to match. Asking
+        what fraction of each square is inked is stable at any size the chart
+        happens to be printed.
+        """
         base = tuple(int(round(v * 255)) for v in fill)
+        step = (1 - 2 * inset) / grid
         bitmap = []
         for gy in range(grid):
             row = []
             for gx in range(grid):
-                fx = inset + (1 - 2 * inset) * (gx + 0.5) / grid
-                fy = inset + (1 - 2 * inset) * (gy + 0.5) / grid
-                px = int((x + fx * size) * self.scale)
-                py = int((PAGE_HEIGHT_PT - (y + (1 - fy) * size)) * self.scale)
-                if not (0 <= px < self.width and 0 <= py < self.height):
-                    row.append(0)
-                    continue
-                pixel = self.pixel(px, py)
-                row.append(1 if sum(abs(a - b) for a, b in zip(pixel, base)) > 150 else 0)
+                left = x + (inset + gx * step) * size
+                right = x + (inset + (gx + 1) * step) * size
+                top = y + (1 - inset - gy * step) * size
+                bottom = y + (1 - inset - (gy + 1) * step) * size
+
+                px0 = int(left * self.scale)
+                px1 = max(px0 + 1, int(right * self.scale))
+                py0 = int((PAGE_HEIGHT_PT - top) * self.scale)
+                py1 = max(py0 + 1, int((PAGE_HEIGHT_PT - bottom) * self.scale))
+
+                seen = inked = 0
+                for py in range(py0, py1):
+                    if not 0 <= py < self.height:
+                        continue
+                    for px in range(px0, px1):
+                        if not 0 <= px < self.width:
+                            continue
+                        seen += 1
+                        pixel = self.pixel(px, py)
+                        if sum(abs(a - b) for a, b in zip(pixel, base)) > 150:
+                            inked += 1
+                row.append(1 if seen and inked / seen >= covered else 0)
             bitmap.append(row)
         return bitmap
 
@@ -370,7 +452,10 @@ def read_key(pdf, page, vector_index, order=None):
         if yarn:
             slots[yarn.group(1)] = fill
             continue
-        symbol = re.match(r"(knit|purl|s2kp|k2tog|k1tbl)", text.strip())
+        # sk2p and s2kp are different stitches - one leans, the other is
+        # centred - and a pattern that uses one names it exactly, so both are
+        # here and neither is read as the other.
+        symbol = re.match(r"(knit|purl|s2kp|sk2p|k2tog|k1tbl)", text.strip())
         if symbol and symbol.group(1) != "knit":
             templates[symbol.group(1)] = rendered.ink(x, y, cell_size, fill)
 
@@ -418,7 +503,7 @@ def resolve_fills(cells, slots):
 
 
 def chart_stream(pdf, vector_index):
-    found = [s for s in streams(pdf) if len(cells_in(s)) > 40]
+    found = [s for s in streams(pdf) if cell_span(s)]
     if vector_index >= len(found):
         raise SystemExit(
             f"--vector {vector_index} out of range; this PDF has "
@@ -429,7 +514,7 @@ def chart_stream(pdf, vector_index):
 
 def extract(pdf, page, vector_index, slots, templates):
     stream = chart_stream(pdf, vector_index)
-    cells = cells_in(stream)
+    cells = cells_in(stream, cell_span(stream))
     size = collections.Counter(round(c[2], 1) for c in cells).most_common(1)[0][0]
     rendered = RenderedPage(pdf, page)
 
@@ -481,7 +566,7 @@ def extract(pdf, page, vector_index, slots, templates):
 
 
 def consumed(row):
-    cost = {"k2tog": 2, "s2kp": 3}
+    cost = {"k2tog": 2, "s2kp": 3, "sk2p": 3}
     return sum(cost.get(cell.get("symbol"), 1) for cell in row)
 
 
