@@ -52,24 +52,23 @@ export interface Tuning {
   restSeconds: number;
   minimumFrames: number;
   /**
-   * Upward, so the hat inflates rather than falling in a heap.
+   * Upward, so the hat is held at the cast-on and blown out rather than
+   * falling in a heap: there is nothing inside these hats to hold them up.
    *
-   * Much gentler here than on the sibling sites, and the bench says why. They
-   * start from a plain cylinder and need real force to blow it out into a
-   * dome. These hats already start as the shape the pattern describes, so
-   * gravity has nothing to add and only pulls them out of shape: a rope joint
-   * caps how far apart two stitches may be but nothing stops a round closing
-   * up, so a hard pull upwards is paid for out of the hat's circumference.
+   * Earth's, in the units the hat is built in. What that buys is not realism
+   * but determinism. Under a gentler gravity the joints to the round below
+   * never go taut - they rested at 0.92 of their length on one hat and 0.99
+   * on the other - so the hat kept whatever shape it happened to fall into,
+   * and two hats built the same way settled differently. At 9.81 every one of
+   * them is taut to three decimal places, and the shape stops being an
+   * accident and becomes a consequence of the rope lengths.
    *
-   *   gravity  settles  tall:wide  width kept   (Aal Ower Toorie, built 1.16)
-   *         0      19s       0.92         97%
-   *         1      37s       0.98         95%
-   *         2     110s       1.36         81%
-   *      9.81      62s       1.42         80%
+   *   gravity  tension  wanted  rounds taut  (Aal Ower Toorie)
+   *         1    1.169   1.097         0.92
+   *      9.81    1.052   1.097         1.00
    *
-   * Somewhere between 1 and 2 it starts trading width for height and finishes
-   * as a tall thin cone whose widest point is the one round that is pinned.
-   * Below that it keeps the circumference the knitting actually has.
+   * See scripts/gauge.mjs, which settles a hat and measures what it came out
+   * as, and the pressure below, which is what closes the rest of that gap.
    */
   gravity: number;
   stepBudgetMs: number;
@@ -137,16 +136,31 @@ export interface Tuning {
    * An outward push from the axis, as an acceleration, so it is in the same
    * units as gravity and can be read against it.
    *
-   * The ropes across a round already know how wide that round should be: n
-   * stitches joined by ropes of length a can be no wider than a circle of
-   * circumference n*a, which is exactly the circumference the knitting has.
-   * Nothing ever pushes a round out to it, though, so every round settles
-   * narrower than it was knitted and the hat comes out small. This pushes.
+   * Without it a settled round keeps nearly all of its stitch gaps - 1.92 of
+   * a possible 2.00 - and still encloses a third less than the knitting does,
+   * because it spends the yarn wandering in and out on the way round rather
+   * than on going round. A rope cannot see that: it caps how far apart two
+   * stitches may be and has nothing to say about the path between them, which
+   * is why the ripple measures the same at every rope length from 0.94 to
+   * 1.00, and why springs do not help either.
    *
-   * It is a cheap stand-in for a head - or for the hat being worn at all -
-   * and unlike a head it cannot be got around by the crown, because each
-   * round is still capped by its own stitch count. So the crown keeps its
-   * taper while the body fills out.
+   * The ropes across a round do know how wide it should be, though. n
+   * stitches on ropes of length a enclose at most a circle of circumference
+   * n*a, and that is exactly the circumference the knitting has. So this
+   * pushes them out to it. It cannot overshoot, because each round is still
+   * held by its own stitch count, and the crown keeps its taper because a
+   * crown round has fewer stitches to be held out by.
+   *
+   *   pressure  tension  wanted  frill  radius of 51.6
+   *          0    1.052   1.097   1.36            36.4
+   *          2    1.080   1.097   1.24            41.2
+   *          5    1.089   1.097   1.11            46.0
+   *         20    1.104   1.097   1.00            51.9
+   *
+   * Five, rather than the twenty that measures best: past about five every
+   * round below the crown is pushed to its stop at once and the hat comes out
+   * a drum, flat on top with a hard shoulder. Five keeps the crown domed and
+   * is still within a percent of the tension the pattern asks for.
    */
   pressure: number;
 }
@@ -159,7 +173,7 @@ export const defaultTuning: Tuning = {
   restThreshold: restMotionThreshold,
   restSeconds: settleRestSeconds,
   minimumFrames: minimumSettleFrames,
-  gravity: 1,
+  gravity: 9.81,
   stepBudgetMs: settleStepBudgetMs,
   colliderRadius: 0.02,
   ropes: "fixed",
@@ -172,7 +186,7 @@ export const defaultTuning: Tuning = {
   headRadius: 0,
   head: "ball",
   headTall: 60,
-  pressure: 0,
+  pressure: 5,
 };
 
 const numbers: (keyof Tuning)[] = [

@@ -9,20 +9,20 @@ import { blockHat } from "../helpers/blocking";
 import { adjacentStitchDistance } from "../constants";
 
 /**
- * Should this page settle the hat rather than draw one already settled?
+ * Should this page settle the hat, or draw one already settled?
  *
- * Only scripts/settle-hats.mjs ever asks for this. Settling is not something
- * to do in front of someone: a step over ten thousand rigid bodies and
- * twenty-five thousand rope joints takes a second or two, so a hat needs
- * minutes and about 245MB of heap to come to rest - more than a phone will
- * give a tab, and Safari on iOS ends the tab rather than waiting.
+ * It settles, so that a hat is watched finding its shape rather than arriving
+ * in it. "?settle=0" asks for the finished one straight away, which is worth
+ * having: a step over ten thousand rigid bodies and twenty-five thousand
+ * joints is not free, and the whole world costs about 245MB of heap - more
+ * than a phone will always give a tab.
  */
 const options = () =>
   new URLSearchParams(
     typeof window === "undefined" ? "" : (window.location.hash.split("?")[1] ?? ""),
   );
 
-const settlingRequested = () => options().get("settle") === "1";
+const settlingRequested = () => options().get("settle") !== "0";
 
 /**
  * "?settled=0" draws the hat where the pattern puts it rather than where it
@@ -85,6 +85,17 @@ const HatModel: React.FC<HatModelProps> = ({
   const [settled, setSettled] = useState<Point[] | undefined>(() =>
     known.get(hatId),
   );
+  /**
+   * Whether the hat is still settling in front of you.
+   *
+   * It stops for one of two reasons: it has come to rest, or somebody has
+   * taken hold of it. Turning a hat while ten thousand bodies are being
+   * stepped cannot be done smoothly, so the moment the mouse goes down the
+   * physics is dropped and the finished shape - worked out once, offline, and
+   * committed - is put in its place. What you lose is the rest of an
+   * animation; what you get is a hat that turns.
+   */
+  const [settling, setSettling] = useState(true);
   /** Undefined while we do not yet know whether there is a file to load. */
   const [looked, setLooked] = useState(known.has(hatId));
 
@@ -147,10 +158,21 @@ const HatModel: React.FC<HatModelProps> = ({
     };
   }, [stitches, rounds, target, roundHeight]);
 
+  /** Hand over to the cheap renderer, and let the physics world go. */
+  const rest = useCallback(() => setSettling(false), []);
+
   const onSettled = useCallback(
     (positions: Point[]) => {
-      known.set(hatId, positions);
-      setSettled(positions);
+      /*
+       * What it came to rest as, unless the committed answer is already here.
+       * They are the same physics either way, and preferring the file means
+       * the hat does not shift under the pointer if the two ever differ.
+       */
+      if (!known.has(hatId)) {
+        known.set(hatId, positions);
+        setSettled(positions);
+      }
+      setSettling(false);
       // How scripts/settle-hats.mjs collects what it came for. Harmless
       // otherwise: in a shipped build nothing ever settles in the browser.
       (window as unknown as { __settledPositions?: Point[] }).__settledPositions =
@@ -182,7 +204,9 @@ const HatModel: React.FC<HatModelProps> = ({
       progress={progress}
       settled={shown}
       settle={settlingRequested()}
+      frozen={!settling}
       onSettled={onSettled}
+      onGrabbed={rest}
       reducedMotion={reducedMotion}
     />
   );

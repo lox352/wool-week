@@ -3,10 +3,10 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Stitch } from "../types/Stitch";
 import { Point } from "../types/Point";
-import { Palette, rgbOf, yarnFor } from "../knitting/palette";
+import { Palette } from "../knitting/palette";
 import { hatShape } from "../helpers/hat-shape";
 import FrameHat, { OrbitLike } from "./FrameHat";
-import StitchInstances from "./StitchInstances";
+import RestingHat from "./RestingHat";
 
 export interface SettledHatProps {
   /** Unused here, but part of the shared stage's props. */
@@ -48,28 +48,6 @@ export default function SettledHat({
     [stitches, rounds, settled],
   );
 
-  const drawn = useMemo(() => stitches.filter((s) => s.id > 0), [stitches]);
-
-  const colours = useMemo(
-    () =>
-      new Float32Array(
-        drawn.flatMap((stitch) =>
-          rgbOf(yarnFor(palette, stitch.slot).hex).map((c) => c / 255),
-        ),
-      ),
-    [drawn, palette],
-  );
-
-  const worked = useMemo(
-    () => new Float32Array(drawn.map((stitch) => (stitch.id <= progress ? 1 : 0))),
-    [drawn, progress],
-  );
-
-  const positionAt = useMemo(
-    () => (id: number) => settled[id] ?? stitches[id]?.position,
-    [settled, stitches],
-  );
-
   return (
     /*
      * Drawn on demand rather than sixty times a second.
@@ -95,12 +73,11 @@ export default function SettledHat({
         zoomSpeed={0.7}
         makeDefault
       />
-      <StitchInstances
+      <RestingHat
         stitches={stitches}
-        positionAt={positionAt}
-        moving={false}
-        colours={colours}
-        worked={worked}
+        palette={palette}
+        progress={progress}
+        settled={settled}
         reducedMotion={reducedMotion}
       />
     </Canvas>
