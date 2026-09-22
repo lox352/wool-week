@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect } from "react";
 import { Stitch } from "../types/Stitch";
 import {
-  ColourRun,
+  Run,
   RoundIndex,
   currentRun,
   endOfRound,
   positionOf,
+  runInstruction,
+  stitchWord,
   totals,
   upcomingRuns,
 } from "../knitting/progress";
@@ -24,7 +26,7 @@ interface KnittingPanelProps {
   onUndo: () => void;
 }
 
-const Swatch: React.FC<{ run: ColourRun; palette: Palette; small?: boolean }> = ({
+const Swatch: React.FC<{ run: Run; palette: Palette; small?: boolean }> = ({
   run,
   palette,
   small,
@@ -34,6 +36,7 @@ const Swatch: React.FC<{ run: ColourRun; palette: Palette; small?: boolean }> = 
     <span
       className={`run-swatch${small ? " run-swatch-small" : ""}`}
       style={{ background: yarn.hex, color: inkOn(yarn.hex) }}
+      title={`${runInstruction(run)} in ${yarn.name}`}
     >
       {run.length}
     </span>
@@ -44,12 +47,17 @@ const Swatch: React.FC<{ run: ColourRun; palette: Palette; small?: boolean }> = 
  * The view you use while actually knitting.
  *
  * Written for someone holding needles. The things in large type are the round,
- * the stitch within it, and how many of this colour to work before changing -
- * which in Fair Isle is the only instruction that matters. A percentage is not
+ * the stitch within it, and what to work before anything changes - which in
+ * Fair Isle is the only instruction that matters. A percentage is not
  * something you can act on, so it is demoted to a bar.
  *
+ * A run ends where the stitch changes as well as where the yarn does, so the
+ * button says "Purl 2 in Port Wine" and not "Work 126 in Port Wine" across a
+ * whole round of twisted rib. That makes runs short in a rib, which is what a
+ * rib is; "End of round" is there for when you do not want telling twice.
+ *
  * The two big buttons are the two things you actually do: work one more
- * stitch, or work to the end of the current run of colour.
+ * stitch, or work to the end of the run in front of you.
  */
 const KnittingPanel: React.FC<KnittingPanelProps> = ({
   stitches,
@@ -160,7 +168,7 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
           <span className="knitting-figure knitting-run">
             <Swatch run={run} palette={palette} />
             <span className="quiet">
-              in {yarnFor(palette, run.slot).name}
+              {stitchWord(run.type)} in {yarnFor(palette, run.slot).name}
               {ahead.length > 0 && (
                 <>
                   , then{" "}
@@ -168,6 +176,11 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
                     <React.Fragment key={next.startId}>
                       {position > 0 && ", "}
                       <Swatch run={next} palette={palette} small />
+                      {/*
+                        A bare number is a knit, which is what most of a Fair
+                        Isle round is. Anything else says so.
+                      */}
+                      {next.type !== "k1" && ` ${stitchWord(next.type)}`}
                     </React.Fragment>
                   ))}
                 </>
@@ -196,7 +209,9 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
           One stitch
         </Button>
         <Button variant="primary" size="lg" onClick={finishRun}>
-          {run ? `Work ${run.length} in ${yarnFor(palette, run.slot).name}` : "Work on"}
+          {run
+            ? `${runInstruction(run)} in ${yarnFor(palette, run.slot).name}`
+            : "Work on"}
         </Button>
         <Button variant="quiet" onClick={finishRound}>
           End of round

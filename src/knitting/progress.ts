@@ -1,12 +1,13 @@
 import { Stitch } from "../types/Stitch";
+import { StitchType } from "../types/StitchType";
 
 /**
  * Where you are in a hat, and what to work next.
  *
  * Progress is the id of the last stitch worked, so the next one is the one
  * after it. A percentage is no use with needles in your hands; what you need
- * is the round, the stitch within it, and how many of this colour to work
- * before you change.
+ * is the round, the stitch within it, and how many of this stitch in this
+ * colour to work before either changes.
  *
  * The rounds come from the pattern rather than being recovered from the
  * stitch graph, so the round a knitter is told they are on is the round the
@@ -88,25 +89,79 @@ export const positionOf = (
   };
 };
 
-export interface ColourRun {
+export interface Run {
   slot: string;
+  type: StitchType;
   length: number;
   startId: number;
   endId: number;
 }
 
 /**
- * The run of one yarn starting at the next stitch.
+ * What a knitter calls one of these.
  *
- * This is the instruction that matters in Fair Isle: work this many in this
- * colour, then change. A run stops at the end of a round, because that is
- * where a knitter's attention resets.
+ * The one-for-one stitches are counted as stitches - "purl 2" - and the rest
+ * as repetitions of themselves, because that is how a pattern writes them:
+ * you do not work three stitches of k2tog, you work k2tog three times.
+ */
+const words: Record<
+  StitchType,
+  { said: string; after?: string; perStitch: boolean }
+> = {
+  k1: { said: "knit", perStitch: true },
+  p1: { said: "purl", perStitch: true },
+  // The count goes in the middle, as a pattern writes it: "knit 2 tbl".
+  k1tbl: { said: "knit", after: "tbl", perStitch: true },
+  m1: { said: "m1", perStitch: false },
+  k2tog: { said: "k2tog", perStitch: false },
+  s2kp: { said: "s2kp", perStitch: false },
+  sk2p: { said: "sk2p", perStitch: false },
+  // Never worked: the seam that closes the cast-on round. See below.
+  join: { said: "knit", perStitch: true },
+};
+
+/** "knit", "purl", "knit tbl", "k2tog". */
+export const stitchWord = (type: StitchType): string =>
+  [words[type].said, words[type].after].filter(Boolean).join(" ");
+
+/**
+ * The instruction a run is: "Knit 6", "Purl 2", "K2tog x 3".
+ *
+ * Which is the whole point of breaking runs on the stitch as well as the
+ * yarn. A round of twisted rib is one colour from end to end, and telling
+ * somebody to work 126 of it says nothing about the four different stitches
+ * it is made of.
+ */
+export const runInstruction = (run: Run): string => {
+  const { said, after, perStitch } = words[run.type];
+  const phrase = perStitch
+    ? [said, run.length, after].filter(Boolean).join(" ")
+    : run.length === 1
+      ? said
+      : `${said} x ${run.length}`;
+  return phrase.charAt(0).toUpperCase() + phrase.slice(1);
+};
+
+/*
+ * The seam that closes the cast-on round is not a stitch anybody works - see
+ * workable - so it must not break the run it sits in. Reading it as a knit
+ * does that, and costs nothing: a cast-on round is knits and one seam.
+ */
+const typeOf = (stitch: Stitch): StitchType =>
+  stitch.type === "join" ? "k1" : stitch.type;
+
+/**
+ * The run of one yarn and one stitch starting at the next stitch.
+ *
+ * This is the instruction that matters in Fair Isle: work this many of this
+ * stitch in this colour, then change. A run stops at the end of a round,
+ * because that is where a knitter's attention resets.
  */
 export const currentRun = (
   stitches: Stitch[],
   progress: number,
   index: RoundIndex,
-): ColourRun | undefined => {
+): Run | undefined => {
   /*
    * Stitches are made in order and never reordered, so a stitch's id is its
    * place in the list and it can simply be looked up. This used to build a
@@ -118,16 +173,18 @@ export const currentRun = (
   if (!first) return undefined;
 
   const round = index.roundOf.get(startId);
+  const type = typeOf(first);
   let endId = startId;
   for (let id = startId + 1; ; id++) {
     const candidate = stitches[id];
     if (!candidate) break;
     if (candidate.slot !== first.slot) break;
+    if (typeOf(candidate) !== type) break;
     if (index.roundOf.get(id) !== round) break;
     endId = id;
   }
 
-  return { slot: first.slot, length: endId - startId + 1, startId, endId };
+  return { slot: first.slot, type, length: endId - startId + 1, startId, endId };
 };
 
 export const upcomingRuns = (
@@ -135,8 +192,8 @@ export const upcomingRuns = (
   progress: number,
   index: RoundIndex,
   count = 3,
-): ColourRun[] => {
-  const runs: ColourRun[] = [];
+): Run[] => {
+  const runs: Run[] = [];
   let at = progress;
   for (let i = 0; i < count; i++) {
     const run = currentRun(stitches, at, index);
