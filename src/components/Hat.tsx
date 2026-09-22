@@ -178,8 +178,12 @@ const HatPage: React.FC<{
           ))}
         </ul>
         <p className="quiet">
-          {colourway.brand} {colourway.yarn}, {colourway.ballMetres}m per{" "}
-          {colourway.ballGrams}g ball ·{" "}
+          {colourway.brand} {colourway.yarn}
+          {colourway.ballMetres !== undefined &&
+          colourway.ballGrams !== undefined
+            ? `, ${colourway.ballMetres}m per ${colourway.ballGrams}g ball`
+            : ""}{" "}
+          ·{" "}
           <a href={colourway.url} target="_blank" rel="noreferrer">
             {colourway.url.replace(/^https?:\/\//, "")}
           </a>

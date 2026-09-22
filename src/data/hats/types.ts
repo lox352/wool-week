@@ -76,9 +76,15 @@ export interface Colourway {
   brand: string;
   yarn: string;
   url: string;
-  /** Metres and grams in one ball, for the shopping list. */
-  ballMetres: number;
-  ballGrams: number;
+  /**
+   * Metres and grams in one ball, for the shopping list.
+   *
+   * Left out where the pattern leaves it out: handspun is sold in skeins
+   * rather than balls, and nobody has said how long a skein is. Better a line
+   * that does not claim it than a number invented to fill the field.
+   */
+  ballMetres?: number;
+  ballGrams?: number;
   shades: Shade[];
   /** Balls of each slot; a slot that needs more in bigger sizes says so. */
   balls: Partial<Record<SlotId, number | Partial<Record<string, number>>>>;

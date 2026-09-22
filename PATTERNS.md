@@ -42,6 +42,13 @@ python3 scripts/extract_chart.py SWW24.pdf --page 7 --vector 1 \
     --key-page 6 --key-vector 0 --key knit purl s2kp A B C D E \
     --charts C:20x15 E:24x23 --out .../sww24-v1.json
 
+# SWW21, Da Crofter's Kep - all three charts and the key on one page,
+# with the body chart set beside the crown chart.
+python3 scripts/extract_chart.py SWW21.pdf --page 4 --vector 0 \
+    --key knit purl A B C D E F k2tog sk2p \
+    --charts A:4x10 B:24x35 C:24x23 \
+    --out src/data/hats/sww21-da-crofters-kep.charts.json
+
 # SWW22, Bonnie Isle Hat - two chart pages with a different key on each.
 python3 scripts/extract_chart.py SWW22.pdf --page 6 --vector 0 \
     --key knit purl A B C D E \
@@ -86,6 +93,8 @@ count the published pattern prints out loud:
   crown.
 - **Bonnie Isle Hat** — cast on 140, 156 after the increase round, 128 after
   the decrease round, 8 at the crown.
+- **Da Crofter's Kep** — cast on 136, 168 after the increase round, 144 after
+  the crown chart's own first row, 12 at the crown.
 
 A chart misread by a single cell breaks one of those, so it fails the build.
 

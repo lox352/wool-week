@@ -522,15 +522,28 @@ def extract(pdf, page, vector_index, slots, templates):
     slabs = [b for b in raw if len(b) > 1]
 
 
-    # Merge slabs sharing a vertical band: a crown chart is drawn as two wedges
-    # either side of its decrease column, but it is one chart.
+    """Merge slabs that are one chart drawn in pieces.
+
+    A crown chart comes apart into two wedges either side of its decrease
+    column, and they share a vertical band, so sharing one is most of the
+    test. But it is not all of it: a page that sets two charts side by side -
+    2021 puts a 24 stitch body chart beside a 24 stitch crown - has them
+    sharing a band too, and merging those gives one impossible chart 48
+    stitches wide. So they must also be within a few cells of each other
+    across the page. A decrease column is one cell; a gutter between two
+    charts is a dozen.
+    """
+    reach = size * 4
     slabs.sort(key=lambda b: -max(c[1] for c in b))
     merged = []
     for slab in slabs:
         low, high = min(c[1] for c in slab), max(c[1] for c in slab)
+        left, right = min(c[0] for c in slab), max(c[0] for c in slab)
         for group in merged:
             glow, ghigh = min(c[1] for c in group), max(c[1] for c in group)
-            if min(high, ghigh) - max(low, glow) > size:
+            gleft, gright = min(c[0] for c in group), max(c[0] for c in group)
+            apart = max(gleft - right, left - gright, 0)
+            if min(high, ghigh) - max(low, glow) > size and apart <= reach:
                 group.extend(slab)
                 break
         else:

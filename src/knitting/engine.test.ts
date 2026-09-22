@@ -126,6 +126,39 @@ describe("the counts the patterns print", () => {
     expect(crown.rows[crown.rows.length - 1].length).toBe(1);
   });
 
+  it("Da Crofter's Kep: 136 sts, 168 after the increase, 144, 12 at the crown", () => {
+    const hat = hatById("sww21-da-crofters-kep")!;
+    const { rounds } = buildHat(hat);
+    const sizes = rounds.map((round) => round.length);
+
+    expect(sizes[0]).toBe(136);
+    // The cast-on and all ten rows of chart A, still 136.
+    expect(sizes.slice(0, 11).every((n) => n === 136)).toBe(true);
+    // "Increase round: K5, m1 (k4, m1) to last 7 sts, k7. 168 sts"
+    expect(sizes[11]).toBe(168);
+    // Chart B's thirty-five rows are all worked over 168.
+    expect(sizes.slice(11, 11 + 1 + 35).every((n) => n === 168)).toBe(true);
+    // Chart C does its own first decrease: "24 st repeat 6 times. 144 sts"
+    expect(sizes[11 + 1 + 35]).toBe(144);
+    expect(sizes[sizes.length - 1]).toBe(12);
+    expect(sizes.length).toBe(1 + 10 + 1 + 35 + 23);
+  });
+
+  it("Da Crofter's Kep: its crown chart is worked over more than it leaves", () => {
+    const hat = hatById("sww21-da-crofters-kep")!;
+    const crown = hat.charts.find((chart) => chart.id === "C")!;
+    // Twenty-eight stitches in, twenty-four out, on four k2tog - which is
+    // where the 168 of the body becomes the 144 the pattern prints.
+    expect(crown.rows[0].reduce((t, c) => t + consumes(c), 0)).toBe(28);
+    expect(crown.rows[0]).toHaveLength(24);
+    // Then an sk2p on every odd row, taking twenty-four down to two.
+    expect(crown.rows[crown.rows.length - 1]).toHaveLength(2);
+    const leaning = crown.rows
+      .flat()
+      .filter((cell) => cell.symbol === "sk2p");
+    expect(leaning).toHaveLength(11);
+  });
+
   it("a chart repeat multiplied out matches the round it is worked over", () => {
     const hat = hatById("sww25-aal-ower-toorie")!;
     const crown = hat.charts.find((chart) => chart.id === "B")!;
