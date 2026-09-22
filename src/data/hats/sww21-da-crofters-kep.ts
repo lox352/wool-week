@@ -149,7 +149,7 @@ const sww21: HatPattern = {
           wool: "uradale-yarns-2ply-jumper-weight-tormentil-heath" },
         { slot: "C", name: "Moss Heath", hex: "#cdc391", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-moss-heath" },
-        { slot: "D", name: "Moorit (Shetland brown)", hex: "#a09d9a", source: "library",
+        { slot: "D", name: "Moorit (Shetland brown)", hex: "#4a3930", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-moorit-shetland-brown" },
         { slot: "E", name: "Flukkra (natural white)", hex: "#eef0e2", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-flukkra-natural-white" },

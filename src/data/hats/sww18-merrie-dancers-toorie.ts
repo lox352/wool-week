@@ -129,7 +129,7 @@ const sww18: HatPattern = {
       url: "https://www.uradale.com",
       ballGrams: 50,
       shades: [
-        { slot: "A", name: "Graeff (Shetland black)", hex: "#5f5555", source: "library",
+        { slot: "A", name: "Graeff (Shetland black)", hex: "#352c2c", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-graeff-shetland-black" },
         { slot: "B", name: "Flukkra (natural white)", hex: "#eef0e2", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-flukkra-natural-white" },

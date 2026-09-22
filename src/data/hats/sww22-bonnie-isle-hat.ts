@@ -148,7 +148,7 @@ const sww22: HatPattern = {
           wool: "uradale-yarns-2ply-jumper-weight-roanberry-meal" },
         { slot: "C", name: "Roanberry Heath", hex: "#fa7657", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-roanberry-heath" },
-        { slot: "D", name: "Graeff (Shetland black)", hex: "#5f5555", source: "library",
+        { slot: "D", name: "Graeff (Shetland black)", hex: "#352c2c", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-graeff-shetland-black" },
         { slot: "E", name: "Flukkra (natural white)", hex: "#eef0e2", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-flukkra-natural-white" },

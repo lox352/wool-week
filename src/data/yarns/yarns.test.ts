@@ -53,19 +53,13 @@ describe("the yarn library", () => {
  * white)", which is as near to a known answer as a photograph of wool gets -
  * so it is worth asking the library whether it agrees with them.
  *
- * Four do not, and they are listed rather than ignored. All four are the
- * sample itself rather than the shadow correction applied to it: a lightness
- * correction cannot turn a grey blue, and two of these are blue. When a
- * better reading of Uradale's photographs turns up this list should shrink,
- * and the test says so by failing if it does.
+ * Four once did not, and are listed here no longer: Graeff and Laebrak
+ * sampled as a mid grey and a light blue, Shoormal as a light blue, Moorit
+ * as a neutral. All four were the sample itself rather than the shadow
+ * correction applied to it, since no amount of lightening turns a grey blue,
+ * and all four have since been read again. Nothing disagrees now, and this
+ * fails if anything starts to.
  */
-const disagrees = [
-  "Graeff (Shetland black)", // #5f5555, a mid grey
-  "Laebrak (dark grey)", // #a7c7e5, a light blue
-  "Moorit (Shetland brown)", // #a09d9a, neutral
-  "Shoormal (mid grey)", // #bbd4ec, a light blue
-];
-
 describe("shades that name their own colour", () => {
   const lum = (hex: string) => {
     const n = parseInt(hex.slice(1), 16);
@@ -79,11 +73,13 @@ describe("shades that name their own colour", () => {
     return Math.max(r, g, b) - Math.min(r, g, b) < 14;
   };
 
-  it("are the colour they say, bar four Uradale naturals", () => {
+  it("are the colour they say", () => {
     const wrong: string[] = [];
+    let asked = 0;
     Object.values(wools()).forEach((wool) => {
       const says = /\(([^)]+)\)/.exec(wool.name)?.[1]?.toLowerCase();
       if (!says) return;
+      asked += 1;
       const light = lum(wool.hex);
       const ok =
         says.includes("black") ? light < 70
@@ -93,7 +89,8 @@ describe("shades that name their own colour", () => {
         : true;
       if (!ok && !wrong.includes(wool.name)) wrong.push(wool.name);
     });
-    expect(wrong.sort()).toEqual(disagrees);
+    expect(asked).toBeGreaterThan(10);
+    expect(wrong.sort()).toEqual([]);
   });
 
   it("lift the whites without lifting the blacks", () => {

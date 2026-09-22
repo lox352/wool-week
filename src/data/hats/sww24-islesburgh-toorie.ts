@@ -127,7 +127,7 @@ const sww24: HatPattern = {
       shades: [
         // Three of these are exact: the 2025 pattern draws its charts in real
         // colour and uses the same undyed Uradale shades.
-        { slot: "A", name: "Moorit (Shetland brown)", hex: "#a09d9a", source: "library",
+        { slot: "A", name: "Moorit (Shetland brown)", hex: "#4a3930", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-moorit-shetland-brown" },
         { slot: "B", name: "Glansin (light grey)", hex: "#ebeae8", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-glansin-light-grey" },
