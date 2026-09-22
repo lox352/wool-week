@@ -1,4 +1,4 @@
-import { Colourway, Shade, SlotId } from "../data/hats/types";
+import { Chart, Colourway, Shade, SlotId, partKey } from "../data/hats/types";
 import { RGB } from "../types/RGB";
 
 /**
@@ -32,6 +32,7 @@ const asYarn = (shade: Shade): Yarn => ({
 export const paletteOf = (
   colourway: Colourway,
   overrides: Overrides = {},
+  charts: Chart[] = [],
 ): Palette => {
   const out: Palette = {};
   colourway.shades.forEach((shade) => {
@@ -46,12 +47,30 @@ export const paletteOf = (
         }
       : base;
   });
+
+  /*
+   * A chart drawn in parts has no colour of its own: it says "ground" and
+   * "motif", and which yarn plays each is a property of the row and of the
+   * colourway together. So every such row gets its own two entries, and a
+   * stitch worked from one carries the key rather than a yarn - which is what
+   * lets a colourway that swaps light for dark recolour the same knitting
+   * instead of needing knitting of its own.
+   */
+  charts.forEach((chart) => {
+    const parts = chart.parts?.[colourway.part ?? ""];
+    if (!parts) return;
+    parts.forEach(([ground, motif], index) => {
+      const row = index + 1;
+      if (out[ground]) out[partKey(chart.id, row, "ground")] = out[ground];
+      if (out[motif]) out[partKey(chart.id, row, "motif")] = out[motif];
+    });
+  });
   return out;
 };
 
 const fallback: Yarn = { name: "unknown", hex: "#cccccc", approximate: true };
 
-export const yarnFor = (palette: Palette, slot: SlotId): Yarn =>
+export const yarnFor = (palette: Palette, slot: string): Yarn =>
   palette[slot] ?? fallback;
 
 export const rgbOf = (hex: string): RGB => {

@@ -1,0 +1,14283 @@
+{
+ "slots": {},
+ "charts": [
+  {
+   "id": "Brim",
+   "rows": [
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     },
+     {
+      "slot": "ground",
+      "symbol": "purl"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "Body",
+   "rows": [
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ]
+   ]
+  },
+  {
+   "id": "Crown",
+   "rows": [
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "motif",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "motif"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     },
+     {
+      "slot": "ground"
+     }
+    ],
+    [
+     {
+      "slot": "ground",
+      "symbol": "s2kp"
+     },
+     {
+      "slot": "ground"
+     }
+    ]
+   ]
+  }
+ ]
+}

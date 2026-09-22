@@ -1,5 +1,5 @@
 import Knitter from "./knitter";
-import { turnUp } from "./turn-up";
+import { foldAt } from "./folding";
 import { adjacentStitchDistance, verticalStitchDistance } from "../constants";
 import { Stitch } from "../types/Stitch";
 import { StitchType } from "../types/StitchType";
@@ -9,8 +9,8 @@ import {
   HatPattern,
   RoundSpec,
   ShapingOp,
-  SlotId,
   consumes,
+  partKey,
 } from "../data/hats/types";
 
 /**
@@ -147,7 +147,7 @@ const runRound = (
   knitter: Knitter,
   labels: string[],
   label: string,
-  work: { type: StitchType; slot: SlotId }[],
+  work: { type: StitchType; slot: string }[],
   length: number,
 ) => {
   knitter.startRound(length);
@@ -161,14 +161,14 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
   const knitter = new Knitter(roundHeight);
   const labels: string[] = [];
   let count = 0;
-  /** The round the brim folds along, if the pattern says it has one. */
-  let fold = -1;
+  /** The rounds the fabric turns on, if the pattern says it has any. */
+  const turns: number[] = [];
 
   const apply = (round: RoundSpec, section: string) => {
     switch (round.type) {
-      case "turnUp": {
-        // Not a round: the fold runs along the last one worked.
-        fold = knitter.rounds.length - 1;
+      case "fold": {
+        // Not a round: the fabric turns on the last one worked.
+        turns.push(knitter.rounds.length - 1);
         return;
       }
       case "castOn": {
@@ -223,10 +223,17 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
                   `stitches, but the round below has ${count}`,
               );
             }
-            const work: { type: StitchType; slot: SlotId }[] = [];
+            const work: { type: StitchType; slot: string }[] = [];
             for (let repeat = 0; repeat < round.repeats; repeat++) {
               cells.forEach((cell) =>
-                work.push({ type: stitchFor(cell), slot: cell.slot }),
+                work.push({
+                  type: stitchFor(cell),
+                  // A part is not a yarn until a colourway says which one.
+                  slot:
+                    cell.slot === "ground" || cell.slot === "motif"
+                      ? partKey(chart.id, row, cell.slot)
+                      : cell.slot,
+                }),
               );
             }
             runRound(
@@ -249,6 +256,6 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
   );
 
   const { stitches, rounds } = knitter.finish();
-  if (fold >= 0) turnUp(stitches, rounds, fold);
+  foldAt(stitches, rounds, turns);
   return { stitches, rounds, roundLabels: labels, roundHeight };
 };

@@ -137,8 +137,8 @@ const ProjectView: React.FC<{
     hat.colourways.find((c) => c.id === project.colourwayId) ?? hat.colourways[0];
   const size = hat.sizes.find((s) => s.id === project.sizeId) ?? hat.sizes[0];
   const palette = useMemo(
-    () => paletteOf(colourway, project.shades),
-    [colourway, project.shades],
+    () => paletteOf(colourway, project.shades, hat.charts),
+    [colourway, project.shades, hat.charts],
   );
 
   const counts = totals(index, project.progress);

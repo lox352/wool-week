@@ -3,7 +3,6 @@ import { StitchType } from "../types/StitchType";
 import { Cell, ChartLayout } from "./layout";
 import { Palette, inkOn, yarnFor } from "./palette";
 import { markFor } from "../helpers/stitch-marks";
-import { SlotId } from "../data/hats/types";
 
 /**
  * The chart as paths.
@@ -123,8 +122,8 @@ export const fillPaths = (
   stitches: Stitch[],
   layout: ChartLayout,
   cell: number,
-): { slot: SlotId; d: string }[] => {
-  const rows = new Map<number, { column: number; slot: SlotId }[]>();
+): { slot: string; d: string }[] => {
+  const rows = new Map<number, { column: number; slot: string }[]>();
   for (const stitch of stitches) {
     const at = layout.cells.get(stitch.id);
     if (!at) continue;
@@ -133,7 +132,7 @@ export const fillPaths = (
     rows.set(at.round, row);
   }
 
-  const paths = new Map<SlotId, string[]>();
+  const paths = new Map<string, string[]>();
   for (const [round, cells] of rows) {
     for (const run of runsOf(cells, (a, b) => a.slot === b.slot)) {
       const { left, right } = extent(layout, run, cell);

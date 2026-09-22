@@ -70,6 +70,9 @@ python3 scripts/extract_chart.py SWW18.pdf --page 3 --vector all \
     --out src/data/hats/sww18-merrie-dancers-toorie.charts.json
 ```
 
+2026's charts are pictures rather than drawings and did not come out of this
+tool at all - see below.
+
 Where a pattern's charts are split across pages, the pieces are merged into
 one file by hand; `--key-page` and `--key-vector` point at the key when it is
 not on the same page as the charts.
@@ -151,6 +154,36 @@ names a yarn and, where it is not a plain knit, a stitch: `A`, `A/purl`,
 Its two sizes are not the same knitting - a DK version over 108 stitches and a
 4ply one over 120, with different chart repeats - and the site builds one hat
 per pattern, so it builds the 4ply. The hat's own file says so.
+
+### Charts that are pictures
+
+2026's are JPEGs. There are no vectors on those pages and no text either, so
+`extract_chart.py` has nothing to read and was not used: the grids were sampled
+from the rendered pages instead, cell by cell, and the marks from how much of a
+cell differs from its own colour. What makes that safe to commit is that this
+pattern checks itself four ways over.
+
+- **Each chart is printed twice**, once for colourways 1-2 and once for 3-4,
+  because the four reverse light and dark between the brim and the top of the
+  hat. The two printings have to be cell-for-cell inverses of each other, and
+  are - all 1,280 cells of the body, every one.
+- **The arithmetic has to chain**, and does: 160 through the lettering, 32 to
+  32 through the body, 32 to 2 over the crown's staircase on fifteen centred
+  decreases, one on each odd row, each read as ink on the page rather than
+  inferred from the shape.
+- **The brim has to spell something.** It spells SHETLAND WOOL WEEK 2026, with
+  a heart either side, which is a stiff test of a 160 by 18 grid read out of a
+  picture rotated on its side and broken across two columns.
+- **The yarn letters printed beside every row** - `A / D`, `B / A` - were read
+  by eye and transcribed into the hat's own file. Colourways 3 and 4 are
+  knitted in four yarns where 1 and 2 use six, and their columns never mention
+  E or F, which is a check on the transcription rather than a coincidence.
+
+Because the two printings are inverses, only one grid is stored. Every cell
+says whether it is ground or motif, and each chart carries a table of which
+yarn plays each part on each row, one per pair of colourways. That is why the
+knitting stays free of the colourway even here: changing colourway recolours
+and never rebuilds.
 
 It refuses to write a file whose arithmetic does not chain: a chart row holds
 the stitches *worked* in that round, so its length is the count afterwards and

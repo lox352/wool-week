@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildHat, rowConsumes } from "./engine";
 import { hats, hatById } from "../data/hats";
 import { consumes } from "../data/hats/types";
+import { paletteOf } from "./palette";
 import { adjacentStitchDistance } from "../constants";
 
 /**
@@ -27,9 +28,35 @@ describe("every hat's charts are internally consistent", () => {
       });
 
       it(`${hat.id} chart ${chart.id} only uses yarns the hat has`, () => {
-        chart.rows.forEach((row) =>
-          row.forEach((cell) => expect(hat.slots).toContain(cell.slot)),
+        // A cell names a yarn, or names the part it plays and leaves the yarn
+        // to the colourway. Either way it may not ask for wool the hat has
+        // not got.
+        const sets = new Set(
+          hat.colourways.map((colourway) => colourway.part ?? ""),
         );
+        chart.rows.forEach((row) =>
+          row.forEach((cell) => {
+            if (cell.slot === "ground" || cell.slot === "motif") {
+              expect(chart.parts, `chart ${chart.id} is drawn in parts`)
+                .toBeDefined();
+            } else {
+              expect(hat.slots).toContain(cell.slot);
+            }
+          }),
+        );
+        if (!chart.parts) return;
+        // And a chart drawn in parts has to say who plays them, on every row
+        // and for every colourway that asks.
+        sets.forEach((set) => {
+          const table = chart.parts?.[set];
+          expect(table, `chart ${chart.id} has no parts for colourway set ${set}`)
+            .toBeDefined();
+          expect(table).toHaveLength(chart.rows.length);
+          table?.forEach(([ground, motif]) => {
+            expect(hat.slots).toContain(ground);
+            expect(hat.slots).toContain(motif);
+          });
+        });
       });
     });
   });
@@ -45,12 +72,19 @@ describe("every hat knits", () => {
       rounds.forEach((round) => expect(round.length).toBeGreaterThan(0));
     });
 
-    it(`${hat.id} has a colour for every slot in every colourway`, () => {
+    it(`${hat.id} has a colour for every yarn each colourway is asked for`, () => {
+      // Not every slot: a hat drawn in parts can be offered in colourways
+      // that use fewer yarns than the pattern names, and 2026's third and
+      // fourth do - four yarns where the first two use six. So what a
+      // colourway has to cover is what it is actually asked for.
+      const { stitches } = buildHat(hat);
+      const asked = new Set(stitches.map((stitch) => stitch.slot));
       hat.colourways.forEach((colourway) => {
-        hat.slots.forEach((slot) => {
+        const palette = paletteOf(colourway, {}, hat.charts);
+        asked.forEach((slot) => {
           expect(
-            colourway.shades.find((shade) => shade.slot === slot),
-            `${colourway.id} has no shade for yarn ${slot}`,
+            palette[slot],
+            `${colourway.id} has no wool for ${slot}`,
           ).toBeDefined();
         });
       });
@@ -158,6 +192,80 @@ describe("the counts the patterns print", () => {
       .flat()
       .filter((cell) => cell.symbol === "sk2p");
     expect(leaning).toHaveLength(11);
+  });
+
+  it("Birsie Beanny: 128 sts, 160 for the lettering, 128, 192, 12 at the crown", () => {
+    const hat = hatById("sww26-birsie-beanny")!;
+    const { rounds } = buildHat(hat);
+    const sizes = rounds.map((round) => round.length);
+
+    expect(sizes[0]).toBe(128);
+    // Cast-on, three rounds of twisted rib and a plain round, still 128.
+    expect(sizes.slice(0, 5).every((n) => n === 128)).toBe(true);
+    // "Inc Round: K2, m1, [k4, m1] x 31, k2. 160 sts."
+    expect(sizes[5]).toBe(160);
+    // A plain round and the eighteen rows of lettering, all over 160.
+    expect(sizes.slice(5, 5 + 2 + 18).every((n) => n === 160)).toBe(true);
+    // "Dec round: [K3, k2tog] x 32. 128 sts." - and the inside rib after it.
+    expect(sizes[25]).toBe(128);
+    // "Inc round: K1, m1, [K2, m1] x 63, k1. 192 sts."
+    expect(sizes[52]).toBe(192);
+    expect(sizes.slice(52, 52 + 41).every((n) => n === 192)).toBe(true);
+    // "work rows 1-29 of Crown Chart... 12 sts."
+    expect(sizes[sizes.length - 1]).toBe(12);
+    expect(sizes.length).toBe(1 + 3 + 1 + 1 + 1 + 18 + 1 + 1 + 24 + 1 + 1 + 40 + 29);
+  });
+
+  it("Birsie Beanny: its brim turns twice, and hangs from both", () => {
+    const hat = hatById("sww26-birsie-beanny")!;
+    const { stitches, rounds } = buildHat(hat);
+    const heights = rounds.map((round) => stitches[round[0]].position.y);
+
+    // The fabric goes up the outer brim, back down the inside rib, and up
+    // again from the foot of it. So its height has one peak and one trough.
+    const peak = heights.indexOf(Math.max(...heights.slice(0, 40)));
+    expect(peak).toBeGreaterThan(20);
+    expect(heights[peak + 1]).toBeLessThan(heights[peak]);
+    const trough = heights.indexOf(Math.min(...heights.slice(30, 60)));
+    expect(trough).toBeGreaterThan(peak);
+    expect(heights[trough + 1]).toBeGreaterThan(heights[trough]);
+    expect(heights[heights.length - 1]).toBe(Math.max(...heights));
+
+    // And it is held at the two rounds where the fabric turns back upwards:
+    // the cast-on, and the round the body sets off from.
+    const held = rounds
+      .map((round, index) => [index, round.every((id) => stitches[id].fixed)] as const)
+      .filter(([, all]) => all)
+      .map(([index]) => index);
+    expect(held).toEqual([0, trough]);
+    // The inside rib reaches the depth of the brim, as the pattern asks.
+    expect(heights[trough]).toBeLessThan(heights[1]);
+  });
+
+  it("Birsie Beanny: one grid of parts, two castings of it", () => {
+    const hat = hatById("sww26-birsie-beanny")!;
+    const body = hat.charts.find((chart) => chart.id === "Body")!;
+    // Every cell of the colourwork charts is a part, not a yarn.
+    expect(
+      body.rows.flat().every((cell) => cell.slot === "ground" || cell.slot === "motif"),
+    ).toBe(true);
+    // The two sets name different yarns on the same row, which is the whole
+    // reason the pattern prints each chart twice.
+    expect(body.parts?.["1-2"][0]).toEqual(["D", "D"]);
+    expect(body.parts?.["3-4"][0]).toEqual(["A", "A"]);
+    // Colourways 3 and 4 are knitted in four yarns, never E or F.
+    const four = body.parts?.["3-4"].flat() ?? [];
+    expect(four.some((slot) => slot === "E" || slot === "F")).toBe(false);
+    // The crown takes thirty-two stitches to two on fifteen centred
+    // decreases, one on every odd row.
+    const crown = hat.charts.find((chart) => chart.id === "Crown")!;
+    const marks = crown.rows.flat().filter((cell) => cell.symbol === "s2kp");
+    expect(marks).toHaveLength(15);
+    expect(crown.rows[crown.rows.length - 1]).toHaveLength(2);
+    // And the brim is one round of 160, not a repeat: it spells something.
+    const brim = hat.charts.find((chart) => chart.id === "Brim")!;
+    expect(brim.rows.every((row) => row.length === 160)).toBe(true);
+    expect(brim.rows[1].every((cell) => cell.symbol === "purl")).toBe(true);
   });
 
   it("Merrie Dancers Toorie: 120 sts, 144 after the rib, 120, 10 at the crown", () => {

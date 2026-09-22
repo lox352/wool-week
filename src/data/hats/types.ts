@@ -17,13 +17,43 @@ export type SlotId = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H";
 /** A mark printed in a cell, on top of its colour. */
 export type ChartSymbol = "purl" | "k1tbl" | "k2tog" | "s2kp" | "sk2p";
 
+/**
+ * What colour a chart cell is, as the chart itself puts it.
+ *
+ * Usually a yarn outright. Some patterns are drawn in parts instead - a
+ * background and a motif - and say row by row which yarn plays each, because
+ * the same knitting is offered in colourways that swap light for dark. 2026's
+ * charts are printed twice for exactly that reason, once each way round, and
+ * the two are cell-for-cell inverses of each other: one piece of knitting,
+ * two castings.
+ */
+export type CellColour = SlotId | "ground" | "motif";
+
 export interface ChartCell {
-  slot: SlotId;
+  slot: CellColour;
   symbol?: ChartSymbol;
 }
 
+/**
+ * What a cell drawn as a part is called in a palette.
+ *
+ * A part is not a colour until a colourway has said which yarn plays it on
+ * that row, so a stitch worked from one carries the row it came from and the
+ * palette carries an entry for it. That keeps the knitting free of the
+ * colourway, which is the whole arrangement here: changing colourway recolours
+ * and never rebuilds.
+ */
+export const partKey = (chart: string, row: number, part: string): string =>
+  `${chart}:${row}:${part}`;
+
 export interface Chart {
   id: string;
+  /**
+   * Which yarn plays each part, row by row, for a chart drawn in ground and
+   * motif. Keyed by the name a colourway asks for; each entry is
+   * [ground, motif] and the first is chart row 1.
+   */
+  parts?: Record<string, [SlotId, SlotId][]>;
   /**
    * The number the pattern gives this chart's first row. Charts are stored
    * from row 1, but a pattern may number a crown chart from 46 because that
@@ -86,6 +116,12 @@ export interface Colourway {
   ballMetres?: number;
   ballGrams?: number;
   shades: Shade[];
+  /**
+   * Which of a chart's `parts` this colourway uses, where its charts are
+   * drawn in parts. 2026 has two: one for the colourways with a light motif
+   * on a dark ground, one for the colourways the other way round.
+   */
+  part?: string;
   /** Balls of each slot; a slot that needs more in bigger sizes says so. */
   balls: Partial<Record<SlotId, number | Partial<Record<string, number>>>>;
 }
@@ -127,20 +163,25 @@ export type ShapingOp =
   | { repeat: ShapingOp[]; times: number };
 
 export type RoundSpec =
-  | { type: "castOn"; count: number; slot: SlotId }
+  | { type: "castOn"; count: number; slot: string }
   | {
       type: "rounds";
       count: number;
-      slot: SlotId;
+      /**
+       * A yarn, or - for a pattern whose plain rounds change colour with the
+       * colourway, as 2026's rib does - a part key. See partKey.
+       */
+      slot: string;
       /** Repeated to the end of each round. Defaults to a single knit. */
       sequence?: ("k" | "p" | "k1tbl")[];
     }
-  | { type: "shaping"; slot: SlotId; ops: ShapingOp[]; /** For the tests. */ to: number }
+  | { type: "shaping"; slot: string; ops: ShapingOp[]; /** For the tests. */ to: number }
   /**
-   * The brim is turned up here: no stitches, just the round the fold runs
-   * along. What it does to the hat is in knitting/turn-up.ts.
+   * The fabric turns back on itself here: no stitches, just the round the
+   * fold runs along. A turned-up brim has one; a hem knitted to hang inside
+   * one has two. What it does to the hat is in knitting/folding.ts.
    */
-  | { type: "turnUp" }
+  | { type: "fold" }
   | {
       type: "chart";
       chart: string;

@@ -57,7 +57,7 @@ const HatPage: React.FC<{
   const size = hat.sizes.find((s) => s.id === sizeId) ?? hat.sizes[0];
   const colourway =
     hat.colourways.find((c) => c.id === colourwayId) ?? hat.colourways[0];
-  const palette = useMemo(() => paletteOf(colourway), [colourway]);
+  const palette = useMemo(() => paletteOf(colourway, {}, hat.charts), [colourway, hat]);
   const counts = totals(index, 0);
   const shades = distinctShades(colourway);
   const anyApproximate = shades.some((entry) => entry.yarn.approximate);
@@ -117,7 +117,7 @@ const HatPage: React.FC<{
         <h2>Colourway</h2>
         <div className="chooser">
           {hat.colourways.map((option) => {
-            const optionPalette = paletteOf(option);
+            const optionPalette = paletteOf(option, {}, hat.charts);
             return (
               <button
                 key={option.id}
@@ -127,10 +127,16 @@ const HatPage: React.FC<{
                 onClick={() => setColourwayId(option.id)}
               >
                 <span className="colourway-swatches" aria-hidden="true">
-                  {hat.slots.map((slot) => (
+                  {/*
+                    The colourway's own wool, not the pattern's full set of
+                    yarns: a hat drawn in parts can be offered in a colourway
+                    that uses fewer than the pattern names, and 2026's last two
+                    do. Asking for a yarn it has not got draws a grey blank.
+                  */}
+                  {option.shades.map((shade) => (
                     <span
-                      key={slot}
-                      style={{ background: yarnFor(optionPalette, slot).hex }}
+                      key={shade.slot}
+                      style={{ background: yarnFor(optionPalette, shade.slot).hex }}
                     />
                   ))}
                 </span>

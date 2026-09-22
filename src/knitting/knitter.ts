@@ -1,6 +1,5 @@
 import { Stitch } from "../types/Stitch";
 import { StitchType, consumption } from "../types/StitchType";
-import { SlotId } from "../data/hats/types";
 import { adjacentStitchDistance, verticalStitchDistance } from "../constants";
 
 /**
@@ -42,7 +41,7 @@ export default class Knitter {
   /** The stitch in the round below that the next stitch is worked into. */
   private below = 1;
   private expected = 0;
-  private slot: SlotId = "A";
+  private slot: string = "A";
   /** Where the round being worked sits: its radius, and its height. */
   private radius = 0;
   private height = 0;
@@ -109,7 +108,7 @@ export default class Knitter {
     };
   }
 
-  castOn(count: number, slot: SlotId): this {
+  castOn(count: number, slot: string): this {
     this.slot = slot;
     this.radius = Knitter.radiusFor(count);
     this.height = 0;
@@ -138,7 +137,7 @@ export default class Knitter {
   }
 
   /** Begin a round that is expected to end up `count` stitches long. */
-  startRound(count: number, slot: SlotId = this.slot): this {
+  startRound(count: number, slot: string = this.slot): this {
     this.current = [];
     this.expected = count;
     this.slot = slot;
@@ -148,7 +147,7 @@ export default class Knitter {
     return this;
   }
 
-  knit(type: StitchType, slot: SlotId = this.slot): this {
+  knit(type: StitchType, slot: string = this.slot): this {
     const eaten = consumption[type];
     const links: number[] = [];
     for (let i = 0; i < eaten; i++) links.push(this.below + i);

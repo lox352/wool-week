@@ -122,7 +122,7 @@ const sww15: HatPattern = {
         // are what carries on into the hat. The pattern measures its 21cm
         // from the turned up edge, not from the cast-on.
         { type: "rounds", count: 12, slot: "A", sequence: ["k", "k", "p", "p"] },
-        { type: "turnUp" },
+        { type: "fold" },
         { type: "rounds", count: 13, slot: "A", sequence: ["k", "k", "p", "p"] },
         {
           // *K2, P2, M1* to the end: 24 increases, 96 becomes 120.

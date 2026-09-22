@@ -51,7 +51,7 @@ const ProjectCard: React.FC<{
   if (!described) return null;
   const { hat, counts, colourway, size } = described;
   const id = bareIdFor(project.id);
-  const palette = paletteOf(colourway, project.shades);
+  const palette = paletteOf(colourway, project.shades, hat.charts);
   const done = counts.percent >= 100;
 
   return (
@@ -70,11 +70,11 @@ const ProjectCard: React.FC<{
           </span>
         </span>
         <span className="project-card-yarns" aria-hidden="true">
-          {hat.slots.map((slot) => (
+          {colourway.shades.map((shade) => (
             <span
-              key={slot}
+              key={shade.slot}
               className="swatch"
-              style={{ background: yarnFor(palette, slot).hex }}
+              style={{ background: yarnFor(palette, shade.slot).hex }}
             />
           ))}
         </span>
@@ -151,7 +151,7 @@ const Home: React.FC = () => {
         <h2>The hats</h2>
         <ul className="hat-list">
           {hats.map((hat) => {
-            const palette = paletteOf(hat.colourways[0]);
+            const palette = paletteOf(hat.colourways[0], {}, hat.charts);
             return (
               <li key={hat.id}>
                 <Link to={`/hat/${hat.id}`} className="hat-card">

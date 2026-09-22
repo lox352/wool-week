@@ -1,5 +1,4 @@
 import { Stitch } from "../types/Stitch";
-import { SlotId } from "../data/hats/types";
 
 /**
  * Where you are in a hat, and what to work next.
@@ -90,7 +89,7 @@ export const positionOf = (
 };
 
 export interface ColourRun {
-  slot: SlotId;
+  slot: string;
   length: number;
   startId: number;
   endId: number;
