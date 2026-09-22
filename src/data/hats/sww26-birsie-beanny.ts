@@ -61,7 +61,7 @@ import charts from "./sww26-birsie-beanny.charts.json";
  *
  * On the two of them it settles to fifty point two centimetres round the
  * inside brim, against the fifty the pattern prints, and twenty-seven point
- * two from the folded edge over the crown against its twenty-seven and a
+ * four from the folded edge over the crown against its twenty-seven and a
  * half. Neither was fitted to: the one comes out of the rib's own tension and
  * the other out of the colourwork's.
  */

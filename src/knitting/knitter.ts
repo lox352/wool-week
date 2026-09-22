@@ -39,8 +39,9 @@ export default class Knitter {
   readonly rounds: number[][] = [];
 
   private current: number[] = [];
-  /** The stitch in the round below that the next stitch is worked into. */
-  private below = 1;
+  /** The round being worked into, and how far along it the next stitch is. */
+  private under: number[] = [];
+  private cursor = 0;
   private expected = 0;
   private slot: string = "A";
   /**
@@ -68,9 +69,7 @@ export default class Knitter {
 
   /** Stitches of the round below still unworked. */
   get remainingBelow(): number {
-    const round = this.rounds[this.rounds.length - 1];
-    if (!round) return 0;
-    return round[round.length - 1] - this.below + 1;
+    return Math.max(this.under.length - this.cursor, 0);
   }
 
   /**
@@ -151,22 +150,33 @@ export default class Knitter {
       rise: this.rise,
     });
     this.rounds.push(Array.from({ length: count }, (_, i) => i + 1));
-    this.below = 1;
     return this;
   }
 
-  /** Begin a round that is expected to end up `count` stitches long. */
+  /**
+   * Begin a round that is expected to end up `count` stitches long.
+   *
+   * `borrow` is how many stitches back from the round below's own start to
+   * begin taking it from, which a round whose first stitch is a centred
+   * decrease needs: see the note in engine's buildHat. The round below is
+   * walked round and round, so a stitch borrowed off its end is simply the
+   * one before its start, and every stitch of it is still worked exactly
+   * once.
+   */
   startRound(
     count: number,
     slot: string = this.slot,
     width: number = this.width,
     rise: number = this.rise,
+    borrow = 0,
   ): this {
     this.current = [];
     this.expected = count;
     this.slot = slot;
     this.width = width;
     this.rise = rise;
+    this.under = this.rounds[this.rounds.length - 1] ?? [];
+    this.cursor = -borrow;
     const radius = Knitter.radiusFor(count, width);
     this.height = this.riseTo(radius);
     this.radius = radius;
@@ -176,7 +186,11 @@ export default class Knitter {
   knit(type: StitchType, slot: string = this.slot): this {
     const eaten = consumption[type];
     const links: number[] = [];
-    for (let i = 0; i < eaten; i++) links.push(this.below + i);
+    const round = this.under.length;
+    for (let i = 0; i < eaten && round > 0; i++) {
+      const at = this.cursor++;
+      links.push(this.under[((at % round) + round) % round]);
+    }
     links.push(this.last.id);
 
     const id = this.last.id + 1;
@@ -191,7 +205,6 @@ export default class Knitter {
       rise: this.rise,
     });
     this.current.push(id);
-    this.below += eaten;
     return this;
   }
 

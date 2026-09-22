@@ -41,12 +41,24 @@ const worksInto = (stitch: Stitch): number[] =>
  * grown, so a centred double decrease inherits the column of the stitch
  * below it exactly, round after round, and never moves.
  */
-const middleOf = (columns: number[]): number => {
-  const sorted = [...columns].sort((a, b) => a - b);
+const middleOf = (columns: number[], width: number): number => {
+  /*
+   * A chart is a cylinder cut open, and one family a round straddles the cut:
+   * a centred decrease worked as a round's first stitch takes the last stitch
+   * of the round below with it, which is the stitch to its right and is drawn
+   * at the far left. Left as it lies it drags the middle right across the
+   * chart. So anything more than half a chart away from the nearest of them
+   * has come round the seam, and belongs just off the other end.
+   */
+  const near = Math.min(...columns);
+  const laid = columns.map((at) => (at - near > width / 2 ? at - width : at));
+  const sorted = laid.sort((a, b) => a - b);
   const half = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 1
-    ? sorted[half]
-    : (sorted[half - 1] + sorted[half]) / 2;
+  const middle =
+    sorted.length % 2 === 1
+      ? sorted[half]
+      : (sorted[half - 1] + sorted[half]) / 2;
+  return middle < 1 ? middle + width : middle;
 };
 
 /**
@@ -148,7 +160,7 @@ export const layOut = (stitches: Stitch[], rounds: number[][]): ChartLayout => {
   for (let index = anchor + 1; index < rounds.length; index++) {
     for (const family of familiesOf(rounds[index], byId)) {
       const below = columnsOf(family.below, column);
-      if (below.length > 0) centre(family.above, middleOf(below), column);
+      if (below.length > 0) centre(family.above, middleOf(below, widest), column);
     }
   }
 
@@ -156,7 +168,7 @@ export const layOut = (stitches: Stitch[], rounds: number[][]): ChartLayout => {
   for (let index = anchor - 1; index >= 0; index--) {
     for (const family of familiesOf(rounds[index + 1], byId)) {
       const above = columnsOf(family.above, column);
-      if (above.length > 0) centre(family.below, middleOf(above), column);
+      if (above.length > 0) centre(family.below, middleOf(above, widest), column);
     }
   }
 

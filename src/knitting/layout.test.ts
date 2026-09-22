@@ -26,6 +26,37 @@ describe("the chart hangs every stitch over what it was worked into", () => {
     });
   });
 
+  it("Birsie Beanny: its crown decreases run straight up their own columns", () => {
+    /*
+     * "At the end of round 40, work until 1 st remains and place it,
+     * unworked, onto the start of the next round to be included in the
+     * centred double decrease (s2kp)."
+     *
+     * A centred double decrease worked as a round's first stitch has no
+     * stitch to its right in that round - it takes the last of the round
+     * below - and a model that gave it the first three instead put it over
+     * the second stitch rather than the first, every decrease round moving
+     * another stitch on. Sixteen rounds of that is a crown that winds shut
+     * instead of closing in. So: six decreases, six columns, thirty-two
+     * apart, and not one of them moves from row 1 to row 29.
+     */
+    const { stitches, rounds, cells, columns } = laid("sww26-birsie-beanny");
+    const spines = rounds
+      .map((round) =>
+        round
+          .map((id) => stitches[id])
+          .filter((stitch) => stitch.type === "s2kp")
+          .map((stitch) => cells.get(stitch.id)!.column),
+      )
+      .filter((row) => row.length > 0);
+
+    expect(spines).toHaveLength(15);
+    const first = spines[0];
+    expect(first).toHaveLength(6);
+    first.forEach((at, i) => expect(at).toBe(1 + (i * columns) / 6));
+    spines.forEach((row) => expect(row).toEqual(first));
+  });
+
   it("a decrease sits on the middle of the stitches it took together", () => {
     for (const hat of ["sww25-aal-ower-toorie", "sww24-islesburgh-toorie"]) {
       const { stitches, cells } = laid(hat);

@@ -152,12 +152,45 @@ const runRound = (
   fabric: { width: number; rise: number },
   backwards = false,
 ) => {
-  knitter.startRound(length, undefined, fabric.width, fabric.rise);
   const order = backwards ? [...work].reverse() : work;
+  knitter.startRound(
+    length,
+    undefined,
+    fabric.width,
+    fabric.rise,
+    borrowFor(order[0]?.type),
+  );
   order.forEach(({ type, slot }) => knitter.knit(type, slot));
   knitter.endRound();
   labels.push(label);
 };
+
+/**
+ * How far back into the round below a round has to reach to begin.
+ *
+ * Usually not at all: a round starts where the one below it started. But a
+ * centred double decrease takes three stitches and leaves one standing over
+ * the middle of them, and a round that opens with one has no stitch to its
+ * right to take - the round below has not started yet. Worked as it is
+ * written it would eat the first three instead of the last and the first
+ * two, and so sit over the second rather than the first, and the whole round
+ * with it. Which does not stay put: every such round shifts another stitch,
+ * the decrease line winds round the crown instead of running up it, and the
+ * wedges the chart opens either side of it come out all on one side.
+ *
+ * 2026's pattern says so itself, for the one place where the shift crosses
+ * the start of the round rather than the start of a repeat: "At the end of
+ * round 40, work until 1 st remains and place it, unworked, onto the start
+ * of the next round to be included in the centred double decrease (s2kp)."
+ * Its crown chart says it fifteen more times, by drawing the s2kp in a
+ * column of its own that never moves and taking a stitch off each end of the
+ * rows beside it.
+ *
+ * Only a centred one asks for it. A k2tog takes the two it is written over,
+ * and so does an sk2p its three - it leans to the left and is meant to - and
+ * those are every other round here that opens on a decrease.
+ */
+const borrowFor = (type?: StitchType): number => (type === "s2kp" ? 1 : 0);
 
 /**
  * How wide a stitch of a named fabric is, and how tall its rounds are.
