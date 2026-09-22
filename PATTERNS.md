@@ -234,6 +234,19 @@ that can be read: Foula Wool, and the handspun in 2021's fifth colourway. Those
 sixteen shades carry `source: "approximate"` and keep considered stand-ins.
 Everything else carries `source: "library"`.
 
+A better reading of the colours can be dropped in without redoing any of that:
+
+```
+python3 scripts/refresh_yarns.py CATALOGUE.json [PALETTE.json]
+```
+
+rewrites the library and re-copies every hat's name, number and colour out of
+it. The hard part - deciding that "Shade 96" is Pale Lemon, that a "Grall" was
+a mistyped Graeff, that 2021 works one yarn in Shetland Supreme and five in
+ordinary 2ply - was done once against the printed pages and is recorded in the
+hat files as a wool id, so a new set of colours never touches it. Running it
+against the catalogue already committed leaves no diff at all.
+
 Sampling the patterns' own photographs was tried and abandoned: the group shots
 are dim enough that a natural-shades hat clusters to a blue-grey.
 
