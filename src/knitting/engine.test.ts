@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildHat, rowConsumes } from "./engine";
 import { hats, hatById } from "../data/hats";
 import { consumes } from "../data/hats/types";
+import { adjacentStitchDistance } from "../constants";
 
 /**
  * These are the tests that matter.
@@ -177,6 +178,72 @@ describe("the counts the patterns print", () => {
     // "You will be Left with 10 stitches on your needles."
     expect(sizes[sizes.length - 1]).toBe(10);
     expect(sizes.length).toBe(1 + 25 + 1 + 45);
+  });
+
+  it("Baa-ble Hat: it hangs from the fold in its brim, not from the cast-on", () => {
+    const hat = hatById("sww15-baa-ble-hat")!;
+    const { stitches, rounds } = buildHat(hat);
+
+    // Cast-on, twelve rounds of rib, then the fold: round 12 is the brim.
+    const fold = 12;
+    expect(rounds[fold].every((id) => stitches[id].fixed)).toBe(true);
+    expect(rounds.flat().filter((id) => stitches[id].fixed)).toHaveLength(
+      rounds[fold].length,
+    );
+    // The fold is the lowest thing there is, and everything is above it.
+    expect(stitches[rounds[fold][0]].position.y).toBe(0);
+    const heights = stitches.filter((s) => s.id > 0).map((s) => s.position.y);
+    expect(Math.min(...heights)).toBe(0);
+    // The cast-on has been folded back up the outside, a round below the top
+    // of the rib rather than a rib below the bottom of it.
+    const topOf = (round: number) =>
+      Math.max(...rounds[round].map((id) => stitches[id].position.y));
+    expect(topOf(0)).toBeGreaterThan(topOf(11));
+    expect(topOf(0)).toBeLessThan(topOf(25));
+  });
+
+  it("Baa-ble Hat: folding it keeps every joint the length it was built", () => {
+    // A reflection is an isometry, and the plane it is done in is the plane
+    // the fold ring sits in, so a joint that crosses the fold spans exactly
+    // what it spanned before. Nothing is stretched to make the brim turn up,
+    // which is why the fold's joints measure the same as any other round of
+    // the same rib, to the last decimal place.
+    const hat = hatById("sww15-baa-ble-hat")!;
+    const { stitches, rounds } = buildHat(hat);
+    const spans = (round: number) =>
+      rounds[round]
+        .flatMap((id) =>
+          stitches[id].links.map((link) => {
+            const other = stitches[link];
+            return Math.hypot(
+              stitches[id].position.x - other.position.x,
+              stitches[id].position.y - other.position.y,
+              stitches[id].position.z - other.position.z,
+            );
+          }),
+        )
+        .sort((a, b) => a - b);
+
+    const fold = spans(12);
+    const ordinary = spans(20);
+    expect(fold).toHaveLength(ordinary.length);
+    fold.forEach((length, i) => expect(length).toBeCloseTo(ordinary[i], 10));
+  });
+
+  it("Baa-ble Hat: turned up, it is the height the pattern says it is", () => {
+    // "48 cm around rib, 21cm from turned up edge to crown." The rib's own
+    // circumference is the scale: 96 stitches of it are 48cm, so a stitch is
+    // half a centimetre and the hat should stand about 84 units tall. Knitted
+    // flat it stands 112, which is a whole turned-up rib too many.
+    const hat = hatById("sww15-baa-ble-hat")!;
+    const { stitches, rounds } = buildHat(hat);
+    const size = hat.sizes[0];
+    const heights = stitches.filter((s) => s.id > 0).map((s) => s.position.y);
+    const perCm =
+      (rounds[0].length * adjacentStitchDistance) / size.circumferenceCm;
+    const cm = (Math.max(...heights) - Math.min(...heights)) / perCm;
+    expect(cm).toBeGreaterThan(size.lengthCm * 0.9);
+    expect(cm).toBeLessThan(size.lengthCm * 1.15);
   });
 
   it("Baa-ble Hat: one chart, half a round wide, decreasing eleven times", () => {

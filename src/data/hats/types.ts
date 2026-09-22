@@ -136,6 +136,11 @@ export type RoundSpec =
       sequence?: ("k" | "p" | "k1tbl")[];
     }
   | { type: "shaping"; slot: SlotId; ops: ShapingOp[]; /** For the tests. */ to: number }
+  /**
+   * The brim is turned up here: no stitches, just the round the fold runs
+   * along. What it does to the hat is in knitting/turn-up.ts.
+   */
+  | { type: "turnUp" }
   | {
       type: "chart";
       chart: string;

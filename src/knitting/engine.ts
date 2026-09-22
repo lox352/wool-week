@@ -1,4 +1,5 @@
 import Knitter from "./knitter";
+import { turnUp } from "./turn-up";
 import { adjacentStitchDistance, verticalStitchDistance } from "../constants";
 import { Stitch } from "../types/Stitch";
 import { StitchType } from "../types/StitchType";
@@ -153,9 +154,16 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
   const knitter = new Knitter(roundHeight);
   const labels: string[] = [];
   let count = 0;
+  /** The round the brim folds along, if the pattern says it has one. */
+  let fold = -1;
 
   const apply = (round: RoundSpec, section: string) => {
     switch (round.type) {
+      case "turnUp": {
+        // Not a round: the fold runs along the last one worked.
+        fold = knitter.rounds.length - 1;
+        return;
+      }
       case "castOn": {
         knitter.castOn(round.count, round.slot);
         count = round.count;
@@ -234,5 +242,6 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
   );
 
   const { stitches, rounds } = knitter.finish();
+  if (fold >= 0) turnUp(stitches, rounds, fold);
   return { stitches, rounds, roundLabels: labels, roundHeight };
 };

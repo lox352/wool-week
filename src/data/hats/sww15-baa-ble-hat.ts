@@ -117,7 +117,13 @@ const sww15: HatPattern = {
       label: "Rib",
       rounds: [
         { type: "castOn", count: 96, slot: "A" },
-        { type: "rounds", count: 25, slot: "A", sequence: ["k", "k", "p", "p"] },
+        // Twenty-five rounds of rib, worn turned up: twelve rounds and the
+        // cast-on come back up the outside, and the thirteen above the fold
+        // are what carries on into the hat. The pattern measures its 21cm
+        // from the turned up edge, not from the cast-on.
+        { type: "rounds", count: 12, slot: "A", sequence: ["k", "k", "p", "p"] },
+        { type: "turnUp" },
+        { type: "rounds", count: 13, slot: "A", sequence: ["k", "k", "p", "p"] },
         {
           // *K2, P2, M1* to the end: 24 increases, 96 becomes 120.
           type: "shaping",
