@@ -129,10 +129,10 @@ const expand = (ops: ShapingOp[], available: number): StitchType[] => {
       return;
     }
     if (op.work === "kfb") {
-      // One instruction produces two stitches from one stitch below. The
-      // graph stores the front knit and the new back loop separately, which
-      // is the same topology as a knit followed by an increase.
-      out.push("k1", "m1");
+      // One instruction produces two loops from one stitch below. Keep the
+      // first loop named KFB so the knitting UI can present one instruction;
+      // the second physical loop follows as the paired increase.
+      out.push("kfb", "m1");
       used += 1;
       return;
     }
@@ -175,6 +175,7 @@ const runRound = (
   length: number,
   fabric: { width: number; rise: number },
   backwards = false,
+  borrow?: number,
 ) => {
   const order = backwards ? [...work].reverse() : work;
   knitter.startRound(
@@ -182,7 +183,7 @@ const runRound = (
     undefined,
     fabric.width,
     fabric.rise,
-    borrowFor(order[0]?.type),
+    borrow ?? borrowFor(order[0]?.type),
   );
   order.forEach(({ type, slot }) => knitter.knit(type, slot));
   knitter.endRound();
@@ -214,15 +215,7 @@ const runRound = (
  * and so does an sk2p its three - it leans to the left and is meant to - and
  * those are every other round here that opens on a decrease.
  */
-const borrowFor = (type?: StitchType): number =>
-  type === "s2kp"
-    ? 1
-    : type === "k2togtbl"
-      // Buggiflooer explicitly moves the first unworked stitch to the end of
-      // the previous round before its final K2tog-tbl round, so begin one
-      // stitch after the old round start and wrap the last pair across it.
-      ? -1
-      : 0;
+const borrowFor = (type?: StitchType): number => (type === "s2kp" ? 1 : 0);
 
 /**
  * How wide a stitch of a named fabric is, and how tall its rounds are.
@@ -337,6 +330,7 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
           after,
           fabricOf(pattern, roundHeight, round.fabric),
           backwards,
+          round.borrow,
         );
         if (after !== round.to) {
           throw new Error(

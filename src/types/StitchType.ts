@@ -16,6 +16,7 @@ export type StitchType =
   | "p1"
   | "k1tbl"
   | "m1"
+  | "kfb"
   | "k2tog"
   | "k2togtbl"
   | "s2kp"
@@ -28,6 +29,7 @@ export const consumption: Record<StitchType, number> = {
   p1: 1,
   k1tbl: 1,
   m1: 0,
+  kfb: 1,
   k2tog: 2,
   k2togtbl: 2,
   s2kp: 3,

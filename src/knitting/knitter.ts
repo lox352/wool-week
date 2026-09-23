@@ -191,6 +191,17 @@ export default class Knitter {
       const at = this.cursor++;
       links.push(this.under[((at % round) + round) % round]);
     }
+    // KFB makes two new loops through one stitch below. The first is stored
+    // as the KFB itself and the second as the immediately following increase;
+    // give that second loop the same parent as the first rather than leaving
+    // it attached only sideways to its neighbour.
+    if (
+      type === "m1" &&
+      this.last.type === "kfb" &&
+      this.last.links.length > 1
+    ) {
+      links.push(this.last.links[0]);
+    }
     links.push(this.last.id);
 
     const id = this.last.id + 1;
