@@ -152,6 +152,8 @@ export interface Size {
   /** Omitted where the pattern only gives a descriptive head size. */
   toFitCm?: number;
   circumferenceCm: number;
+  /** How the pattern names that circumference when it is not a finished size. */
+  circumferenceLabel?: string;
   lengthCm: number;
   /** Over the colourwork pattern, after blocking. */
   stitchesPer10cm: number;
@@ -159,6 +161,12 @@ export interface Size {
   needlesMm: number;
   /** Where the brim is worked on finer needles than the body. */
   ribNeedlesMm?: number;
+  /**
+   * A size-specific knitting script when the designer changes stitch counts,
+   * chart sequence or shaping rather than only needles and measurements.
+   * Most hats leave this out and use HatPattern.sections.
+   */
+  sections?: Section[];
 }
 
 /* -------------------------------------------------------------- the script */

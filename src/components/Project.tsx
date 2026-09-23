@@ -146,12 +146,12 @@ const ProjectView: React.FC<{
   restoreShades,
 }) => {
   const hat = hatById(hatId)!;
+  const size = hat.sizes.find((s) => s.id === project.sizeId) ?? hat.sizes[0];
   const { stitches, rounds, roundHeight, roundLabels, turns, index } =
-    useHat(hat);
+    useHat(hat, size.id);
 
   const colourway =
     hat.colourways.find((c) => c.id === project.colourwayId) ?? hat.colourways[0];
-  const size = hat.sizes.find((s) => s.id === project.sizeId) ?? hat.sizes[0];
   const palette = useMemo(
     () => paletteOf(colourway, project.shades, hat.charts),
     [colourway, project.shades, hat.charts],
@@ -179,6 +179,7 @@ const ProjectView: React.FC<{
             <div className="project-stage">
               <HatModel
                 hatId={hat.id}
+                sizeId={size.id}
                 stitches={stitches}
                 rounds={rounds}
                 roundHeight={roundHeight}

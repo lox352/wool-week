@@ -32,7 +32,7 @@ const formatDate = (iso: string) =>
 const describe = (project: Project) => {
   const hat = hatById(project.hatId);
   if (!hat) return undefined;
-  const { rounds, roundLabels } = hatStitches(hat);
+  const { rounds, roundLabels } = hatStitches(hat, project.sizeId);
   const index = indexRounds(rounds, roundLabels);
   const counts = totals(index, project.progress);
   const colourway =

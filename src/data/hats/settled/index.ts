@@ -3,19 +3,28 @@ import { Point } from "../../../types/Point";
 /**
  * Where each hat comes to rest, worked out once and committed.
  *
- * See scripts/settle-hats.mjs for how these are made. A hat with no file here
- * is drawn from the geometry the pattern was built with instead, which is a
- * stiffer but perfectly good hat. Fetched rather than
- * bundled, so the file for a hat you are not looking at is never downloaded,
- * and positions are stored as one flat array of numbers because ten thousand
- * three-key objects is several times the bytes for the same thing.
+ * Most patterns have one stitch topology and therefore one <hat>.json file.
+ * A pattern whose sizes are different knitting can instead have
+ * <hat>--<size>.json files. If any size-specific files exist for a hat, a
+ * missing size does not fall back to another size's geometry.
  */
 const files = import.meta.glob<{ default: number[] }>("./*.json");
 
 export const loadSettled = async (
   hatId: string,
+  sizeId?: string,
 ): Promise<Point[] | undefined> => {
-  const load = files[`./${hatId}.json`];
+  const prefix = `./${hatId}--`;
+  const hasSizeSpecific = Object.keys(files).some((name) =>
+    name.startsWith(prefix),
+  );
+  const key = hasSizeSpecific
+    ? sizeId
+      ? `${prefix}${sizeId}.json`
+      : undefined
+    : `./${hatId}.json`;
+  if (!key) return undefined;
+  const load = files[key];
   if (!load) return undefined;
   try {
     const { default: flat } = await load();
@@ -25,7 +34,6 @@ export const loadSettled = async (
     }
     return out;
   } catch {
-    // Nothing to settle with; the caller falls back to working it out.
     return undefined;
   }
 };

@@ -97,6 +97,12 @@ python3 scripts/extract_sww17.py SWW17.pdf \
 # every cell and purl mark to agree before reading the separate crown chart.
 python3 scripts/extract_sww16.py SWW16.pdf \
     --out src/data/hats/sww16-crofthoose-hat.charts.json
+
+# SWW14, Shwook Hat - A/B/C are table grids and D is a red-outlined crown
+# staircase. Its A-E key and row-by-row dark/light tables are on the same page;
+# the CDD glyphs survive as PDF text and are read directly.
+python3 scripts/extract_sww14.py SWW14.pdf \
+    --out src/data/hats/sww14-shwook-hat.charts.json
 ```
 
 2023 and 2026 have charts embedded as pictures rather than PDF drawings.
@@ -263,10 +269,48 @@ count the published pattern prints out loud:
 - **Crofthoose Hat** — cast on 120, increase to 168 on chart row 9, decrease
   to 144 on crown row 1, then 132, 120, 108, 96, 84, 72, 60, 48, 36, 24 and
   12 through the eleven centred double decreases before the final 6.
+- **Shwook Hat** — its sizes are different knitting, not just different
+  needles. Size 1 checks 112 → 140 → 138 → 120 → 112 and Chart D down to
+  14 → 7; Sizes 2 and 3 check 134 → 168 → 144 → 128 and Chart D down to
+  16 → 8. Their chart sequences are also asserted: B, A, C, D for Size 1 and
+  A, B, A, C, D for Sizes 2 and 3.
 
 A chart misread by a single cell breaks one of those, so it fails the build.
 
 ## Colours
+
+### Shwook Hat (2014) source checks
+
+Shwook is the first hat here whose selectable sizes are not the same knitting.
+Size 1 deliberately starts with Chart B and uses fewer stitches; Sizes 2 and 3
+use A, B, A, C, D. A Size may therefore carry its own round script, and settled
+geometry is keyed by size where that happens. Existing hats keep their old
+single script and single settled file.
+
+Page 4 is read three ways. A/B/C are sampled on their printed grid and mapped
+through the page's own A-E key. The printed dark/light yarn table independently
+limits which letters may occur in every row. Chart D's active cells are its
+red-outlined staircase, while its seven centred double decreases are read from
+the PDF's actual `/|\\` text glyphs and then checked by stitch consumption:
+16 → 14 → 14 → 12 → ... → 2 per repeat. The written size counts multiply that
+out independently.
+
+The source itself has three inconsistencies, and they are documented rather
+than silently erased. Its page-1 size table says Size 3 uses a 3.25mm main
+needle, while page 2 specifies 3.50mm and gives the Size-3 tension on 3.50mm;
+the detailed 3.50mm specification is used. Chart D's count table twice prints
+`42 (38:48)`, where its own chart and surrounding counts require
+`42 (48:48)`. And the generic finishing paragraph says to thread through
+eight stitches even though the immediately preceding size-specific count is
+7 (8:8). The engine keeps 7 for Size 1 and 8 for Sizes 2/3.
+
+The displayed circumference is labelled **Unstretched rib circumference**
+because that is what Hazel Tindall measures; it is not relabelled as a
+finished body circumference. All thirty commercial shade slots in the three
+Jamieson & Smith and three Jamieson's versions resolve to exact yarn-library
+entries. The historical organic option is kept in both alternatives the
+leaflet permits for Yarn B — fawn and silver — and remains approximate rather
+than being silently mapped to a current producer.
 
 ### Crofthoose Hat (2016) source checks
 
