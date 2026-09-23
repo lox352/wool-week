@@ -144,7 +144,7 @@ const sww19: HatPattern = {
         { slot: "D", name: "Speedwell", hex: "#5fccff",
           source: "library", wool: "uradale-yarns-2ply-jumper-weight-speedwell" },
         { slot: "E", name: "Ling Heath", hex: "#ac5284",
-          source: "library", wol: "uradale-yarns-2ply-jumper-weight-ling-heath" },
+          source: "library", wool: "uradale-yarns-2ply-jumper-weight-ling-heath" },
         { slot: "F", name: "Flukkra (natural white)", hex: "#eef0e2",
           source: "library", wool: "uradale-yarns-2ply-jumper-weight-flukkra-natural-white" },
         { slot: "G", name: "Sundew Heath", hex: "#9ebf72",
