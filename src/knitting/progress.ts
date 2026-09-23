@@ -171,6 +171,7 @@ const words: Record<
   // The count goes in the middle, as a pattern writes it: "knit 2 tbl".
   k1tbl: { said: "knit", after: "tbl", perStitch: true },
   m1: { said: "m1", perStitch: false },
+  kfb: { said: "KFB", perStitch: false },
   k2tog: { said: "k2tog", perStitch: false },
   k2togtbl: { said: "k2tog tbl", perStitch: false },
   s2kp: { said: "s2kp", perStitch: false },
@@ -233,6 +234,27 @@ export const currentRun = (
 
   const round = index.roundOf.get(startId);
   const type = typeOf(first);
+
+  // A KFB is one action at the needles but produces two physical loops. The
+  // engine stores the second as a paired m1 so the graph has two stitches;
+  // hide that implementation detail from the knitting instructions.
+  if (type === "kfb") {
+    const second = stitches[startId + 1];
+    if (
+      second?.type === "m1" &&
+      second.slot === first.slot &&
+      index.roundOf.get(second.id) === round
+    ) {
+      return {
+        slot: first.slot,
+        type,
+        length: 1,
+        startId,
+        endId: second.id,
+      };
+    }
+  }
+
   let endId = startId;
   for (let id = startId + 1; ; id++) {
     const candidate = stitches[id];

@@ -208,6 +208,12 @@ export type RoundSpec =
       /** For the tests. */
       to: number;
       fabric?: string;
+      /**
+       * Where to begin consuming the round below. Positive borrows from its
+       * end; negative skips forward. Only set when the written pattern moves
+       * the round opening explicitly.
+       */
+      borrow?: number;
     }
   /**
    * The fabric turns back on itself here: no stitches, just the round the

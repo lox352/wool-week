@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { hatById } from "../data/hats";
 import { consumes } from "../data/hats/types";
 import { buildHat } from "./engine";
+import { currentRun, indexRounds, runInstruction } from "./progress";
 
 const hat = hatById("sww23-buggiflooer-beanie")!;
 
@@ -87,6 +88,29 @@ describe("Buggiflooer Beanie reconciles with the 2023 pattern", () => {
       expect(shade("E").wool).toBe(shade("B").wool);
       expect(Object.keys(colourway.balls).sort()).toEqual(["A", "B", "F"]);
     }
+  });
+
+  it("keeps KFB as one knitting instruction while giving it two physical loops", () => {
+    const { stitches, rounds, roundLabels, turns } = buildHat(hat);
+    const increase = rounds[12].map((id) => stitches[id]);
+    const fronts = increase.filter((stitch) => stitch.type === "kfb");
+    expect(fronts).toHaveLength(16);
+
+    fronts.forEach((front) => {
+      const back = stitches[front.id + 1];
+      expect(back.type).toBe("m1");
+      // Both loops are made through the same stitch below.
+      expect(back.links[0]).toBe(front.links[0]);
+    });
+
+    const index = indexRounds(rounds, roundLabels, turns);
+    const first = fronts[0];
+    const run = currentRun(stitches, first.id - 1, index)!;
+    expect(run.type).toBe("kfb");
+    expect(run.length).toBe(1);
+    expect(run.startId).toBe(first.id);
+    expect(run.endId).toBe(first.id + 1);
+    expect(runInstruction(run)).toBe("KFB");
   });
 
   it("models the final shifted K2tog-tbl round at the middle of chart E", () => {

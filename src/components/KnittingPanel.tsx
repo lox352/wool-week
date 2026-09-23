@@ -101,8 +101,24 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
   const counts = totals(index, progress);
 
   const step = useCallback(
-    (delta: number) => setProgress(progress + delta),
-    [progress, setProgress],
+    (delta: number) => {
+      if (delta > 0) {
+        const next = currentRun(stitches, progress, index);
+        if (next?.type === "kfb" && next.startId === progress + 1) {
+          setProgress(next.endId);
+          return;
+        }
+      } else if (delta < 0) {
+        const current = stitches[progress];
+        const previous = stitches[progress - 1];
+        if (current?.type === "m1" && previous?.type === "kfb") {
+          setProgress(progress - 2);
+          return;
+        }
+      }
+      setProgress(progress + delta);
+    },
+    [stitches, index, progress, setProgress],
   );
 
   const finishRun = useCallback(() => {

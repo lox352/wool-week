@@ -249,9 +249,10 @@ const sww23: HatPattern = {
           type: "shaping",
           slot: "D",
           to: 7,
-          // The pattern moves the opening one stitch before working K2tog tbl
-          // all the way round; the engine models that start offset for this
-          // stitch type.
+          // The pattern moves the first unknitted stitch to the end of the
+          // previous round before working K2tog tbl all the way round. That
+          // is a property of this round, not of K2tog tbl in general.
+          borrow: -1,
           ops: [{ repeat: [{ work: "k2togtbl" }], times: 7 }],
         },
       ],
