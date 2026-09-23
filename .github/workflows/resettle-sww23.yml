@@ -1,0 +1,40 @@
+name: Resettle SWW23 once
+
+on:
+  push:
+    branches:
+      - claude/shetland-wool-week-tracker-u20lz7
+
+permissions:
+  contents: write
+
+jobs:
+  settle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/shetland-wool-week-tracker-u20lz7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build site for settlement
+        run: npm run build
+      - name: Resettle Buggiflooer Beanie
+        run: npm run settle -- sww23-buggiflooer-beanie
+      - name: Commit changed settled positions
+        shell: bash
+        run: |
+          if git diff --quiet -- src/data/hats/settled/sww23-buggiflooer-beanie.json; then
+            echo "Settled geometry is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/hats/settled/sww23-buggiflooer-beanie.json
+          git commit -m "Regenerate Buggiflooer settled geometry"
+          git push origin HEAD:claude/shetland-wool-week-tracker-u20lz7
