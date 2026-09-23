@@ -85,6 +85,12 @@ python3 scripts/extract_chart.py SWW18.pdf --page 3 --vector all \
     --cell 6.615 --marks --key A A/purl B C D E A/s2kp E/s2kp \
     --charts B:12x34 A:4x12 C:24x21 \
     --out src/data/hats/sww18-merrie-dancers-toorie.charts.json
+
+# SWW17, Bousta Beanie - vector-filled cells, but some crown decrease slashes
+# only survive reliably in the rendered page, so the dedicated extractor uses
+# vectors for yarns and pixels for those marks.
+python3 scripts/extract_sww17.py SWW17.pdf \
+    --out src/data/hats/sww17-bousta-beanie.charts.json
 ```
 
 2023 and 2026 have charts embedded as pictures rather than PDF drawings.
@@ -244,6 +250,10 @@ count the published pattern prints out loud:
   charts agree with the greys the extractor read. Two of them are named in the
   written instructions as well - "join in yarn B" at chart A, "join in yarn D"
   at chart C - which anchors the letters to prose.
+- **Bousta Beanie** — cast on 120, 144 after the rib increase, 132 after crown
+  row 1, 72 after crown row 10, then 48, 24 and 12. The crown repeat is also
+  checked row by row: its visible widths are 11, 11, 10, 10, 9, 9, 8, 8, 6,
+  6 and its decrease marks consume exactly the preceding row.
 
 A chart misread by a single cell breaks one of those, so it fails the build.
 
