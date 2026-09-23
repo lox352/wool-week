@@ -91,6 +91,12 @@ python3 scripts/extract_chart.py SWW18.pdf --page 3 --vector all \
 # vectors for yarns and pixels for those marks.
 python3 scripts/extract_sww17.py SWW17.pdf \
     --out src/data/hats/sww17-bousta-beanie.charts.json
+
+# SWW16, Crofthoose Hat - the body chart is printed four times, once in each
+# colourway. The dedicated extractor maps all four back to A-E and requires
+# every cell and purl mark to agree before reading the separate crown chart.
+python3 scripts/extract_sww16.py SWW16.pdf \
+    --out src/data/hats/sww16-crofthoose-hat.charts.json
 ```
 
 2023 and 2026 have charts embedded as pictures rather than PDF drawings.
@@ -254,10 +260,36 @@ count the published pattern prints out loud:
   row 1, 72 after crown row 10, then 48, 24 and 12. The crown repeat is also
   checked row by row: its visible widths are 11, 11, 10, 10, 9, 9, 8, 8, 6,
   6 and its decrease marks consume exactly the preceding row.
+- **Crofthoose Hat** — cast on 120, increase to 168 on chart row 9, decrease
+  to 144 on crown row 1, then 132, 120, 108, 96, 84, 72, 60, 48, 36, 24 and
+  12 through the eleven centred double decreases before the final 6.
 
 A chart misread by a single cell breaks one of those, so it fails the build.
 
 ## Colours
+
+### Crofthoose Hat (2016) source checks
+
+The main 12 × 41 chart is unusually well self-checking: the PDF prints it four
+times, once for every sample colourway. The dedicated extractor learns A-E
+from each printing separately and requires all 492 cells plus the 48
+corrugated-rib purl marks to agree across all four copies. The crown is a
+second 24-column chart: its visible widths step 24 → 22 → 22 → 20 → ... → 2,
+and eleven CDD marks consume exactly the preceding row. The written counts
+then independently reconcile 120 → 168 → 144 → 12 → 6.
+
+The leaflet gives a 22-inch head size and a gauge, but not finished hat
+measurements. The site's 64.6cm body circumference is therefore the pattern's
+168 stitches at 26 sts/10cm, and its 24.6cm length is the 64 worked rounds at
+26 rounds/10cm. They are arithmetic consequences of the printed pattern, not
+extra measurements supplied by the designer.
+
+Jamieson & Smith and Jamieson's shades match current library entries.
+Shetland Organics was a separate historical producer, and the fourth sample is
+a one-off naturally dyed set referenced to Spindrift Crafts; neither can be
+honestly mapped onto a current catalogue. Their printed names are retained
+with display colours sampled from their own chart printings and marked
+`source: "approximate"`.
 
 ### Roadside Beanie (2019) source checks
 
@@ -311,11 +343,12 @@ The library also names shades the way the shop does - the 2025 pattern's
 "Shade 96" is Pale Lemon - and building it caught real errors, among them a
 Jamieson & Smith dark red that had been recorded as an orange.
 
-Two spinners are not in the library, because neither sells online in a form
-that can be read: Foula Wool, and the handspun in 2021's fifth colourway. Those
-shades carry `source: "approximate"` and keep considered stand-ins, as do the
-two ambiguous historic Uradale names in Roadside Beanie described above.
-All matched shades carry `source: "library"`.
+Not every historical sample can be tied to a current catalogue. Foula Wool,
+the 2021 handspun, 2016's discontinued Shetland Organics range and its one-off
+naturally dyed Spindrift Crafts sample therefore keep considered stand-ins, as
+do the two ambiguous historic Uradale names in Roadside Beanie. Those shades
+carry `source: "approximate"`; all positively matched shades carry
+`source: "library"`.
 
 A better reading of the colours can be dropped in without redoing any of that:
 
