@@ -102,7 +102,8 @@ const cost = (op: ShapingOp): number => {
     return "times" in op ? each * op.times : each;
   }
   if (op.work === "m1") return 0;
-  if (op.work === "k2tog") return 2;
+  if (op.work === "kfb") return 1;
+  if (op.work === "k2tog" || op.work === "k2togtbl") return 2;
   if (op.work === "s2kp" || op.work === "sk2p") return 3;
   return op.times;
 };
@@ -127,7 +128,20 @@ const expand = (ops: ShapingOp[], available: number): StitchType[] => {
       out.push("m1");
       return;
     }
-    if (op.work === "k2tog" || op.work === "s2kp" || op.work === "sk2p") {
+    if (op.work === "kfb") {
+      // One instruction produces two stitches from one stitch below. The
+      // graph stores the front knit and the new back loop separately, which
+      // is the same topology as a knit followed by an increase.
+      out.push("k1", "m1");
+      used += 1;
+      return;
+    }
+    if (
+      op.work === "k2tog" ||
+      op.work === "k2togtbl" ||
+      op.work === "s2kp" ||
+      op.work === "sk2p"
+    ) {
       out.push(op.work);
       used += cost(op);
       return;
@@ -200,7 +214,15 @@ const runRound = (
  * and so does an sk2p its three - it leans to the left and is meant to - and
  * those are every other round here that opens on a decrease.
  */
-const borrowFor = (type?: StitchType): number => (type === "s2kp" ? 1 : 0);
+const borrowFor = (type?: StitchType): number =>
+  type === "s2kp"
+    ? 1
+    : type === "k2togtbl"
+      // Buggiflooer explicitly moves the first unworked stitch to the end of
+      // the previous round before its final K2tog-tbl round, so begin one
+      // stitch after the old round start and wrap the last pair across it.
+      ? -1
+      : 0;
 
 /**
  * How wide a stitch of a named fabric is, and how tall its rounds are.
