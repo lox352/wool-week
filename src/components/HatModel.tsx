@@ -61,6 +61,8 @@ const blockedWanted = () => {
 interface HatModelProps {
   /** The hat's id: what its settled positions are filed under. */
   hatId: string;
+  /** Size-specific hats have one settled model per size. */
+  sizeId?: string;
   stitches: Stitch[];
   rounds: number[][];
   roundHeight: number;
@@ -75,6 +77,7 @@ const known = new Map<string, Point[]>();
 
 const HatModel: React.FC<HatModelProps> = ({
   hatId,
+  sizeId,
   stitches,
   rounds,
   roundHeight,
@@ -82,8 +85,9 @@ const HatModel: React.FC<HatModelProps> = ({
   progress,
   target,
 }) => {
+  const settledKey = sizeId ? `${hatId}--${sizeId}` : hatId;
   const [settled, setSettled] = useState<Point[] | undefined>(() =>
-    known.get(hatId),
+    known.get(settledKey),
   );
   /**
    * Whether the hat is still settling in front of you.
@@ -97,7 +101,7 @@ const HatModel: React.FC<HatModelProps> = ({
    */
   const [settling, setSettling] = useState(true);
   /** Undefined while we do not yet know whether there is a file to load. */
-  const [looked, setLooked] = useState(known.has(hatId));
+  const [looked, setLooked] = useState(known.has(settledKey));
 
   useEffect(() => {
     let live = true;
@@ -106,7 +110,7 @@ const HatModel: React.FC<HatModelProps> = ({
       setLooked(true);
       return;
     }
-    const cached = known.get(hatId);
+    const cached = known.get(settledKey);
     if (cached) {
       setSettled(cached);
       setLooked(true);
@@ -114,10 +118,10 @@ const HatModel: React.FC<HatModelProps> = ({
     }
     setSettled(undefined);
     setLooked(false);
-    loadSettled(hatId).then((positions) => {
+    loadSettled(hatId, sizeId).then((positions) => {
       if (!live) return;
       if (positions) {
-        known.set(hatId, positions);
+        known.set(settledKey, positions);
         setSettled(positions);
       }
       setLooked(true);
@@ -125,7 +129,7 @@ const HatModel: React.FC<HatModelProps> = ({
     return () => {
       live = false;
     };
-  }, [hatId]);
+  }, [hatId, sizeId, settledKey]);
 
   /*
    * How wide each round's stitches are, for blocking. One fabric for most
@@ -188,8 +192,8 @@ const HatModel: React.FC<HatModelProps> = ({
        * They are the same physics either way, and preferring the file means
        * the hat does not shift under the pointer if the two ever differ.
        */
-      if (!known.has(hatId)) {
-        known.set(hatId, positions);
+      if (!known.has(settledKey)) {
+        known.set(settledKey, positions);
         setSettled(positions);
       }
       setSettling(false);
@@ -198,7 +202,7 @@ const HatModel: React.FC<HatModelProps> = ({
       (window as unknown as { __settledPositions?: Point[] }).__settledPositions =
         positions;
     },
-    [hatId],
+    [settledKey],
   );
 
   const blocking = blockedWanted();

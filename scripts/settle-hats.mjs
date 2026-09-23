@@ -168,77 +168,99 @@ const browser = await chromium.launch({
 });
 
 for (const hatId of hatIds) {
-  const page = await browser.newPage({ viewport: { width: 900, height: 700 } });
-  page.on("pageerror", (error) => say(`  ${hatId}: ERROR ${error.message}`));
-
   /*
-   * "settled=0" in the query below is what stops the page loading the file it
-   * wrote last time. Blocking the request does not work: Vite compiles a JSON
-   * import into a JS chunk, so there is no .json to block, and a run made
-   * that way quietly re-reports the answer it already had.
+   * Discover the pattern's sizes before settling. One-size hats keep their
+   * historical unsuffixed file. A pattern with several selectable sizes is
+   * settled once per size so different stitch counts or gauges can never
+   * inherit another size's coordinates.
    */
+  const discovery = await browser.newPage({ viewport: { width: 900, height: 700 } });
+  await discovery.goto(`${base}#/hat/${hatId}?settle=0&settled=0`, {
+    waitUntil: "networkidle",
+  });
+  await discovery.waitForFunction(() => Array.isArray(window.__hatSizeIds), {
+    timeout: firstProgressMs,
+  });
+  const sizeIds = await discovery.evaluate(() => window.__hatSizeIds);
+  await discovery.close();
 
-  // ?settle=1 is what asks the page for the physics stage rather than a hat
-  // drawn where it already came to rest; the rest is the tuning above.
-  const query = Object.entries({ settle: 1, settled: 0, stepBudgetMs, ...tuning })
-    .map(([key, value]) => `${key}=${value}`)
-    .join("&");
-  await page.goto(`${base}#/hat/${hatId}?${query}`, { waitUntil: "networkidle" });
+  const targets = sizeIds.length > 1 ? sizeIds : [undefined];
 
-  const started = Date.now();
-  let reported = 0;
-  const ticker = setInterval(async () => {
-    const progress = await page
-      .evaluate(() => window.__settleProgress)
-      .catch(() => undefined);
-    if (!progress || progress.steps === reported) return;
-    reported = progress.steps;
-    say(
-      `  ${hatId}: ${progress.steps} steps, the average stitch moving ` +
-        `${progress.moved.toFixed(5)} of its own width a step, ` +
-        `${((Date.now() - started) / 1000).toFixed(0)}s`,
-    );
-  }, 5_000);
+  for (const sizeId of targets) {
+    const label = sizeId ? `${hatId}/${sizeId}` : hatId;
+    const page = await browser.newPage({ viewport: { width: 900, height: 700 } });
+    page.on("pageerror", (error) => say(`  ${label}: ERROR ${error.message}`));
 
-  await page
-    .waitForFunction(() => window.__settleProgress, undefined, {
-      timeout: firstProgressMs,
-      polling: 500,
+    const query = Object.entries({
+      settle: 1,
+      settled: 0,
+      ...(sizeId ? { size: sizeId } : {}),
+      stepBudgetMs,
+      ...tuning,
     })
-    .catch(() => {
-      clearInterval(ticker);
-      say(
-        `${hatId}: the page never started settling. Is it a hat the site ` +
-          `knows, and did the build include it?`,
-      );
-      process.exit(1);
+      .map(([key, value]) => `${key}=${value}`)
+      .join("&");
+    await page.goto(`${base}#/hat/${hatId}?${query}`, {
+      waitUntil: "networkidle",
     });
 
-  const positions = await page
-    .waitForFunction(() => window.__settledPositions, undefined, {
-      timeout: settleTimeoutMs,
-      polling: 1_000,
-    })
-    .then((handle) => handle.jsonValue())
-    .finally(() => clearInterval(ticker));
+    const started = Date.now();
+    let reported = 0;
+    const ticker = setInterval(async () => {
+      const progress = await page
+        .evaluate(() => window.__settleProgress)
+        .catch(() => undefined);
+      if (!progress || progress.steps === reported) return;
+      reported = progress.steps;
+      say(
+        `  ${label}: ${progress.steps} steps, the average stitch moving ` +
+          `${progress.moved.toFixed(5)} of its own width a step, ` +
+          `${((Date.now() - started) / 1000).toFixed(0)}s`,
+      );
+    }, 5_000);
 
-  const flat = [];
-  for (const point of positions) {
-    flat.push(
-      Number(point.x.toFixed(places)),
-      Number(point.y.toFixed(places)),
-      Number(point.z.toFixed(places)),
+    await page
+      .waitForFunction(() => window.__settleProgress, undefined, {
+        timeout: firstProgressMs,
+        polling: 500,
+      })
+      .catch(() => {
+        clearInterval(ticker);
+        say(
+          `${label}: the page never started settling. Is it a hat the site ` +
+            `knows, and did the build include it?`,
+        );
+        process.exit(1);
+      });
+
+    const positions = await page
+      .waitForFunction(() => window.__settledPositions, undefined, {
+        timeout: settleTimeoutMs,
+        polling: 1_000,
+      })
+      .then((handle) => handle.jsonValue())
+      .finally(() => clearInterval(ticker));
+
+    const flat = [];
+    for (const point of positions) {
+      flat.push(
+        Number(point.x.toFixed(places)),
+        Number(point.y.toFixed(places)),
+        Number(point.z.toFixed(places)),
+      );
+    }
+
+    const filename =
+      sizeIds.length > 1 ? `${hatId}--${sizeId}.json` : `${hatId}.json`;
+    const out = join(root, "src/data/hats/settled", filename);
+    writeFileSync(out, JSON.stringify(flat) + "\n");
+    const kb = Math.round(JSON.stringify(flat).length / 1024);
+    say(
+      `${label}: ${positions.length} stitches settled in ` +
+        `${((Date.now() - started) / 1000).toFixed(1)}s -> ${kb}kB`,
     );
+    await page.close();
   }
-
-  const out = join(root, "src/data/hats/settled", `${hatId}.json`);
-  writeFileSync(out, JSON.stringify(flat) + "\n");
-  const kb = Math.round(JSON.stringify(flat).length / 1024);
-  say(
-    `${hatId}: ${positions.length} stitches settled in ` +
-      `${((Date.now() - started) / 1000).toFixed(1)}s -> ${kb}kB`,
-  );
-  await page.close();
 }
 
 await browser.close();

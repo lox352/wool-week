@@ -1,5 +1,10 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
@@ -17,18 +22,25 @@ import "./Hat.css";
 /**
  * One hat: what it is, what it is made of, and a way to start knitting it.
  *
- * The size picker is the odd one out compared with the other two hat sites,
- * where you choose a stitch count. You cannot do that here - the designer
- * chose it, and every size of these patterns casts on the same number. What
- * a size changes is the needles and the tension, so what it changes here is
- * the measurements, not the chart.
+ * Most hats use one knitting script at every size, but a pattern is allowed
+ * to change its stitch counts and chart sequence by size. Shwook does: Size 1
+ * is shorter and takes a different route through the charts.
  */
 const Hat: React.FC = () => {
   const { hatId } = useParams();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const hat = hatId ? hatById(hatId) : undefined;
+  const requestedSize = params.get("size");
+  const initialSize =
+    (requestedSize && hat?.sizes.some((size) => size.id === requestedSize)
+      ? requestedSize
+      : undefined) ??
+    hat?.sizes[1]?.id ??
+    hat?.sizes[0]?.id ??
+    "";
 
-  const [sizeId, setSizeId] = useState(hat?.sizes[1]?.id ?? hat?.sizes[0]?.id ?? "");
+  const [sizeId, setSizeId] = useState(initialSize);
   const [colourwayId, setColourwayId] = useState(hat?.colourways[0]?.id ?? "");
   /*
    * The wool a knitter has chosen for themselves. Held beside the colourway
@@ -82,10 +94,14 @@ const HatPage: React.FC<{
   navigate,
 }) => {
   const hat = hatById(hatId)!;
-  const { stitches, rounds, roundHeight, roundLabels, turns, index } =
-    useHat(hat);
-
   const size = hat.sizes.find((s) => s.id === sizeId) ?? hat.sizes[0];
+  const { stitches, rounds, roundHeight, roundLabels, turns, index } =
+    useHat(hat, size.id);
+
+  useEffect(() => {
+    (window as unknown as { __hatSizeIds?: string[] }).__hatSizeIds =
+      hat.sizes.map((candidate) => candidate.id);
+  }, [hat]);
   const colourway =
     hat.colourways.find((c) => c.id === colourwayId) ?? hat.colourways[0];
   const palette = useMemo(
@@ -135,6 +151,7 @@ const HatPage: React.FC<{
         <div className="hat-stage">
           <HatModel
             hatId={hat.id}
+            sizeId={size.id}
             stitches={stitches}
             rounds={rounds}
             roundHeight={roundHeight}
@@ -155,7 +172,7 @@ const HatPage: React.FC<{
           <p>{hat.story}</p>
           <p>
             <a href={hat.patternUrl} target="_blank" rel="noreferrer">
-              Buy the pattern from Shetland Wool Week
+              Pattern source
             </a>
             . {hat.credit}
             {hat.hashtag ? ` · ${hat.hashtag}` : ""}
@@ -249,7 +266,7 @@ const HatPage: React.FC<{
         </div>
         <dl className="measurements">
           <div>
-            <dt>Finished circumference</dt>
+            <dt>{size.circumferenceLabel ?? "Finished circumference"}</dt>
             <dd>{size.circumferenceCm}cm</dd>
           </div>
           <div>
@@ -272,9 +289,11 @@ const HatPage: React.FC<{
           </div>
         </dl>
         <p className="quiet">
-          Every size of this hat casts on the same number of stitches; the size
-          is in the needles and the tension, so the chart is the same whichever
-          you knit.
+          {hat.sizes.some((option) => option.sections)
+            ? "This pattern changes its stitch counts and round sequence by size; " +
+              "the chart above follows the size you selected."
+            : "Every size of this hat uses the same knitting; the size is in " +
+              "the needles and tension."}
         </p>
       </section>
 

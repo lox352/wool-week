@@ -51,11 +51,20 @@ export interface HatStitches {
  * round is 31/34 of a stitch's width, and a hat built on the flat 0.8 this
  * used to assume came out a fifteenth too squat.
  *
- * Taken from the middle size, because a hat is drawn once and every size of
- * these patterns has the same stitch count - the size is in the needles.
+ * The selected size supplies its own gauge. Historically every imported hat
+ * used one knitting script for all sizes; Shwook (2014) is the first whose
+ * small size genuinely changes stitch counts and round sequence as well.
  */
-export const roundHeightFor = (pattern: HatPattern): number => {
-  const size = pattern.sizes[Math.floor(pattern.sizes.length / 2)];
+export const roundHeightFor = (
+  pattern: HatPattern,
+  sizeId?: string,
+): number => {
+  const size = sizeId
+    ? pattern.sizes.find((candidate) => candidate.id === sizeId)
+    : pattern.sizes[Math.floor(pattern.sizes.length / 2)];
+  if (sizeId && !size) {
+    throw new Error(`${pattern.id}: no size ${sizeId}`);
+  }
   if (!size?.stitchesPer10cm || !size?.roundsPer10cm) {
     return verticalStitchDistance;
   }
@@ -242,8 +251,18 @@ export const fabricOf = (
   };
 };
 
-export const buildHat = (pattern: HatPattern): HatStitches => {
-  const roundHeight = roundHeightFor(pattern);
+export const buildHat = (
+  pattern: HatPattern,
+  sizeId?: string,
+): HatStitches => {
+  const size = sizeId
+    ? pattern.sizes.find((candidate) => candidate.id === sizeId)
+    : undefined;
+  if (sizeId && !size) {
+    throw new Error(`${pattern.id}: no size ${sizeId}`);
+  }
+  const sections = size?.sections ?? pattern.sections;
+  const roundHeight = roundHeightFor(pattern, sizeId);
   const knitter = new Knitter(roundHeight);
   const labels: string[] = [];
   let count = 0;
@@ -260,7 +279,7 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
    * chart reads, so with an odd number of turns it is the first that goes on
    * backwards, and with an even number none of them does.
    */
-  const turnCount = pattern.sections.reduce(
+  const turnCount = sections.reduce(
     (total, section) =>
       total + section.rounds.filter((round) => round.type === "turn").length,
     0,
@@ -388,7 +407,7 @@ export const buildHat = (pattern: HatPattern): HatStitches => {
     }
   };
 
-  pattern.sections.forEach((section) =>
+  sections.forEach((section) =>
     section.rounds.forEach((round) => apply(round, section.label)),
   );
 
