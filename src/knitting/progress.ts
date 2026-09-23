@@ -172,6 +172,7 @@ const words: Record<
   k1tbl: { said: "knit", after: "tbl", perStitch: true },
   m1: { said: "m1", perStitch: false },
   k2tog: { said: "k2tog", perStitch: false },
+  k2togtbl: { said: "k2tog tbl", perStitch: false },
   s2kp: { said: "s2kp", perStitch: false },
   sk2p: { said: "sk2p", perStitch: false },
   // Never worked: the seam that closes the cast-on round. See below.
