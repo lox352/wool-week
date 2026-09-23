@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: settle-missing
@@ -68,6 +69,7 @@ jobs:
         run: npm run settle -- ${{ steps.missing.outputs.hats }}
 
       - name: Commit settled positions
+        id: commit
         if: steps.missing.outputs.hats != ''
         shell: bash
         run: |
@@ -75,8 +77,19 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add src/data/hats/settled/*.json
           if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No settled geometry changed."
             exit 0
           fi
           git commit -m "Settle missing hats"
           git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      # A push made with GITHUB_TOKEN does not trigger another workflow.
+      # Explicitly dispatch the normal Pages workflow against the new branch
+      # head so the just-committed settled file is what gets published.
+      - name: Deploy the settled source
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref "$GITHUB_REF_NAME"
