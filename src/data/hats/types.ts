@@ -176,7 +176,10 @@ export interface Size {
 export type ShapingOp =
   | { work: "k" | "p"; times: number }
   | { work: "m1" }
+  /** Knit front and back: consumes one stitch and leaves two. */
+  | { work: "kfb" }
   | { work: "k2tog" }
+  | { work: "k2togtbl" }
   | { work: "s2kp" }
   | { work: "sk2p" }
   /** "[m1, k4] to last 5 sts" - repeat until that many are left unworked. */

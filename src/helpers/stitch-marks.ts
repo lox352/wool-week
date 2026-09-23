@@ -52,6 +52,14 @@ const marks: Partial<Record<StitchType, Mark>> = {
       ],
     ],
   },
+  k2togtbl: {
+    strokes: [
+      [
+        [near, near],
+        [far, far],
+      ],
+    ],
+  },
   s2kp: {
     strokes: [
       [
@@ -97,6 +105,7 @@ export const markLabels: Partial<Record<StitchType, string>> = {
   p1: "purl",
   k1tbl: "knit through the back loop",
   k2tog: "knit two together",
+  k2togtbl: "knit two together through the back loops",
   s2kp: "slip 2, knit 1, pass slipped stitches over",
   sk2p: "slip 1, knit 2 together, pass slipped stitch over",
   m1: "make one",

@@ -34,6 +34,11 @@ its source:
 python3 scripts/extract_chart.py SWW25.pdf --page 5 --vector 0 \
     --charts A:18x16 B:16x16 --out src/data/hats/sww25-aal-ower-toorie.charts.json
 
+# SWW23, Buggiflooer Beanie - the five charts are embedded raster images.
+# Its dedicated extractor reads the cell fills, purl dots and CDD triangles.
+python3 scripts/extract_sww23.py SWW23.pdf \\
+    --out src/data/hats/sww23-buggiflooer-beanie.charts.json
+
 # SWW24, Islesburgh Toorie - two chart pages, one key, named by hand.
 python3 scripts/extract_chart.py SWW24.pdf --page 6 --vector 0 \
     --key knit purl s2kp A B C D E \
@@ -82,7 +87,8 @@ python3 scripts/extract_chart.py SWW18.pdf --page 3 --vector all \
     --out src/data/hats/sww18-merrie-dancers-toorie.charts.json
 ```
 
-2026's charts are pictures rather than drawings and did not come out of this
+2023 and 2026 have charts embedded as pictures rather than PDF drawings.
+2023's dedicated extractor is listed above; 2026's did not come out of this
 tool at all - see below.
 
 Where a pattern's charts are split across pages, the pieces are merged into
