@@ -69,6 +69,11 @@ python3 scripts/extract_chart.py SWW20.pdf --page 3 --vector 0 \
     --charts A:4x8 B:24x40 C:24x23 \
     --out src/data/hats/sww20-katies-kep.charts.json
 
+# SWW19, Roadside Beanie - PyMuPDF reads the vector cells and marks directly.
+# The symbol key is unfilled, and the crown's decrease column is detached.
+python3 scripts/extract_sww19.py SWW19.pdf \
+    --out src/data/hats/sww19-roadside-beanie.charts.json
+
 # SWW18, Merrie Dancers Toorie - charts drawn as outlines, with the yarn
 # printed as a number in each cell.
 python3 scripts/extract_chart.py SWW18.pdf --page 3 --vector all \
@@ -238,6 +243,28 @@ A chart misread by a single cell breaks one of those, so it fails the build.
 
 ## Colours
 
+### Roadside Beanie (2019) source checks
+
+All six charts are read from page 3's vector paths, bottom to top and right
+to left. Duplicate painted cells are deduplicated only when their content
+agrees. Purl dots and decrease strokes are read as paths, including the
+crown's detached left column. The 28 purls and 19 single decreases match the
+printed charts. `src/knitting/roadside.test.ts` checks the published counts
+132 → 168 → 140 → 7, the chart boundaries, and all four colourways.
+
+The leaflet credits Oliver Henry's theme, Sandra Manson's design and knitting,
+and Ella Gordon's charting. These credits are retained. Its finished
+circumference (58.5cm) and gauge (32 sts/10cm) are retained as printed even
+though 168 stitches at that gauge imply 52.5cm. It gives no numeric head
+measurement, so the size is labelled Medium adult without inventing one.
+
+Uradale's historic names "Forget-me-not" and "Sea Pink" cannot be uniquely
+matched to the current Heath/Meal catalogue names. They retain their printed
+names with approximate display colours. Foula shades also remain approximate,
+consistent with the other hats; the remaining 19 shades use the yarn library.
+
+### Shared yarn catalogue
+
 Every shade on the site comes out of one place: `src/data/yarns`, a library of
 998 shades from the five Shetland spinners these patterns are written in -
 Jamieson's of Shetland, Jamieson & Smith, Uradale, Laxdale and Aister 'oo' -
@@ -270,8 +297,9 @@ Jamieson & Smith dark red that had been recorded as an orange.
 
 Two spinners are not in the library, because neither sells online in a form
 that can be read: Foula Wool, and the handspun in 2021's fifth colourway. Those
-sixteen shades carry `source: "approximate"` and keep considered stand-ins.
-Everything else carries `source: "library"`.
+shades carry `source: "approximate"` and keep considered stand-ins, as do the
+two ambiguous historic Uradale names in Roadside Beanie described above.
+All matched shades carry `source: "library"`.
 
 A better reading of the colours can be dropped in without redoing any of that:
 

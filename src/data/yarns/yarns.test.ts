@@ -154,12 +154,18 @@ describe("what the hats are knitted in", () => {
     expect(seen.size).toBeGreaterThan(80);
   });
 
-  it("leaves only Foula Wool and the handspun without a library entry", () => {
+  it("leaves only unavailable or ambiguous historic shades without a library entry", () => {
     const loose = new Set<string>();
     hats.forEach((hat) =>
       hat.colourways.forEach((colourway) =>
         colourway.shades.forEach((shade) => {
-          if (!shade.wool) loose.add(colourway.brand);
+          if (!shade.wool) {
+            if (colourway.brand === "Uradale Yarns") {
+              expect(hat.id).toBe("sww19-roadside-beanie");
+              expect(["Forget-me-not", "Sea Pink"]).toContain(shade.name);
+              expect(shade.source).toBe("approximate");
+            } else loose.add(colourway.brand);
+          }
         }),
       ),
     );

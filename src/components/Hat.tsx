@@ -223,8 +223,8 @@ const HatPage: React.FC<{
           The colours come from the spinners' own photographs of the wool, so
           they are close rather than exact.
           {anyApproximate
-            ? " Two of these spinners do not sell online in a form that can be" +
-              " read, so their shades are considered stand-ins."
+            ? " Some shades use approximate colours where an exact match" +
+              " is unavailable. These are marked in the wool list."
             : ""}
         </p>
       </section>
@@ -241,7 +241,9 @@ const HatPage: React.FC<{
               onClick={() => setSizeId(option.id)}
             >
               <strong>{option.label}</strong>
-              <span className="quiet">to fit {option.toFitCm}cm</span>
+              {option.toFitCm !== undefined && (
+                <span className="quiet">to fit {option.toFitCm}cm</span>
+              )}
             </button>
           ))}
         </div>
