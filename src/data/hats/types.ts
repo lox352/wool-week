@@ -91,7 +91,9 @@ export interface Chart {
  *
  * "approximate" is a considered stand-in, for the two spinners the library
  * does not reach - Foula Wool, and the handspun in 2021's fifth colourway,
- * neither of which sells online in a form that can be read. The shade's name
+ * neither of which sells online in a form that can be read, and historic
+ * shades that cannot be unambiguously matched to the current catalogue.
+ * The shade's name
  * is exactly as the pattern publishes it and the colour is yours to correct.
  */
 export type ShadeSource = "library" | "approximate";
@@ -148,7 +150,8 @@ export interface Colourway {
 export interface Size {
   id: string;
   label: string;
-  toFitCm: number;
+  /** Omitted where the pattern only gives a descriptive head size. */
+  toFitCm?: number;
   circumferenceCm: number;
   lengthCm: number;
   /** Over the colourwork pattern, after blocking. */
