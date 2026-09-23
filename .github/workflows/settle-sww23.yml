@@ -1,0 +1,58 @@
+name: Settle SWW23 once
+
+on:
+  push:
+    branches:
+      - claude/shetland-wool-week-tracker-u20lz7
+
+permissions:
+  contents: write
+
+jobs:
+  settle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/shetland-wool-week-tracker-u20lz7
+
+      - name: Stop if geometry is already committed
+        id: missing
+        shell: bash
+        run: |
+          if [[ -f src/data/hats/settled/sww23-buggiflooer-beanie.json ]]; then
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.missing.outputs.needed == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+        if: steps.missing.outputs.needed == 'true'
+
+      - name: Install Chromium
+        if: steps.missing.outputs.needed == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Build site for settlement
+        if: steps.missing.outputs.needed == 'true'
+        run: npm run build
+
+      - name: Settle Buggiflooer Beanie
+        if: steps.missing.outputs.needed == 'true'
+        run: npm run settle -- sww23-buggiflooer-beanie
+
+      - name: Commit settled positions
+        if: steps.missing.outputs.needed == 'true'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/hats/settled/sww23-buggiflooer-beanie.json
+          git commit -m "Add settled geometry for Buggiflooer Beanie"
+          git push origin HEAD:claude/shetland-wool-week-tracker-u20lz7
