@@ -1,0 +1,2533 @@
+{
+  "charts": [
+    {
+      "id": "A",
+      "rows": [
+        [
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "A"
+          }
+        ],
+        [
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          }
+        ],
+        [
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          }
+        ],
+        [
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "C"
+          }
+        ],
+        [
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "A",
+            "symbol": "purl"
+          },
+          {
+            "slot": "B"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          }
+        ],
+        [
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          }
+        ],
+        [
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          }
+        ],
+        [
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "B",
+      "rows": [
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A",
+            "symbol": "s2kp"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "s2kp"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B",
+            "symbol": "s2kp"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          }
+        ],
+        [
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "B",
+            "symbol": "s2kp"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "s2kp"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B",
+            "symbol": "s2kp"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          }
+        ],
+        [
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B",
+            "symbol": "s2kp"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A",
+            "symbol": "s2kp"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B",
+            "symbol": "s2kp"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "C"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "C"
+          }
+        ],
+        [
+          {
+            "slot": "B"
+          },
+          {
+            "slot": "E"
+          },
+          {
+            "slot": "B",
+            "symbol": "s2kp"
+          },
+          {
+            "slot": "E"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          },
+          {
+            "slot": "D"
+          }
+        ],
+        [
+          {
+            "slot": "A"
+          },
+          {
+            "slot": "A",
+            "symbol": "s2kp"
+          }
+        ]
+      ]
+    }
+  ]
+}

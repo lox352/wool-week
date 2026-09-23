@@ -1,6 +1,7 @@
 import { HatPattern } from "./types";
 import sww26 from "./sww26-birsie-beanny";
 import sww15 from "./sww15-baa-ble-hat";
+import sww16 from "./sww16-crofthoose-hat";
 import sww17 from "./sww17-bousta-beanie";
 import sww18 from "./sww18-merrie-dancers-toorie";
 import sww19 from "./sww19-roadside-beanie";
@@ -18,7 +19,7 @@ import sww25 from "./sww25-aal-ower-toorie";
  * are earlier toories than these going back to 2010, and nothing about the
  * site assumes how many there are.
  */
-export const hats: HatPattern[] = [sww26, sww25, sww24, sww23, sww22, sww21, sww20, sww19, sww18, sww17, sww15];
+export const hats: HatPattern[] = [sww26, sww25, sww24, sww23, sww22, sww21, sww20, sww19, sww18, sww17, sww16, sww15];
 
 export const hatById = (id: string): HatPattern | undefined =>
   hats.find((hat) => hat.id === id);

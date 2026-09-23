@@ -89,12 +89,11 @@ export interface Chart {
  * Uradale Graeff was three different colours in three different hats, because
  * each had been guessed at separately.
  *
- * "approximate" is a considered stand-in, for the two spinners the library
- * does not reach - Foula Wool, and the handspun in 2021's fifth colourway,
- * neither of which sells online in a form that can be read, and historic
- * shades that cannot be unambiguously matched to the current catalogue.
- * The shade's name
- * is exactly as the pattern publishes it and the colour is yours to correct.
+ * "approximate" is a considered stand-in where the library cannot identify
+ * a current shop entry: small or discontinued producers, one-off handspun or
+ * naturally dyed ranges, and historic shades that cannot be unambiguously
+ * matched to a current catalogue. The shade's name is exactly as the pattern
+ * publishes it and the colour is yours to correct.
  */
 export type ShadeSource = "library" | "approximate";
 

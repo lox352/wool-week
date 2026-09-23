@@ -118,7 +118,9 @@ describe("what the hats are knitted in", () => {
         colourway.shades.forEach((shade) => {
           const where = `${hat.id} · ${colourway.id} · ${shade.slot}`;
           if (!shade.wool) {
-            // Only the two spinners the library does not reach.
+            // Historical, one-off or otherwise unavailable shades stay
+            // explicit approximations rather than being forced onto a
+            // different current yarn.
             expect(shade.source, where).toBe("approximate");
             return;
           }
@@ -169,6 +171,11 @@ describe("what the hats are knitted in", () => {
         }),
       ),
     );
-    expect([...loose].sort()).toEqual(["Foula Wool", "Shetland Handspun"]);
+    expect([...loose].sort()).toEqual([
+      "Foula Wool",
+      "Shetland Handspun",
+      "Shetland Organics",
+      "Spindrift Crafts",
+    ]);
   });
 });
