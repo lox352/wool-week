@@ -33,7 +33,7 @@ jobs:
       - name: Commit settled positions
         shell: bash
         run: |
-          if git diff --quiet -- src/data/hats/settled/sww17-bousta-beanie.json; then
+          if [ -z "$(git status --porcelain -- src/data/hats/settled/sww17-bousta-beanie.json)" ]; then
             echo "Settled geometry is already current."
             exit 0
           fi
