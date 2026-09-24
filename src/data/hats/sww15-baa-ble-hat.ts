@@ -52,8 +52,9 @@ const sww15: HatPattern = {
       // 48cm round the rib and 21cm from the turned up edge to the crown.
       id: "one",
       label: "One size",
-      toFitCm: 54.5,
+      toFitRangeCm: [52, 57],
       circumferenceCm: 48,
+      circumferenceLabel: "Rib circumference",
       lengthCm: 21,
       stitchesPer10cm: 23,
       roundsPer10cm: 26,

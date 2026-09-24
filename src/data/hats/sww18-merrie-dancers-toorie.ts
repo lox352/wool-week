@@ -84,6 +84,8 @@ const sww18: HatPattern = {
   sizes: [
     { id: "yw1", label: "Yarn weight 1 · DK", circumferenceCm: 48.5,
       lengthCm: 25.9, stitchesPer10cm: 27, roundsPer10cm: 27, needlesMm: 3.5,
+      lengthEstimated: true,
+      measurementNote: "Length estimated from 70 worked rounds at the published tension. The pattern does not specify a head-size measurement.",
       sections: dkSections },
     {
       // The leaflet gives a circumference and a tension and no length, so the
@@ -92,9 +94,10 @@ const sww18: HatPattern = {
       // fits; a 50cm hat is knitted for about a 54cm one.
       id: "yw2",
       label: "Yarn weight 2",
-      toFitCm: 54,
       circumferenceCm: 50,
       lengthCm: 25,
+      lengthEstimated: true,
+      measurementNote: "Length is an estimate from rounds and tension, not a designer-supplied measurement. The pattern does not specify a head-size measurement.",
       stitchesPer10cm: 29,
       roundsPer10cm: 29,
       needlesMm: 3.5,

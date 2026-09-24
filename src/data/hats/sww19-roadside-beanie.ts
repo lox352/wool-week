@@ -38,6 +38,7 @@ const sww19: HatPattern = {
     id: "one",
     label: "Medium adult",
     circumferenceCm: 58.5,
+    measurementNote: "The leaflet prints 58.5cm, but 168 stitches at its stated 32 sts/10cm imply 52.5cm. Both printed figures are retained; swatch and check fit before starting.",
     lengthCm: 23,
     stitchesPer10cm: 32,
     roundsPer10cm: 28,
