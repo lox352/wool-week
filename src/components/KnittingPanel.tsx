@@ -138,7 +138,7 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
       const target = event.target as HTMLElement | null;
       if (
         target &&
-        (["INPUT", "BUTTON", "SELECT", "A", "TEXTAREA"].includes(target.tagName) ||
+        (target.closest("input, button, select, a, textarea, summary, dialog, [role=button]") ||
           target.isContentEditable)
       ) {
         return;

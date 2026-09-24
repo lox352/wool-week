@@ -22,6 +22,11 @@ it("saves once per action under StrictMode and preserves undo", async () => {
   };
   try {
     await act(async () => root.render(<StrictMode><App /></StrictMode>));
+    const summary = document.createElement("summary");
+    host.append(summary);
+    await act(async () => summary.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true })));
+    expect(saves).not.toHaveBeenCalled();
+    summary.remove();
     await click("One stitch");
     expect(saves).toHaveBeenCalledTimes(1);
     expect(readProject(project.id)?.progress).toBe(1);
