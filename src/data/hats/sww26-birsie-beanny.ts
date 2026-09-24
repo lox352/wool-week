@@ -332,7 +332,9 @@ const sww26: HatPattern = {
         { slot: "D", name: "Moss", hex: "#d1d67c", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-moss" },
       ],
-      balls: { A: 2, B: 1, C: 1, D: 1 },
+      // Official 2026 errata: Heddery Hills needs two balls of Yarn B.
+      // https://shop.shetlandwoolweek.com/products/birsie-beanny-shetland-wool-week-2026-paper-copy
+      balls: { A: 2, B: 2, C: 1, D: 1 },
     },
     {
       id: "nostalgia",
