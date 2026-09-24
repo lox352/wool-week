@@ -189,34 +189,27 @@ const sww18: HatPattern = {
         {
           // "K2, kfb, (k3, kfb) 3 times, *k7, kfb, (k3, kfb) 3 times;
           //  rep from * to last 5 sts, k5. 144 sts"
-          //
-          // A kfb knits into a stitch twice, so it is a knit that consumes the
-          // stitch below and a make-one for the loop that comes out of nothing.
           type: "shaping",
           slot: "A",
           to: 144,
           ops: [
             { work: "k", times: 2 },
-            { work: "k", times: 1 },
-            { work: "m1" },
+            { work: "kfb" },
             {
               repeat: [
                 { work: "k", times: 3 },
-                { work: "k", times: 1 },
-                { work: "m1" },
+                { work: "kfb" },
               ],
               times: 3,
             },
             {
               repeat: [
                 { work: "k", times: 7 },
-                { work: "k", times: 1 },
-                { work: "m1" },
+                { work: "kfb" },
                 {
                   repeat: [
                     { work: "k", times: 3 },
-                    { work: "k", times: 1 },
-                    { work: "m1" },
+                    { work: "kfb" },
                   ],
                   times: 3,
                 },

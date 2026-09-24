@@ -216,23 +216,14 @@ const sww22: HatPattern = {
           type: "shaping",
           slot: "A",
           to: 156,
-          /*
-           * K9, kfb, [k7, kfb] to last 10 sts, k to end.
-           *
-           * A kfb knits into a stitch twice, so it is the knit that consumes
-           * the stitch below and a make-one for the loop that comes out of
-           * nothing - which is the same pair the chart lays out as one stitch
-           * becoming two.
-           */
+          // K9, kfb, [k7, kfb] to last 10 sts, k to end.
           ops: [
             { work: "k", times: 9 },
-            { work: "k", times: 1 },
-            { work: "m1" },
+            { work: "kfb" },
             {
               repeat: [
                 { work: "k", times: 7 },
-                { work: "k", times: 1 },
-                { work: "m1" },
+                { work: "kfb" },
               ],
               untilRemaining: 10,
             },
