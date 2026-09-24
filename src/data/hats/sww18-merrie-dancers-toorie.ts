@@ -1,4 +1,4 @@
-import { Chart, HatPattern } from "./types";
+import { Chart, HatPattern, Section } from "./types";
 import charts from "./sww18-merrie-dancers-toorie.charts.json";
 
 /**
@@ -34,6 +34,31 @@ const chartsOf = (): Chart[] =>
     rows: chart.rows as Chart["rows"],
   }));
 
+// YW1, pages 2–3: omit chart A rows 6 and 12; the common plain
+// rounds after the increases/decreases apply to both weights.
+const dkSections: Section[] = [
+  { label: "Rib", rounds: [
+    { type: "castOn", count: 108, slot: "A" },
+    { type: "rounds", count: 1, slot: "A", sequence: ["k", "k", "p", "p"] },
+    { type: "chart", chart: "A", rows: [1, 5], repeats: 27 },
+    { type: "chart", chart: "A", rows: [7, 11], repeats: 27 },
+    { type: "shaping", slot: "A", to: 132, ops: [
+      { work: "k", times: 6 }, { work: "kfb" },
+      { repeat: [{ work: "k", times: 3 }, { work: "kfb" }], untilRemaining: 13 },
+      { work: "k", times: 7 }, { work: "kfb" }, { work: "k", times: 5 },
+    ] },
+    { type: "rounds", count: 1, slot: "A" },
+  ] },
+  { label: "Body", rounds: [{ type: "chart", chart: "B", rows: [1, 34], repeats: 11 }] },
+  { label: "Crown", rounds: [
+    { type: "shaping", slot: "A", to: 120, ops: [
+      { repeat: [{ work: "k", times: 9 }, { work: "k2tog" }], times: 12 },
+    ] },
+    { type: "rounds", count: 1, slot: "A" },
+    { type: "chart", chart: "C", rows: [1, 21], repeats: 5 },
+  ] },
+];
+
 const sww18: HatPattern = {
   id: "sww18-merrie-dancers-toorie",
   year: 2018,
@@ -51,12 +76,17 @@ const sww18: HatPattern = {
     "pattern. Its dark background carries colours that remind me of the " +
     "northern lights, or merrie dancers in Shetland dialect, and a familiar " +
     "sight to fishermen.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://www.ravelry.com/patterns/library/merrie-dancers-toorie-2",
   credit: "© Elizabeth Johnston (Shetland Handspun)",
   hashtag: "#merriedancerstoorie",
   slots: ["A", "B", "C", "D", "E"],
 
   sizes: [
+    { id: "yw1", label: "Yarn weight 1 · DK", circumferenceCm: 48.5,
+      lengthCm: 25.9, stitchesPer10cm: 27, roundsPer10cm: 27, needlesMm: 3.5,
+      lengthEstimated: true,
+      measurementNote: "Length estimated from 70 worked rounds at the published tension. The pattern does not specify a head-size measurement.",
+      sections: dkSections },
     {
       // The leaflet gives a circumference and a tension and no length, so the
       // length here is the pattern's own arithmetic: seventy-three rounds at
@@ -64,9 +94,10 @@ const sww18: HatPattern = {
       // fits; a 50cm hat is knitted for about a 54cm one.
       id: "yw2",
       label: "Yarn weight 2",
-      toFitCm: 54,
       circumferenceCm: 50,
       lengthCm: 25,
+      lengthEstimated: true,
+      measurementNote: "Length is an estimate from rounds and tension, not a designer-supplied measurement. The pattern does not specify a head-size measurement.",
       stitchesPer10cm: 29,
       roundsPer10cm: 29,
       needlesMm: 3.5,
@@ -223,5 +254,14 @@ const sww18: HatPattern = {
     },
   ],
 };
+
+// Same named shades, but explicitly DK rather than a fingering-weight purchase.
+const dkColourways = sww18.colourways.filter(c => c.id !== "jamieson-smith").map(c => ({
+  ...c, id: `${c.id}-dk`, sizeIds: ["yw1"], yarn: "DK", wool: undefined,
+  ballMetres: undefined,
+  shades: c.shades.map(s => ({ ...s, wool: undefined, source: "approximate" as const })),
+}));
+sww18.colourways.forEach(c => { c.sizeIds = ["yw2"]; });
+sww18.colourways.push(...dkColourways);
 
 export default sww18;

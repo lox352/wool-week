@@ -39,7 +39,7 @@ const sww21: HatPattern = {
     "Kep honours the people who work the land in Shetland - whose commitment " +
     "to their land and livestock, in all weathers and for generations, is why " +
     "there are Shetland sheep, and wool, and yarn at all.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://www.ravelry.com/patterns/library/da-crofters-kep",
   credit: "© Wilma Malcolmson",
   hashtag: "#dacrofterskep",
   slots: ["A", "B", "C", "D", "E", "F"],

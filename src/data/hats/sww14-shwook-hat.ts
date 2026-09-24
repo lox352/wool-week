@@ -208,6 +208,7 @@ const sww14: HatPattern = {
     },
     {
       id: "size3",
+      measurementNote: "The summary specifies 3.25mm needles; the detailed instructions and tension specify 3.50mm. This companion follows the detailed 3.50mm specification.",
       label: "Size 3",
       toFitCm: 62,
       circumferenceCm: 46,

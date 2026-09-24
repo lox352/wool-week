@@ -22,7 +22,8 @@ const options = () =>
     typeof window === "undefined" ? "" : (window.location.hash.split("?")[1] ?? ""),
   );
 
-const settlingRequested = () => options().get("settle") !== "0";
+// Simulation is an explicit opt-in for settlement scripts, never a phone default.
+const settlingRequested = () => options().get("settle") === "1";
 
 /**
  * "?settled=0" draws the hat where the pattern puts it rather than where it

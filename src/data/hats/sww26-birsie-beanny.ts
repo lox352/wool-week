@@ -215,7 +215,7 @@ const sww26: HatPattern = {
     "from the lace Tree of Life. The slouch is from the hat in Stanley " +
     "Cursiter's The Fair Isle Jumper of 1923, and the optional toosks - " +
     "birsie means hairy - are the tassels on the Gunnister Man's purse.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://payhip.com/b/Zozyp",
   credit: "© Helen Robertson",
   hashtag: "#BirsieBeanny",
   slots: ["A", "B", "C", "D", "E", "F"],
@@ -332,7 +332,9 @@ const sww26: HatPattern = {
         { slot: "D", name: "Moss", hex: "#d1d67c", source: "library",
           wool: "uradale-yarns-2ply-jumper-weight-moss" },
       ],
-      balls: { A: 2, B: 1, C: 1, D: 1 },
+      // Official 2026 errata: Heddery Hills needs two balls of Yarn B.
+      // https://shop.shetlandwoolweek.com/products/birsie-beanny-shetland-wool-week-2026-paper-copy
+      balls: { A: 2, B: 2, C: 1, D: 1 },
     },
     {
       id: "nostalgia",

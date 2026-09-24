@@ -28,6 +28,34 @@ export interface Project {
 }
 
 const prefix = "project-";
+const pending = new Map<string, Project>();
+// The exact persisted value when saving first failed; undefined means unreadable.
+const pendingBase = new Map<string, string | null | undefined>();
+let storageNotice = "";
+export const storageChanged = "projectStorageChanged";
+export const getStorageNotice = () => storageNotice;
+const notice = (message: string) => {
+  storageNotice = message;
+  queueMicrotask(() => window.dispatchEvent(new Event(storageChanged)));
+};
+export const retrySaving = () => {
+  let recovered = false;
+  for (const project of pending.values()) {
+    try {
+      const raw = localStorage.getItem(project.id);
+      const conflict = raw !== pendingBase.get(project.id);
+      const saved = conflict ? { ...project, id: `${prefix}${crypto.randomUUID()}`,
+        name: `Recovered copy${project.name ? `: ${project.name}` : ""}` } : project;
+      localStorage.setItem(saved.id, JSON.stringify(saved));
+      pending.delete(project.id);
+      pendingBase.delete(project.id);
+      recovered ||= conflict;
+    }
+    catch { notice("Progress is not being saved. Keep this tab open and export a backup before leaving."); return; }
+  }
+  notice(recovered ? "Another tab changed this project while saving was unavailable. Your unsaved work was saved as a separate recovered copy in My projects." : "");
+  notifyChanged();
+};
 
 /** Fired after any write, so open views can re-read. */
 export const projectsChanged = "projectsChanged";
@@ -41,16 +69,26 @@ export const storageKeyFor = (id: string) =>
 export const bareIdFor = (id: string) => id.replace(new RegExp(`^${prefix}`), "");
 
 export const notifyChanged = () =>
-  window.dispatchEvent(new CustomEvent(projectsChanged));
+  queueMicrotask(() => window.dispatchEvent(new CustomEvent(projectsChanged)));
 
 const isProject = (value: unknown): value is Project => {
   if (typeof value !== "object" || value === null) return false;
   const candidate = value as Partial<Project>;
+  const validDate = (date: unknown) => date === undefined ||
+    (typeof date === "string" && Number.isFinite(Date.parse(date)));
+  if (!validDate(candidate.startedAt) || !validDate(candidate.updatedAt) ||
+    (candidate.name !== undefined && typeof candidate.name !== "string") ||
+    (candidate.version !== undefined && candidate.version !== currentVersion)) return false;
+  if (candidate.shades !== undefined) {
+    if (!candidate.shades || typeof candidate.shades !== "object" || Array.isArray(candidate.shades)) return false;
+    if (Object.values(candidate.shades).some(shade => !shade || typeof shade !== "object" ||
+      Object.values(shade).some(v => typeof v !== "string"))) return false;
+  }
   return (
     typeof candidate.hatId === "string" &&
     typeof candidate.sizeId === "string" &&
     typeof candidate.colourwayId === "string" &&
-    typeof candidate.progress === "number"
+    typeof candidate.progress === "number" && Number.isSafeInteger(candidate.progress) && candidate.progress >= 0
   );
 };
 
@@ -61,6 +99,7 @@ const isProject = (value: unknown): value is Project => {
  * anything that cannot be understood is reported as missing rather than thrown.
  */
 export const readProject = (id: string): Project | undefined => {
+  if (pending.has(storageKeyFor(id))) return pending.get(storageKeyFor(id));
   try {
     const raw = localStorage.getItem(storageKeyFor(id));
     if (!raw) return undefined;
@@ -83,23 +122,41 @@ export const readProject = (id: string): Project | undefined => {
 };
 
 export const listProjects = (): Project[] => {
-  const out: Project[] = [];
+  const out = new Map(pending);
+  try {
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (!key?.startsWith(prefix)) continue;
     const project = readProject(key);
-    if (project) out.push(project);
+    if (project) out.set(project.id, project);
   }
-  return out.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  } catch { notice("Browser storage is unavailable. Keep this tab open and export a backup before leaving."); }
+  return [...out.values()].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 };
 
 export const writeProject = (project: Project): Project => {
-  const updated = { ...project, version: currentVersion, updatedAt: new Date().toISOString() };
+  const saved = readProject(project.id);
+  if (saved && saved.updatedAt !== project.updatedAt) {
+    notice("This project changed in another tab. The latest saved version has been loaded; check your position before continuing.");
+    return saved;
+  }
+  const updated = { ...project, version: currentVersion, updatedAt: new Date(Math.max(Date.now(), Date.parse(project.updatedAt) + 1)).toISOString() };
+  if (pending.has(updated.id)) {
+    pending.set(updated.id, updated);
+    retrySaving();
+    return readProject(updated.id) ?? updated;
+  }
+  let base: string | null | undefined;
   try {
+    base = localStorage.getItem(updated.id);
     localStorage.setItem(updated.id, JSON.stringify(updated));
+    pending.delete(updated.id);
+    if (pending.size === 0) notice("");
     notifyChanged();
   } catch {
-    // A browser with no room left is not worth interrupting a knitter over.
+    pending.set(updated.id, updated);
+    pendingBase.set(updated.id, base);
+    notice("Progress is not being saved. Keep this tab open and export a backup before leaving.");
   }
   return updated;
 };
@@ -113,7 +170,7 @@ export const startProject = (
 ): Project =>
   writeProject({
     version: currentVersion,
-    id: `${prefix}${Date.now()}`,
+    id: `${prefix}${crypto.randomUUID()}`,
     hatId,
     sizeId,
     colourwayId,
@@ -126,9 +183,11 @@ export const startProject = (
 export const deleteProject = (id: string) => {
   try {
     localStorage.removeItem(storageKeyFor(id));
+    pending.delete(storageKeyFor(id));
+    pendingBase.delete(storageKeyFor(id));
     notifyChanged();
   } catch {
-    // Nothing to do.
+    notice("The project could not be deleted from browser storage. Please try again.");
   }
 };
 

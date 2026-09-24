@@ -42,7 +42,7 @@ const sww22: HatPattern = {
     "anchor, a common motif in Fair Isle knitting, for keeping grounded and " +
     "connected to what matters. The circle at the crown is a spinning wheel, " +
     "a tribute to her mother Ina Irvine, a prolific spinner and knitter.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://www.ravelry.com/patterns/library/bonnie-isle-hat",
   credit: "© Linda Shearer",
   hashtag: "#BonnieIsleHat",
   slots: ["A", "B", "C", "D", "E"],

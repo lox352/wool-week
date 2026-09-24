@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
@@ -9,6 +9,7 @@ import {
   Project as SavedProject,
   knittingParam,
   readProject,
+  projectsChanged,
   writeProject,
 } from "../helpers/projects";
 import PageLayout from "./ui/PageLayout";
@@ -36,59 +37,78 @@ const Project: React.FC = () => {
     projectId ? readProject(projectId) : undefined,
   );
   const [previous, setPrevious] = useState<number>();
+  const currentProject = useRef(project);
+  const adopt = useCallback((next: SavedProject | undefined) => {
+    currentProject.current = next;
+    setProject(next);
+  }, []);
+  const change = useCallback((edit: (current: SavedProject) => SavedProject) => {
+    const current = currentProject.current;
+    if (current) adopt(writeProject(edit(current)));
+  }, [adopt]);
 
   const knitting = params.get(knittingParam) === "1";
   const hat = project ? hatById(project.hatId) : undefined;
 
   useEffect(() => {
-    if (projectId) setProject(readProject(projectId));
-  }, [projectId]);
+    adopt(projectId ? readProject(projectId) : undefined);
+    setPrevious(undefined);
+    const refresh = (event: StorageEvent) => {
+      if (event.key === null || event.key === `project-${projectId}`) {
+        adopt(projectId ? readProject(projectId) : undefined);
+        setPrevious(undefined);
+      }
+    };
+    window.addEventListener("storage", refresh);
+    const refreshLocal = () => {
+      const next = projectId ? readProject(projectId) : undefined;
+      if (next?.updatedAt !== currentProject.current?.updatedAt) setPrevious(undefined);
+      adopt(next);
+    };
+    window.addEventListener(projectsChanged, refreshLocal);
+    return () => {
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener(projectsChanged, refreshLocal);
+    };
+  }, [projectId, adopt]);
 
   const setProgress = useCallback(
     (next: number) => {
-      setProject((current) => {
-        if (!current) return current;
+      change((current) => {
         setPrevious(current.progress);
-        return writeProject({ ...current, progress: Math.max(next, 0) });
+        return { ...current, progress: Math.max(next, 0) };
       });
     },
-    [],
+    [change],
   );
 
   const undo = useCallback(() => {
     if (previous === undefined) return;
-    setProject((current) =>
-      current ? writeProject({ ...current, progress: previous }) : current,
-    );
+    change(current => ({ ...current, progress: previous }));
     setPrevious(undefined);
-  }, [previous]);
+  }, [previous, change]);
 
   const setColourway = useCallback((colourwayId: string) => {
-    setProject((current) =>
-      current ? writeProject({ ...current, colourwayId }) : current,
-    );
-  }, []);
+    change(current => ({ ...current, colourwayId }));
+  }, [change]);
 
   const setShade = useCallback((slots: SlotId[], chosen: Chosen | undefined) => {
-    setProject((current) => {
-      if (!current) return current;
+    change((current) => {
       const shades = { ...current.shades };
       slots.forEach((slot) => {
         if (chosen) shades[slot] = chosen;
         else delete shades[slot];
       });
-      return writeProject({
+      return {
         ...current,
         shades: Object.keys(shades).length > 0 ? shades : undefined,
-      });
+      };
     });
-  }, []);
+  }, [change]);
 
   const restoreShades = useCallback(() => {
-    setProject((current) =>
-      current ? writeProject({ ...current, shades: undefined }) : current,
-    );
-  }, []);
+    change(current => ({ ...current, shades: undefined }));
+  }, [change]);
 
   if (!project || !hat) {
     return (
@@ -150,8 +170,8 @@ const ProjectView: React.FC<{
   const { stitches, rounds, roundHeight, roundLabels, turns, index } =
     useHat(hat, size.id);
 
-  const colourway =
-    hat.colourways.find((c) => c.id === project.colourwayId) ?? hat.colourways[0];
+  const colourways = hat.colourways.filter(c => !c.sizeIds || c.sizeIds.includes(size.id));
+  const colourway = colourways.find((c) => c.id === project.colourwayId) ?? colourways[0];
   const palette = useMemo(
     () => paletteOf(colourway, project.shades, hat.charts),
     [colourway, project.shades, hat.charts],
@@ -230,7 +250,7 @@ const ProjectView: React.FC<{
               at once; a row below changes any of them afterwards.
             */}
             <div className="chooser">
-              {hat.colourways.map((option) => {
+              {colourways.map((option) => {
                 const optionPalette = paletteOf(option, {}, hat.charts);
                 return (
                   <button

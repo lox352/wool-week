@@ -115,6 +115,8 @@ export interface Shade {
 
 export interface Colourway {
   id: string;
+  /** Yarn-weight variants may only be used with these sizes. */
+  sizeIds?: string[];
   /** As the pattern names it, e.g. "Vintage". */
   name: string;
   brand: string;
@@ -151,6 +153,10 @@ export interface Size {
   label: string;
   /** Omitted where the pattern only gives a descriptive head size. */
   toFitCm?: number;
+  toFitRangeCm?: [number, number];
+  measurementNote?: string;
+  lengthEstimated?: boolean;
+  circumferenceEstimated?: boolean;
   circumferenceCm: number;
   /** How the pattern names that circumference when it is not a finished size. */
   circumferenceLabel?: string;

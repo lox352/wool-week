@@ -13,6 +13,7 @@ import {
 } from "./chart-paths";
 
 interface ChartSvgProps {
+  yarnLabels?: Record<string, string>;
   stitches: Stitch[];
   rounds: number[][];
   layout: ChartLayout;
@@ -84,6 +85,7 @@ const Knitting: React.FC<{
 });
 
 const ChartSvg: React.FC<ChartSvgProps> = ({
+  yarnLabels,
   stitches,
   rounds,
   layout,
@@ -129,6 +131,7 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
         cell={cell}
         grid={grid}
       />
+      {yarnLabels && <YarnLabels stitches={stitches} layout={layout} cell={cell} labels={yarnLabels} />}
       {veil && <path d={veil} className="chart-done" />}
       {grid.turn && (
         <path d={grid.turn} className="chart-rule chart-rule-turn">
@@ -151,6 +154,7 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
             x={layout.columns * cell + Math.round(cell * 0.45)}
             y={cellAt(layout, round, 1, cell).y + cell / 2}
             dominantBaseline="middle"
+            style={{ fontSize: Math.max(12, cell * .55) }}
           >
             {round}
           </text>
@@ -161,3 +165,12 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
 };
 
 export default ChartSvg;
+
+const YarnLabels = React.memo(({ stitches, layout, cell, labels }: {
+  stitches: Stitch[]; layout: ChartLayout; cell: number; labels: Record<string, string>;
+}) => <g fill="#000" fontSize="9" aria-hidden="true">{stitches.map(stitch => {
+  const at = layout.cells.get(stitch.id);
+  if (!at) return null;
+  const { x, y } = cellAt(layout, at.round, at.column, cell);
+  return <text key={stitch.id} x={x + 2} y={y + 9}>{labels[stitch.slot]}</text>;
+})}</g>);

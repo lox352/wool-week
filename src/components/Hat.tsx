@@ -102,8 +102,8 @@ const HatPage: React.FC<{
     (window as unknown as { __hatSizeIds?: string[] }).__hatSizeIds =
       hat.sizes.map((candidate) => candidate.id);
   }, [hat]);
-  const colourway =
-    hat.colourways.find((c) => c.id === colourwayId) ?? hat.colourways[0];
+  const colourways = hat.colourways.filter(c => !c.sizeIds || c.sizeIds.includes(size.id));
+  const colourway = colourways.find((c) => c.id === colourwayId) ?? colourways[0];
   const palette = useMemo(
     () => paletteOf(colourway, own, hat.charts),
     [colourway, own, hat],
@@ -185,7 +185,7 @@ const HatPage: React.FC<{
       <section className="section">
         <h2>Colourway</h2>
         <div className="chooser">
-          {hat.colourways.map((option) => {
+          {colourways.map((option) => {
             const optionPalette = paletteOf(option, {}, hat.charts);
             return (
               <button
@@ -261,17 +261,18 @@ const HatPage: React.FC<{
               {option.toFitCm !== undefined && (
                 <span className="quiet">to fit {option.toFitCm}cm</span>
               )}
+              {option.toFitRangeCm && <span className="quiet">to fit {option.toFitRangeCm.join("–")}cm</span>}
             </button>
           ))}
         </div>
         <dl className="measurements">
           <div>
             <dt>{size.circumferenceLabel ?? "Finished circumference"}</dt>
-            <dd>{size.circumferenceCm}cm</dd>
+            <dd>{size.circumferenceCm}cm{size.circumferenceEstimated ? " (estimated)" : ""}</dd>
           </div>
           <div>
             <dt>Length</dt>
-            <dd>{size.lengthCm}cm</dd>
+            <dd>{size.lengthCm}cm{size.lengthEstimated ? " (estimated)" : ""}</dd>
           </div>
           <div>
             <dt>Tension</dt>
@@ -288,6 +289,7 @@ const HatPage: React.FC<{
             </dd>
           </div>
         </dl>
+        {size.measurementNote && <p className="measurement-note">{size.measurementNote}</p>}
         <p className="quiet">
           {hat.sizes.some((option) => option.sections)
             ? "This pattern changes its stitch counts and round sequence by size; " +

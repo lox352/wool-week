@@ -30,7 +30,7 @@ const sww19: HatPattern = {
     "his family croft in Hamnavoe on Burra Isle. Created for Shetland Wool " +
     "Week's tenth year, the beanie was designed and knitted by Sandra " +
     "Manson and charted by Ella Gordon.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://www.ravelry.com/patterns/library/roadside-beanie-2",
   credit: "© Sandra Manson; charted by Ella Gordon; for Oliver Henry",
   hashtag: "#roadsidebeanie",
   slots: ["A", "B", "C", "D", "E", "F", "G"],
@@ -38,6 +38,7 @@ const sww19: HatPattern = {
     id: "one",
     label: "Medium adult",
     circumferenceCm: 58.5,
+    measurementNote: "The leaflet prints 58.5cm, but 168 stitches at its stated 32 sts/10cm imply 52.5cm. Both printed figures are retained; swatch and check fit before starting.",
     lengthCm: 23,
     stitchesPer10cm: 32,
     roundsPer10cm: 28,

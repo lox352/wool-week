@@ -39,3 +39,5 @@ gauge-*.log
 gauge-*.json
 gauge-shots/
 trace.log
+test-results/
+playwright-report/

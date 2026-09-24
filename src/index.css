@@ -15,7 +15,7 @@
   --paper-sunk: #ded9d4;
   --ink: #1f1d1b;
   --ink-soft: #57534e;
-  --ink-faint: #a29a91;
+  --ink-faint: #66605a;
   --crimson: #bb2c43;
   --crimson-dark: #94202f;
   --rule: #cec7c0;
@@ -140,6 +140,8 @@ select {
   outline: 2px solid var(--crimson);
   outline-offset: 2px;
 }
+
+.storage-notice { border: 2px solid var(--crimson); padding: 1rem; margin: 1rem 0; }
 
 @media print {
   .screen-only {

@@ -203,9 +203,13 @@ names a yarn and, where it is not a plain knit, a stitch: `A`, `A/purl`,
   through something that split it into eight hundred streams, one per grid
   line, and no single one of them holds a chart.
 
-Its two sizes are not the same knitting - a DK version over 108 stitches and a
-4ply one over 120, with different chart repeats - and the site builds one hat
-per pattern, so it builds the 4ply. The hat's own file says so.
+Both yarn weights are supported: DK (YW1) casts on 108, omits rib-chart rows
+6 and 12, increases to 132, works eleven body repeats, then decreases to 120.
+4ply (YW2) retains its existing 120 → 144 → 120 sequence. Both finish with
+five crown repeats and ten live stitches. Size-filtered colourways prevent
+offering fingering-weight yarn as the DK materials. DK display colours are
+explicitly approximate, not claimed to be DK catalogue samples. The YW1
+length is estimated from 70 worked rounds at 27 rounds per 10cm.
 
 ### Charts that are pictures
 

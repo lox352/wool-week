@@ -33,7 +33,7 @@ const sww23: HatPattern = {
     "abundance around the Shetland coast and inspired Alison Rendall's " +
     "Shetland Wool Week 2023 hat. She chose the name as part of her practice " +
     "of keeping Shetland words for birds, plants and places in everyday use.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://www.ravelry.com/patterns/library/buggiflooer-beanie",
   credit: "Design and pattern © Alison Rendall 2023",
   hashtag: "#alisonrendall",
   slots: ["A", "B", "C", "D", "E", "F"],

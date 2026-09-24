@@ -17,9 +17,11 @@
  */
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
-import { appendFileSync, writeFileSync, readdirSync } from "node:fs";
+import { appendFileSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+
+import { settlementPlan, manifestPath } from "./settlement-plan.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
@@ -94,27 +96,16 @@ const tuning = {};
  * was never coming. Every chart file is named for exactly one hat, so there is
  * nothing to parse.
  */
-const known = readdirSync(join(root, "src/data/hats"))
-  .filter((name) => name.endsWith(".charts.json"))
-  .map((name) => name.replace(".charts.json", ""))
-  .sort();
-
-// Named on the command line, or all of them. Settling one hat takes a couple
-// of minutes and gives an answer that is very slightly its own each time, so
-// adding a year should be able to leave the years already settled alone.
-const wanted = process.argv.slice(2);
-const missing = wanted.filter((id) => !known.includes(id));
-if (missing.length > 0) {
-  say(`no such hat: ${missing.join(", ")}; this repository has ${known.join(", ")}`);
-  process.exit(1);
-}
-const hatIds = wanted.length > 0 ? wanted : known;
-
-if (hatIds.length === 0) {
-  say("found no hats: src/data/hats holds no *.charts.json");
-  process.exit(1);
-}
-say(`settling ${hatIds.length} hats: ${hatIds.join(", ")}`);
+const plan = await settlementPlan();
+const known = plan.map(target => target.id);
+const requested = process.argv.slice(2).filter(arg => arg !== "--changed");
+const unknown = requested.filter(id => !known.includes(id));
+if (unknown.length) throw new Error(`Unknown hats: ${unknown.join(", ")}`);
+const targets = plan.filter(target => requested.length ? requested.includes(target.id)
+  : !process.argv.includes("--changed") || target.needed);
+if (!targets.length) { say("All hat sizes have current geometry."); process.exit(0); }
+const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, "utf8")) : {};
+say(`settling ${targets.length} hats: ${targets.map(target => target.id).join(", ")}`);
 
 /*
  * Its own preview server, in its own process group.
@@ -167,26 +158,12 @@ const browser = await chromium.launch({
   executablePath: process.env.PLAYWRIGHT_CHROMIUM || undefined,
 });
 
-for (const hatId of hatIds) {
-  /*
-   * Discover the pattern's sizes before settling. One-size hats keep their
-   * historical unsuffixed file. A pattern with several selectable sizes is
-   * settled once per size so different stitch counts or gauges can never
-   * inherit another size's coordinates.
-   */
-  const discovery = await browser.newPage({ viewport: { width: 900, height: 700 } });
-  await discovery.goto(`${base}#/hat/${hatId}?settle=0&settled=0`, {
-    waitUntil: "networkidle",
-  });
-  await discovery.waitForFunction(() => Array.isArray(window.__hatSizeIds), {
-    timeout: firstProgressMs,
-  });
-  const sizeIds = await discovery.evaluate(() => window.__hatSizeIds);
-  await discovery.close();
+for (const target of targets) {
+  const hatId = target.id;
+  const sizeIds = target.sizes;
+  const sizes = sizeIds.length > 1 ? sizeIds : [undefined];
 
-  const targets = sizeIds.length > 1 ? sizeIds : [undefined];
-
-  for (const sizeId of targets) {
+  for (const sizeId of sizes) {
     const label = sizeId ? `${hatId}/${sizeId}` : hatId;
     const page = await browser.newPage({ viewport: { width: 900, height: 700 } });
     page.on("pageerror", (error) => say(`  ${label}: ERROR ${error.message}`));
@@ -261,6 +238,9 @@ for (const hatId of hatIds) {
     );
     await page.close();
   }
+  // Advance only after every size succeeds. An interrupted run stays stale.
+  manifest[hatId] = target.fingerprint;
+  writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
 }
 
 await browser.close();

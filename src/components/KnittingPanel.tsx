@@ -14,6 +14,7 @@ import {
 import { Palette, inkOn, yarnFor } from "../knitting/palette";
 import Button from "./ui/Button";
 import "./KnittingPanel.css";
+import JumpTo from "./JumpTo";
 
 interface KnittingPanelProps {
   stitches: Stitch[];
@@ -137,7 +138,7 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
       const target = event.target as HTMLElement | null;
       if (
         target &&
-        (["INPUT", "BUTTON", "SELECT", "A", "TEXTAREA"].includes(target.tagName) ||
+        (target.closest("input, button, select, a, textarea, summary, dialog, [role=button]") ||
           target.isContentEditable)
       ) {
         return;
@@ -184,6 +185,7 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
           </span>
         </div>
         <div className="knitting-actions">
+          <JumpTo stitches={stitches} index={index} progress={progress} onJump={setProgress} />
           <Button variant="quiet" onClick={onUndo} disabled={!canUndo}>
             Undo
           </Button>
@@ -197,6 +199,10 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
 
   return (
     <div className="knitting-panel">
+      <p className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+        Round {position.round}, stitch {position.stitchInRound}.
+        {run && ` ${runInstruction(run)} in ${yarnFor(palette, run.slot).name}.`}
+      </p>
       <div className="knitting-readout">
         <span className="knitting-figure">
           <em>{position.round}</em>
@@ -245,6 +251,7 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
       </div>
 
       <div className="knitting-actions">
+        <JumpTo stitches={stitches} index={index} progress={progress} onJump={setProgress} />
         <Button variant="quiet" onClick={() => step(-1)} disabled={progress <= 0}>
           Back
         </Button>
