@@ -45,6 +45,13 @@ const sww22: HatPattern = {
   patternUrl: "https://www.ravelry.com/patterns/library/bonnie-isle-hat",
   credit: "© Linda Shearer",
   hashtag: "#BonnieIsleHat",
+  stitchNotes: {
+    sk2p: {
+      note:
+        "Not the centred s2kp most years use: this hat's crown decreases " +
+        "lean rather than standing straight.",
+    },
+  },
   slots: ["A", "B", "C", "D", "E"],
 
   sizes: [

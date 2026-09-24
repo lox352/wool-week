@@ -308,6 +308,7 @@ const HatPage: React.FC<{
           progress={0}
           labels={roundLabels}
           turns={turns}
+          stitchNotes={hat.stitchNotes}
         />
       </section>
     </PageLayout>

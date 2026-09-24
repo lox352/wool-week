@@ -295,6 +295,7 @@ const ProjectView: React.FC<{
           follow={knitting}
           labels={roundLabels}
           turns={turns}
+          stitchNotes={hat.stitchNotes}
         />
         <ul className="chart-key">
           {hat.slots.map((slot) => (

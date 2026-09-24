@@ -6,6 +6,7 @@ import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
 import { StitchLegend, TextRound } from "./ChartHelp";
 import { useSettings } from "../helpers/settings";
+import type { HatPattern } from "../data/hats/types";
 import { maxCell, minCell, usePinchZoom } from "./usePinchZoom";
 import "./Chart.css";
 
@@ -80,6 +81,8 @@ interface ChartProps {
    * opposite faces of the tube, and so the other way about the hat.
    */
   turns?: number[];
+  /** What the pattern says about its stitches, for the symbol key. */
+  stitchNotes?: HatPattern["stitchNotes"];
 }
 
 /**
@@ -105,6 +108,7 @@ const Chart: React.FC<ChartProps> = ({
   follow = false,
   labels,
   turns,
+  stitchNotes,
 }) => {
   const [zoom, setZoom] = useState(16);
   const { highContrast: contrast, writtenRounds } = useSettings();
@@ -331,7 +335,7 @@ const Chart: React.FC<ChartProps> = ({
           )}
         </div>
       </div>
-      <StitchLegend stitches={stitches} />
+      <StitchLegend stitches={stitches} notes={stitchNotes} />
       {writtenRounds && <details className="chart-help" onToggle={e => setShowText(e.currentTarget.open)}>
         <summary>Text round instructions</summary>
         <label>Read round <select value={follow && focusRound ? focusRound : textRound} disabled={follow && !!focusRound} onChange={e => setTextRound(Number(e.target.value))}>

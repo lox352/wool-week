@@ -175,6 +175,30 @@ export interface Size {
   sections?: Section[];
 }
 
+/** An entry in the stitch-symbol key. A KFB's second loop is part of "kfb". */
+export type StitchKeyId =
+  | "k1"
+  | "p1"
+  | "k1tbl"
+  | "kfb"
+  | "m1"
+  | "k2tog"
+  | "k2togtbl"
+  | "s2kp"
+  | "sk2p";
+
+/**
+ * What a pattern says about one of its stitches, for the symbol key.
+ *
+ * `label` and `how` replace the key's own wording where the pattern puts it
+ * differently; `note` is added underneath, for anything peculiar to this hat.
+ */
+export interface StitchNote {
+  label?: string;
+  how?: string;
+  note?: string;
+}
+
 /* -------------------------------------------------------------- the script */
 
 /**
@@ -309,6 +333,8 @@ export interface HatPattern {
    * another.
    */
   tensions?: Record<string, { stitch?: number; round?: number }>;
+  /** Anything the pattern says about its stitches. See StitchNote. */
+  stitchNotes?: Partial<Record<StitchKeyId, StitchNote>>;
 }
 
 /** Stitches a cell consumes from the round below. */
