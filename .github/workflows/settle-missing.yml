@@ -1,11 +1,20 @@
-name: Settle missing hats
+name: Settle missing or changed hats
 
 on:
   push:
     branches:
+      - main
       - claude/shetland-wool-week-tracker-u20lz7
     paths:
-      - "src/data/hats/*.charts.json"
+      - "src/data/hats/**"
+      - "src/knitting/**"
+      - "src/ChainModel/**"
+      - "src/helpers/settling.ts"
+      - "src/types/**"
+      - "src/constants.ts"
+      - "package-lock.json"
+      - "scripts/settle*.mjs"
+      - ".github/workflows/settle-missing.yml"
   workflow_dispatch:
 
 permissions:
@@ -13,7 +22,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: settle-missing
+  group: settle-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -21,74 +30,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Find hats without settled geometry
-        id: missing
-        shell: bash
-        run: |
-          hats="$(node --input-type=module <<'NODE'
-          import { readdirSync } from "node:fs";
-          const charts = readdirSync("src/data/hats")
-            .filter((name) => name.endsWith(".charts.json"))
-            .map((name) => name.replace(".charts.json", ""))
-            .sort();
-          const settled = new Set(
-            readdirSync("src/data/hats/settled")
-              .filter((name) => name.endsWith(".json"))
-              .map((name) => name.replace(".json", "")),
-          );
-          process.stdout.write(charts.filter((id) => !settled.has(id)).join(" "));
-          NODE
-          )"
-          echo "hats=$hats" >> "$GITHUB_OUTPUT"
-          if [ -z "$hats" ]; then
-            echo "Every hat already has settled geometry."
-          else
-            echo "Missing: $hats"
-          fi
-
       - uses: actions/setup-node@v4
-        if: steps.missing.outputs.hats != ''
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci
-        if: steps.missing.outputs.hats != ''
-
-      - name: Build site for settlement
-        if: steps.missing.outputs.hats != ''
-        run: npm run build
-
-      - name: Install Chromium
-        if: steps.missing.outputs.hats != ''
-        run: npx playwright install --with-deps chromium
-
-      - name: Settle missing hats
-        if: steps.missing.outputs.hats != ''
-        run: npm run settle -- ${{ steps.missing.outputs.hats }}
-
+      - name: Check all pattern sizes and source fingerprints
+        id: plan
+        run: |
+          if node scripts/settlement-plan.mjs --check; then
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - run: npm run build
+        if: steps.plan.outputs.needed == 'true'
+      - run: npx playwright install --with-deps chromium
+        if: steps.plan.outputs.needed == 'true'
+      - run: npm run settle -- --changed
+        if: steps.plan.outputs.needed == 'true'
+      - name: Verify every size
+        run: npx vitest run src/data/hats/settled/settled.test.ts
       - name: Commit settled positions
         id: commit
-        if: steps.missing.outputs.hats != ''
-        shell: bash
+        if: steps.plan.outputs.needed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/data/hats/settled/*.json
+          git add src/data/hats/settled/*.json scripts/settlement-manifest.json
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "No settled geometry changed."
             exit 0
           fi
-          git commit -m "Settle missing hats"
+          git commit -m "Refresh settled geometry for changed patterns and sizes"
           git push
           echo "changed=true" >> "$GITHUB_OUTPUT"
-
-      # A push made with GITHUB_TOKEN does not trigger another workflow.
-      # Explicitly dispatch the normal Pages workflow against the new branch
-      # head so the just-committed settled file is what gets published.
-      - name: Deploy the settled source
+      - name: Deploy refreshed source
         if: steps.commit.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
