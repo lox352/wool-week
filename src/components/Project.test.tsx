@@ -8,7 +8,7 @@ vi.mock("./HatModel", () => ({ default: () => null }));
 vi.mock("../knitting/Chart", () => ({ default: () => null }));
 afterEach(() => { localStorage.clear(); window.location.hash = ""; vi.restoreAllMocks(); });
 
-it("saves once per action under StrictMode and preserves undo", async () => {
+it("saves once per action under StrictMode and undoes more than one step", async () => {
   const project = startProject("sww18-merrie-dancers-toorie", "yw2", "jamieson-smith");
   window.location.hash = `#/project/${bareIdFor(project.id)}?knitting=1`;
   const host = document.createElement("div");
@@ -16,7 +16,7 @@ it("saves once per action under StrictMode and preserves undo", async () => {
   const root = createRoot(host);
   const saves = vi.spyOn(Storage.prototype, "setItem");
   const click = async (label: string) => {
-    const button = [...host.querySelectorAll("button")].find(b => b.textContent === label);
+    const button = [...host.querySelectorAll("button")].find(b => b.textContent?.trim() === label);
     expect(button, label).toBeDefined();
     await act(async () => button!.click());
   };
@@ -27,12 +27,17 @@ it("saves once per action under StrictMode and preserves undo", async () => {
     await act(async () => summary.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true })));
     expect(saves).not.toHaveBeenCalled();
     summary.remove();
-    await click("One stitch");
+    await click("End of round");
     expect(saves).toHaveBeenCalledTimes(1);
-    expect(readProject(project.id)?.progress).toBe(1);
+    expect(readProject(project.id)?.progress).toBe(120);
     expect(getStorageNotice()).toBe("");
-    await click("Undo");
+    await click("End of round");
     expect(saves).toHaveBeenCalledTimes(2);
+    expect(readProject(project.id)?.progress).toBe(240);
+    await click("Undo");
+    expect(saves).toHaveBeenCalledTimes(3);
+    expect(readProject(project.id)?.progress).toBe(120);
+    await click("Undo");
     expect(readProject(project.id)?.progress).toBe(0);
   } finally { await act(async () => root.unmount()); host.remove(); }
 });

@@ -14,7 +14,6 @@ import {
 import { Palette, inkOn, yarnFor } from "../knitting/palette";
 import Button from "./ui/Button";
 import "./KnittingPanel.css";
-import JumpTo from "./JumpTo";
 
 interface KnittingPanelProps {
   stitches: Stitch[];
@@ -70,6 +69,25 @@ const Turn: React.FC<{ opening: boolean }> = ({ opening }) => (
   </div>
 );
 
+const UndoButton: React.FC<{ onUndo: () => void; canUndo: boolean }> = ({
+  onUndo,
+  canUndo,
+}) => (
+  <Button variant="quiet" className="knitting-undo" onClick={onUndo} disabled={!canUndo}>
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M5.5 3.5L2.5 6.5l3 3M2.5 6.5h7a4 4 0 0 1 0 8H7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+    Undo
+  </Button>
+);
+
 /**
  * The view you use while actually knitting.
  *
@@ -83,8 +101,11 @@ const Turn: React.FC<{ opening: boolean }> = ({ opening }) => (
  * whole round of twisted rib. That makes runs short in a rib, which is what a
  * rib is; "End of round" is there for when you do not want telling twice.
  *
- * The two big buttons are the two things you actually do: work one more
- * stitch, or work to the end of the run in front of you.
+ * The big button is the thing you actually do: work to the end of the run in
+ * front of you. "End of round" is beside it for when you would rather not be
+ * told twice, and Undo steps back through anything tapped by mistake. To go
+ * anywhere else, tap the stitch on the chart. A single stitch forward or back
+ * is still on the arrow keys, for anyone with a keyboard to hand.
  */
 const KnittingPanel: React.FC<KnittingPanelProps> = ({
   stitches,
@@ -184,11 +205,8 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
             up the crown.
           </span>
         </div>
-        <div className="knitting-actions">
-          <JumpTo stitches={stitches} index={index} progress={progress} onJump={setProgress} />
-          <Button variant="quiet" onClick={onUndo} disabled={!canUndo}>
-            Undo
-          </Button>
+        <div className="knitting-done-actions">
+          <UndoButton onUndo={onUndo} canUndo={canUndo} />
           <Button variant="primary" onClick={onStop}>
             Done
           </Button>
@@ -199,6 +217,17 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
 
   return (
     <div className="knitting-panel">
+      <button
+        type="button"
+        className="knitting-close"
+        onClick={onStop}
+        aria-label="Stop knitting"
+        title="Stop knitting"
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      </button>
       <p className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
         Round {position.round}, stitch {position.stitchInRound}.
         {run && ` ${runInstruction(run)} in ${yarnFor(palette, run.slot).name}.`}
@@ -251,26 +280,14 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
       </div>
 
       <div className="knitting-actions">
-        <JumpTo stitches={stitches} index={index} progress={progress} onJump={setProgress} />
-        <Button variant="quiet" onClick={() => step(-1)} disabled={progress <= 0}>
-          Back
+        <UndoButton onUndo={onUndo} canUndo={canUndo} />
+        <Button variant="secondary" className="knitting-round" onClick={finishRound}>
+          End of round
         </Button>
-        <Button variant="quiet" onClick={onUndo} disabled={!canUndo}>
-          Undo
-        </Button>
-        <Button variant="secondary" size="lg" onClick={() => step(1)}>
-          One stitch
-        </Button>
-        <Button variant="primary" size="lg" onClick={finishRun}>
+        <Button variant="primary" size="lg" className="knitting-go" onClick={finishRun}>
           {run
             ? `${runInstruction(run)} in ${yarnFor(palette, run.slot).name}`
             : "Work on"}
-        </Button>
-        <Button variant="quiet" onClick={finishRound}>
-          End of round
-        </Button>
-        <Button variant="quiet" onClick={onStop}>
-          Stop
         </Button>
       </div>
     </div>

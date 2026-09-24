@@ -36,6 +36,14 @@ const sww23: HatPattern = {
   patternUrl: "https://www.ravelry.com/patterns/library/buggiflooer-beanie",
   credit: "Design and pattern © Alison Rendall 2023",
   hashtag: "#alisonrendall",
+  stitchNotes: {
+    k2togtbl: {
+      note:
+        "Used only in the last round. First move the first stitch of the " +
+        "round, unworked, to the end of the round before, then work k2tog tbl " +
+        "all the way round.",
+    },
+  },
   slots: ["A", "B", "C", "D", "E", "F"],
 
   sizes: [

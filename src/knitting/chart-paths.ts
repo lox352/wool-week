@@ -1,8 +1,7 @@
 import { Stitch } from "../types/Stitch";
-import { StitchType } from "../types/StitchType";
 import { Cell, ChartLayout } from "./layout";
 import { Palette, inkOn, yarnFor } from "./palette";
-import { markFor } from "../helpers/stitch-marks";
+import { markAt } from "./chart-marks";
 
 /**
  * The chart as paths.
@@ -270,9 +269,10 @@ export const markPaths = (
   cell: number,
 ): { ink: string; strokes: string; dots: string }[] => {
   const groups = new Map<string, { strokes: string[]; dots: string[] }>();
+  const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
 
   for (const stitch of stitches) {
-    const mark = markFor(stitch.type as StitchType);
+    const mark = markAt(stitch, byId, layout);
     if (!mark) continue;
     const at = layout.cells.get(stitch.id);
     if (!at) continue;

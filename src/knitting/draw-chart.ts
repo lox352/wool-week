@@ -1,7 +1,7 @@
 import { Stitch } from "../types/Stitch";
 import { ChartLayout } from "./layout";
 import { Palette, inkOn, yarnFor } from "./palette";
-import { markFor } from "../helpers/stitch-marks";
+import { markAt } from "./chart-marks";
 
 /**
  * Drawing the chart.
@@ -110,6 +110,7 @@ export const drawChart = (
   const filled = new Set<string>();
   layout.cells.forEach((at) => filled.add(key(at.round, at.column)));
 
+  const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
   ctx.lineWidth = 1;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
@@ -162,7 +163,7 @@ export const drawChart = (
       ctx.stroke();
     }
 
-    const mark = markFor(stitch.type);
+    const mark = markAt(stitch, byId, layout);
     if (!mark) continue;
     const ink = inkOn(yarn.hex);
     if (mark.dot) {

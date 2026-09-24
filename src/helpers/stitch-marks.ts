@@ -88,18 +88,45 @@ const marks: Partial<Record<StitchType, Mark>> = {
       ],
     ],
   },
-  // An increase makes a stitch out of nothing: the bar it is made from.
+  /*
+   * A make-one, picked up from the strand between two stitches: the strand
+   * along the foot of the cell, and the new stitch lifted up out of it. It
+   * sits over the gap between those two stitches, with nothing under it.
+   */
   m1: {
     strokes: [
       [
-        [near, mid],
-        [far, mid],
+        [near, far],
+        [far, far],
+      ],
+      [
+        [mid, far],
+        [mid, near],
       ],
     ],
   },
 };
 
 export const markFor = (type: StitchType): Mark | undefined => marks[type];
+
+/**
+ * One stitch becoming two, drawn across both: a V opening from over the
+ * stitch below to the middle of each stitch it becomes - the double
+ * decrease's chevron, the other way up.
+ *
+ * Points are in the unit cell of the stitch that does the work, so `from` and
+ * `to` are cell centres measured from its left edge - 0.5 is its own middle
+ * and -0.5 the middle of the cell to its left. Where the point of the V
+ * stands is what says which way the increase leans: under the working stitch
+ * when the new one is made beside it, as a KFB's is, so one arm stands
+ * straight up; or between the two when neither keeps the column.
+ */
+export const forkMark = (from: number, to: number[]): Mark => ({
+  strokes: to.map((x) => [
+    [from, far],
+    [x, near],
+  ]),
+});
 
 export const markLabels: Partial<Record<StitchType, string>> = {
   p1: "purl",
@@ -109,4 +136,5 @@ export const markLabels: Partial<Record<StitchType, string>> = {
   s2kp: "slip 2, knit 1, pass slipped stitches over",
   sk2p: "slip 1, knit 2 together, pass slipped stitch over",
   m1: "make one",
+  kfb: "knit front and back",
 };

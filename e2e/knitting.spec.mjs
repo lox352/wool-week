@@ -3,10 +3,14 @@ import { readFile } from "node:fs/promises";
 
 const pattern = "#/hat/sww18-merrie-dancers-toorie";
 const position = page => page.locator(".knitting-panel [role=status]");
+async function openSettings(page) {
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  return page.getByRole("dialog", { name: "Settings", exact: true });
+}
 async function start(page) {
   await page.goto(pattern);
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
-  await expect(page.getByRole("button", { name: "One stitch", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "End of round", exact: true })).toBeVisible();
 }
 
 test("all patterns remain usable without WebGL; default visits never request live physics", async ({ page }) => {
@@ -35,8 +39,14 @@ test("DK selection, accessible chart controls and text instructions", async ({ p
   await page.goto(pattern);
   await page.getByRole("button", { name: "Yarn weight 1 · DK", exact: true }).click();
   await expect(page.getByRole("button", { name: "Yarn weight 1 · DK", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await page.getByLabel("Chart zoom").selectOption("30");
-  await page.getByLabel("High contrast with numbered yarns").check();
+  const sheetWidth = () => page.locator(".chart-sheets").evaluate(node => node.offsetWidth);
+  const unzoomed = await sheetWidth();
+  await page.getByRole("region", { name: /Scrollable knitting chart/ }).press("+");
+  await expect.poll(sheetWidth).toBeGreaterThan(unzoomed);
+  const settings = await openSettings(page);
+  await settings.getByRole("switch", { name: "High contrast chart" }).check();
+  await settings.getByRole("switch", { name: "Written round instructions" }).check();
+  await page.getByRole("button", { name: "Done", exact: true }).click();
   await expect(page.locator(".chart-yarn-numbers li")).not.toHaveCount(0);
   await page.getByText("Text round instructions", { exact: true }).click();
   await expect(page.getByText(/Cast on 108 stitches/)).toBeVisible();
@@ -45,40 +55,62 @@ test("DK selection, accessible chart controls and text instructions", async ({ p
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 });
 
-test("progress survives reload, undo and confirmed jumps; a second tab stays in sync", async ({ page, context }) => {
+test("progress survives reload and undo; a second tab stays in sync", async ({ page, context }) => {
   await start(page);
   const original = await position(page).textContent();
-  await page.getByRole("button", { name: "One stitch", exact: true }).click();
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
   const advanced = await position(page).textContent();
   expect(advanced).not.toBe(original);
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect(position(page)).toHaveText(advanced);
   await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect(position(page)).toHaveText(original);
-  await page.getByRole("button", { name: "One stitch", exact: true }).click();
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
   await page.reload();
   await expect(position(page)).toHaveText(advanced);
   const other = await context.newPage();
   await other.goto(page.url());
-  await page.getByRole("button", { name: "Go to round/stitch", exact: true }).click();
-  await page.getByRole("dialog").getByRole("combobox", { name: "Round", exact: true }).selectOption("3");
-  await page.getByLabel("Next stitch", { exact: true }).fill("4");
-  await page.getByRole("button", { name: "Confirm position", exact: true }).click();
-  await expect(position(page)).toContainText("Round 3, stitch 4.");
-  await expect(position(other)).toContainText("Round 3, stitch 4.");
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
+  const further = await position(page).textContent();
+  await expect(position(other)).toHaveText(further);
   await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect(position(other)).toHaveText(advanced);
+});
+
+test("tapping a stitch on the chart carries on from it, and can be undone", async ({ page }) => {
+  await start(page);
+  const original = await position(page).textContent();
+  // Round 20, the fourth stitch from the right-hand edge.
+  await page.locator(".chart-sheets").evaluate(sheet => {
+    const cell = 16;
+    const box = sheet.getBoundingClientRect();
+    const columns = Math.round((box.width - Math.round(cell * 2.2)) / cell);
+    sheet.dispatchEvent(new MouseEvent("click", { bubbles: true,
+      clientX: box.left + (columns - 3.5) * cell, clientY: box.bottom - 19.5 * cell }));
+  });
+  const picker = page.getByRole("dialog", { name: "Round 20, stitch 4" });
+  await expect(picker).toBeVisible();
+  await picker.getByRole("button", { name: "Knit up to here" }).click();
+  await expect(position(page)).toContainText("Round 20, stitch 4.");
+  await expect(picker).toBeHidden();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect(position(page)).toHaveText(original);
 });
 
 test("backup restores copies and rename/delete require their dialogs", async ({ page }) => {
   await start(page);
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Export project backup", exact: true }).click();
+  await (await openSettings(page)).getByRole("button", { name: "Save", exact: true }).click();
   const download = await downloadPromise;
   const buffer = await readFile(await download.path());
   expect(JSON.parse(buffer.toString()).projects).toHaveLength(1);
+  await page.getByRole("button", { name: "Done", exact: true }).click();
   await page.getByRole("link", { name: "Wool Week Toories", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Wool Week Toories", level: 1, exact: true })).toBeVisible();
-  await page.getByLabel("Import project backup").setInputFiles({ name: "backup.json", mimeType: "application/json", buffer });
+  await (await openSettings(page)).getByLabel("Import project backup").setInputFiles({ name: "backup.json", mimeType: "application/json", buffer });
   await page.getByRole("button", { name: "Restore copies", exact: true }).click();
+  await page.getByRole("button", { name: "Done", exact: true }).click();
   await expect(page.getByRole("button", { name: "Rename", exact: true })).toHaveCount(2);
   await page.getByRole("button", { name: "Rename", exact: true }).first().click();
   await page.getByRole("textbox", { name: "Name this project" }).fill("Regression test hat");
@@ -94,7 +126,7 @@ test("quota failures preserve progress and offer a recovery export", async ({ pa
     Storage.prototype.setItem = () => { throw new DOMException("Storage full", "QuotaExceededError"); };
   });
   await start(page);
-  await page.getByRole("button", { name: "One stitch", exact: true }).click();
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("Progress is not being saved");
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export recovery backup", exact: true }).click();
@@ -108,7 +140,7 @@ test("a prepared project reloads and saves progress offline", async ({ page, con
   await expect(page.getByText(/Ready for offline knitting/)).toBeVisible({ timeout: 45_000 });
   await context.setOffline(true);
   await page.reload();
-  await page.getByRole("button", { name: "One stitch", exact: true }).click();
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
   const progress = await position(page).textContent();
   await page.reload();
   await expect(position(page)).toHaveText(progress);

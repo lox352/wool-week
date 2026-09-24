@@ -75,11 +75,78 @@
   transition: width 0.2s ease;
 }
 
+/*
+ * The run in front of you is the one big button, at the bottom where a thumb
+ * lands; "End of round" and Undo sit above it on a phone and beside it on
+ * anything wider.
+ */
 .knitting-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    "undo . round"
+    "go go go";
+  gap: 0.6rem 0.75rem;
   align-items: center;
+}
+
+.knitting-undo {
+  grid-area: undo;
+  gap: 0.35rem;
+}
+
+.knitting-round {
+  grid-area: round;
+}
+
+.knitting-go {
+  grid-area: go;
+  white-space: normal;
+  text-align: center;
+}
+
+@media (min-width: 621px) {
+  .knitting-actions {
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas: "undo round go";
+    gap: 0.75rem 1.25rem;
+  }
+  .knitting-go {
+    justify-self: end;
+    min-width: 18rem;
+  }
+}
+
+/* Stop: out of the way in the corner, where closing a sheet usually is. */
+.knitting-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.knitting-close:hover {
+  background: var(--paper-sunk);
+  color: var(--ink);
+}
+
+.knitting-readout {
+  padding-right: 2.75rem;
+}
+
+.knitting-done-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .knitting-panel-done {
@@ -104,9 +171,6 @@
 @media (max-width: 620px) {
   .knitting-figure em {
     font-size: 1.7rem;
-  }
-  .knitting-actions .btn {
-    flex: 1 1 auto;
   }
 }
 

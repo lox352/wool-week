@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./PageLayout.css";
 import StorageNotice from "../StorageNotice";
-import ProjectBackup from "../ProjectBackup";
+import Settings from "../Settings";
 import OfflineStatus from "../OfflineStatus";
 
 interface PageLayoutProps {
@@ -35,7 +35,10 @@ const PageLayout: React.FC<PageLayoutProps> = ({
       <Link to="/" className="masthead-title">
         Wool Week Toories
       </Link>
-      {aside}
+      <div className="masthead-actions">
+        {aside}
+        <Settings />
+      </div>
     </header>
     <StorageNotice />
     {eyebrow && <p className="eyebrow screen-only">{eyebrow}</p>}
@@ -43,7 +46,6 @@ const PageLayout: React.FC<PageLayoutProps> = ({
     {lede && <p className="lede screen-only">{lede}</p>}
     {children}
     <footer className="colophon screen-only">
-      <ProjectBackup />
       <OfflineStatus />
       <p>
         An unofficial companion for knitters who have bought these patterns.
@@ -55,7 +57,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
       </p>
       <p className="quiet">
         Your projects are kept in this browser, on this device. Nothing is sent
-        anywhere.
+        anywhere. To move them or keep a copy, save a backup from Settings.
       </p>
     </footer>
   </div>

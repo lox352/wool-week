@@ -178,6 +178,14 @@ const sww14: HatPattern = {
     "designed by Hazel Tindall for Shetland Wool Week 2014.",
   patternUrl: "https://www.hazeltindall.com",
   credit: "Shwook hat © Hazel Tindall, 2014",
+  stitchNotes: {
+    kfb: {
+      note:
+        "The leaflet's written rounds call these increases \u201cm1\u201d, " +
+        "but it defines every increase as knitting into the front and back " +
+        "of the stitch.",
+    },
+  },
   slots: ["A", "B", "C", "D", "E"],
 
   sizes: [

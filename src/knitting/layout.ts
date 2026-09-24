@@ -28,37 +28,61 @@ const worksInto = (stitch: Stitch): number[] =>
   stitch.links.slice(0, consumption[stitch.type]);
 
 /**
- * The middle of these columns, counted by stitch rather than by distance.
+ * Which of a family's columns the other side of it lines up with.
  *
- * With three stitches that is the middle one's column exactly, and with two
- * it is the half column between them. Which is not the same as averaging
- * their positions, and the difference is the whole of why a crown's decrease
- * line runs straight: the stitches a decrease takes together stop being
- * evenly spaced the moment the crown has opened a wedge beside them, so
- * their average creeps a fraction of a column towards the wider side every
- * round, and sixteen rounds of that is a decrease line you can see bending.
- * Counting to the middle instead ignores how wide the gaps either side have
- * grown, so a centred double decrease inherits the column of the stitch
- * below it exactly, round after round, and never moves.
+ * "middle" is a symmetric stitch: a centred double decrease stands on the
+ * middle of its three, and a stitch that becomes two straddles it. The other
+ * two are the leaning ones, named by where on the chart they sit, which reads
+ * right to left from column 1: a right-leaning k2tog stands on the right-hand
+ * (lower) of its two columns and leaves a gap on its left, and a KFB keeps
+ * its own column and puts the new stitch in a gap to its left.
  */
-const middleOf = (columns: number[], width: number): number => {
-  /*
-   * A chart is a cylinder cut open, and one family a round straddles the cut:
-   * a centred decrease worked as a round's first stitch takes the last stitch
-   * of the round below with it, which is the stitch to its right and is drawn
-   * at the far left. Left as it lies it drags the middle right across the
-   * chart. So anything more than half a chart away from the nearest of them
-   * has come round the seam, and belongs just off the other end.
-   */
+export type Lean = "right" | "middle" | "left";
+
+/**
+ * A family's columns in order across the chart, right to left.
+ *
+ * A chart is a cylinder cut open, and one family a round straddles the cut:
+ * a centred decrease worked as a round's first stitch takes the last stitch
+ * of the round below with it, which is the stitch to its right and is drawn
+ * at the far left. Left as it lies it drags the family right across the
+ * chart. So anything more than half a chart away from the nearest of them
+ * has come round the seam, and belongs just off the other end.
+ */
+const unwrapped = (columns: number[], width: number): number[] => {
   const near = Math.min(...columns);
-  const laid = columns.map((at) => (at - near > width / 2 ? at - width : at));
-  const sorted = laid.sort((a, b) => a - b);
+  return columns
+    .map((at) => (at - near > width / 2 ? at - width : at))
+    .sort((a, b) => a - b);
+};
+
+/**
+ * The column of these that a family lines up with, counted by stitch rather
+ * than by distance.
+ *
+ * For "middle" that is the middle one of three exactly, and with two the half
+ * column between them. Which is not the same as averaging their positions,
+ * and the difference is the whole of why a crown's decrease line runs
+ * straight: the stitches a decrease takes together stop being evenly spaced
+ * the moment the crown has opened a wedge beside them, so their average
+ * creeps a fraction of a column towards the wider side every round, and
+ * sixteen rounds of that is a decrease line you can see bending. Counting
+ * instead ignores how wide the gaps either side have grown, so a decrease
+ * inherits the column of the stitch below it exactly, round after round, and
+ * never moves.
+ */
+const pick = (columns: number[], width: number, lean: Lean): number => {
+  const sorted = unwrapped(columns, width);
   const half = Math.floor(sorted.length / 2);
-  const middle =
-    sorted.length % 2 === 1
-      ? sorted[half]
-      : (sorted[half - 1] + sorted[half]) / 2;
-  return middle < 1 ? middle + width : middle;
+  const at =
+    lean === "right"
+      ? sorted[0]
+      : lean === "left"
+        ? sorted[sorted.length - 1]
+        : sorted.length % 2 === 1
+          ? sorted[half]
+          : (sorted[half - 1] + sorted[half]) / 2;
+  return at < 1 ? at + width : at;
 };
 
 /**
@@ -75,7 +99,50 @@ interface Family {
   above: number[];
 }
 
-const familiesOf = (above: number[], byId: Map<number, Stitch>): Family[] => {
+/**
+ * Whether a make-one is the second loop of the KFB worked just before it,
+ * rather than a stitch picked up on its own between two others.
+ */
+export const isSecondLoop = (stitch: Stitch, byId: Map<number, Stitch>): boolean =>
+  stitch.type === "m1" && byId.get(stitch.id - 1)?.type === "kfb";
+
+/**
+ * How a family lines up with the round below.
+ *
+ * Decreases by the way they lean. An increase by what made it: a KFB keeps
+ * its stitch over the one it was worked into and puts the new one beside it,
+ * to its left; anything else that makes two of one - a make-one only ever
+ * joins a family when there is nowhere else to put it - straddles it.
+ */
+const leanOf = (family: Family, byId: Map<number, Stitch>): Lean => {
+  if (family.above.length > 1) {
+    return family.above.some((id) => byId.get(id)?.type === "kfb")
+      ? "right"
+      : "middle";
+  }
+  switch (byId.get(family.above[0])?.type) {
+    case "k2tog":
+      return "right";
+    case "k2togtbl":
+    case "sk2p":
+      return "left";
+    default:
+      return "middle";
+  }
+};
+
+const familiesOf = (
+  above: number[],
+  byId: Map<number, Stitch>,
+  /**
+   * Leave a make-one picked up between two stitches out of any family, so it
+   * keeps whatever column the round above gave it and the round below simply
+   * has no stitch under it. Only possible working down from the widest round;
+   * working up there is no column for it yet, and it straddles the stitch
+   * before it instead.
+   */
+  standalone = false,
+): Family[] => {
   const families: Family[] = [];
   /** Increases seen before any stitch that has something below it. */
   let orphans: number[] = [];
@@ -85,6 +152,7 @@ const familiesOf = (above: number[], byId: Map<number, Stitch>): Family[] => {
     if (!stitch) continue;
     const below = worksInto(stitch);
     if (below.length === 0) {
+      if (standalone && !isSecondLoop(stitch, byId)) continue;
       const last = families[families.length - 1];
       if (last) last.above.push(id);
       else orphans.push(id);
@@ -101,20 +169,27 @@ const familiesOf = (above: number[], byId: Map<number, Stitch>): Family[] => {
 };
 
 /**
- * Space a family's stitches out across the middle of the ones they answer to.
+ * Lay out one side of a family against a column on the other side of it.
  *
- * One stitch worked into three lands on the middle of the three; three
- * stitches worked into one straddle it, a column and a half either side. It
- * is the same rule read in either direction, which is what makes a decrease
- * and an increase mirror images of each other on the chart rather than two
- * separate special cases.
+ * Its stitches go in a row, one column apart, with the one at `anchor` on
+ * the column: a symmetric family is centred on it, a k2tog's right-hand
+ * stitch below it stands under it, and a KFB's own stitch above it stands
+ * over it with the new stitch in the gap beside. It is the same rule read in
+ * either direction, which is what makes a decrease and an increase mirror
+ * images of each other on the chart rather than two separate special cases.
  */
-const centre = (ids: number[], on: number, column: Map<number, number>) => {
+const place = (
+  ids: number[],
+  on: number,
+  lean: Lean,
+  column: Map<number, number>,
+) => {
+  const anchor =
+    lean === "right" ? 0 : lean === "left" ? ids.length - 1 : (ids.length - 1) / 2;
   ids.forEach((id, index) => {
-    column.set(id, on + index - (ids.length - 1) / 2);
+    column.set(id, on + index - anchor);
   });
 };
-
 
 const columnsOf = (ids: number[], column: Map<number, number>): number[] =>
   ids.map((id) => column.get(id)).filter((at): at is number => at !== undefined);
@@ -122,12 +197,14 @@ const columnsOf = (ids: number[], column: Map<number, number>): number[] =>
 /**
  * Lay the tube out flat as a chart.
  *
- * Every stitch sits over the middle of the stitches it was worked into, and
- * under the middle of the stitches worked into it. A plain knit inherits its
- * column exactly, so the colourwork stacks up in true vertical columns; a
- * centred double decrease sits on the middle of the three it took together,
- * and a k2tog on the half column between its two. Read the other way, a
- * stitch that becomes two sits half a column in from each of them. The columns a decrease gave up are simply left empty,
+ * Every stitch sits over the stitches it was worked into, and under the
+ * stitches worked into it. A plain knit inherits its column exactly, so the
+ * colourwork stacks up in true vertical columns; a centred double decrease
+ * sits on the middle of the three it took together, and a leaning one on the
+ * stitch it leans onto - a k2tog on the right of its two, a k2tog tbl on the
+ * left. Read the other way, a KFB keeps its column and the stitch it makes
+ * sits beside it, and a make-one picked up between two stitches sits over
+ * the gap between them. The columns a decrease gave up are simply left empty,
  * which is what draws the crown as the wedges of absent fabric a printed
  * crown chart shows, and the columns an increase has yet to fill are left
  * empty too, so the rib shows where every new stitch is about to come in.
@@ -156,19 +233,21 @@ export const layOut = (stitches: Stitch[], rounds: number[][]): ChartLayout => {
     rounds[anchor].forEach((id, index) => column.set(id, index + 1));
   }
 
-  // Upwards from the anchor: over the middle of what it was worked into.
+  // Upwards from the anchor: over what it was worked into.
   for (let index = anchor + 1; index < rounds.length; index++) {
     for (const family of familiesOf(rounds[index], byId)) {
       const below = columnsOf(family.below, column);
-      if (below.length > 0) centre(family.above, middleOf(below, widest), column);
+      const lean = leanOf(family, byId);
+      if (below.length > 0) place(family.above, pick(below, widest, lean), lean, column);
     }
   }
 
-  // And downwards: under the middle of whatever was worked into it.
+  // And downwards: under whatever was worked into it.
   for (let index = anchor - 1; index >= 0; index--) {
-    for (const family of familiesOf(rounds[index + 1], byId)) {
+    for (const family of familiesOf(rounds[index + 1], byId, true)) {
       const above = columnsOf(family.above, column);
-      if (above.length > 0) centre(family.below, middleOf(above, widest), column);
+      const lean = leanOf(family, byId);
+      if (above.length > 0) place(family.below, pick(above, widest, lean), lean, column);
     }
   }
 
