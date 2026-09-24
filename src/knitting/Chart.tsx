@@ -106,7 +106,7 @@ const Chart: React.FC<ChartProps> = ({
   turns,
 }) => {
   const [zoom, setZoom] = useState(16);
-  const { highContrast: contrast } = useSettings();
+  const { highContrast: contrast, writtenRounds } = useSettings();
   const [textRound, setTextRound] = useState(1);
   const [showText, setShowText] = useState(false);
   const cellSize = contrast ? Math.max(28, zoom) : zoom;
@@ -319,13 +319,13 @@ const Chart: React.FC<ChartProps> = ({
         </div>
       </div>
       <StitchLegend stitches={stitches} />
-      <details className="chart-help" onToggle={e => setShowText(e.currentTarget.open)}>
+      {writtenRounds && <details className="chart-help" onToggle={e => setShowText(e.currentTarget.open)}>
         <summary>Text round instructions</summary>
         <label>Read round <select value={follow && focusRound ? focusRound : textRound} disabled={follow && !!focusRound} onChange={e => setTextRound(Number(e.target.value))}>
           {rounds.map((_, i) => <option key={i} value={i + 1}>{i + 1} · {labels?.[i]}</option>)}
         </select></label>
         {showText && <TextRound stitches={stitches} rounds={rounds} round={follow && focusRound ? focusRound : textRound} labels={labels} palette={palette} />}
-      </details>
+      </details>}
       <p className="chart-caption">
         {layout.columns} stitches at its widest, {layout.rounds} rounds. Read
         from the bottom right, working right to left; scroll sideways to see a

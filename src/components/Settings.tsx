@@ -56,6 +56,16 @@ const ChartSettings: React.FC = () => {
             onChange={(highContrast) => updateSettings({ highContrast })}
           />
         </SettingRow>
+        <SettingRow
+          title="Written instructions"
+          detail="Offer the chart as words too, a round at a time, below the chart."
+        >
+          <Toggle
+            label="Written round instructions"
+            checked={settings.writtenRounds}
+            onChange={(writtenRounds) => updateSettings({ writtenRounds })}
+          />
+        </SettingRow>
       </ul>
     </section>
   );

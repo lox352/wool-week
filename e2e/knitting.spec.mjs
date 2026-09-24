@@ -40,7 +40,9 @@ test("DK selection, accessible chart controls and text instructions", async ({ p
   await page.getByRole("button", { name: "Yarn weight 1 · DK", exact: true }).click();
   await expect(page.getByRole("button", { name: "Yarn weight 1 · DK", exact: true })).toHaveAttribute("aria-pressed", "true");
   await page.getByLabel("Chart zoom").selectOption("30");
-  await (await openSettings(page)).getByRole("switch", { name: "High contrast chart" }).check();
+  const settings = await openSettings(page);
+  await settings.getByRole("switch", { name: "High contrast chart" }).check();
+  await settings.getByRole("switch", { name: "Written round instructions" }).check();
   await page.getByRole("button", { name: "Done", exact: true }).click();
   await expect(page.locator(".chart-yarn-numbers li")).not.toHaveCount(0);
   await page.getByText("Text round instructions", { exact: true }).click();
