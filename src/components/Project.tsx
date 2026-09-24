@@ -42,6 +42,15 @@ const Project: React.FC = () => {
 
   useEffect(() => {
     if (projectId) setProject(readProject(projectId));
+    setPrevious(undefined);
+    const refresh = (event: StorageEvent) => {
+      if (event.key === null || event.key === `project-${projectId}`) {
+        setProject(projectId ? readProject(projectId) : undefined);
+        setPrevious(undefined);
+      }
+    };
+    window.addEventListener("storage", refresh);
+    return () => window.removeEventListener("storage", refresh);
   }, [projectId]);
 
   const setProgress = useCallback(

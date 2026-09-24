@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { getStorageNotice, listProjects, readProject, retrySaving, startProject } from "./projects";
+import { getStorageNotice, listProjects, readProject, retrySaving, startProject, writeProject } from "./projects";
 
 afterEach(() => { vi.restoreAllMocks(); retrySaving(); localStorage.clear(); });
 
@@ -17,4 +17,12 @@ it("retains failed saves for recovery and retries them", () => {
 
 it("never collides when starting projects in the same millisecond", () => {
   expect(startProject("h", "s", "c").id).not.toBe(startProject("h", "s", "c").id);
+});
+
+it("rejects stale progress instead of overwriting a newer saved version", () => {
+  const old = startProject("h", "s", "c");
+  const newer = writeProject({ ...old, progress: 10 });
+  expect(writeProject({ ...old, progress: 1 })).toEqual(newer);
+  expect(readProject(old.id)?.progress).toBe(10);
+  expect(getStorageNotice()).toContain("another tab");
 });

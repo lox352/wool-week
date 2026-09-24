@@ -113,7 +113,12 @@ export const listProjects = (): Project[] => {
 };
 
 export const writeProject = (project: Project): Project => {
-  const updated = { ...project, version: currentVersion, updatedAt: new Date().toISOString() };
+  const saved = readProject(project.id);
+  if (saved && saved.updatedAt !== project.updatedAt) {
+    notice("This project changed in another tab. The latest saved version has been loaded; check your position before continuing.");
+    return saved;
+  }
+  const updated = { ...project, version: currentVersion, updatedAt: new Date(Math.max(Date.now(), Date.parse(project.updatedAt) + 1)).toISOString() };
   try {
     localStorage.setItem(updated.id, JSON.stringify(updated));
     pending.delete(updated.id);
