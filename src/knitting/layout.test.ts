@@ -57,9 +57,9 @@ describe("the chart hangs every stitch over what it was worked into", () => {
     spines.forEach((row) => expect(row).toEqual(first));
   });
 
-  it("a decrease sits on the middle of the stitches it took together", () => {
-    for (const hat of ["sww25-aal-ower-toorie", "sww24-islesburgh-toorie"]) {
-      const { stitches, cells } = laid(hat);
+  it("a decrease stands on the stitch it leans onto, or the middle if it does not lean", () => {
+    for (const hat of ["sww25-aal-ower-toorie", "sww24-islesburgh-toorie", "sww22-bonnie-isle-hat"]) {
+      const { stitches, cells, columns: width } = laid(hat);
       const decreases = stitches.filter(
         (stitch) => consumption[stitch.type] > 1,
       );
@@ -70,28 +70,34 @@ describe("the chart hangs every stitch over what it was worked into", () => {
           .slice(0, consumption[stitch.type])
           .map((id) => cells.get(id)!.column)
           .sort((a, b) => a - b);
+        // A family round the chart's seam is checked by the Birsie test.
+        if (columns[columns.length - 1] - columns[0] > width / 2) continue;
         const half = Math.floor(columns.length / 2);
-        // The middle counted by stitch: the middle one of an odd number of
-        // them, and half way between the two middle ones of an even number.
-        const middle =
-          columns.length % 2 === 1
-            ? columns[half]
-            : (columns[half - 1] + columns[half]) / 2;
-        expect(cells.get(stitch.id)!.column).toBe(middle);
+        const expected =
+          stitch.type === "k2tog"
+            ? columns[0]
+            : stitch.type === "k2togtbl" || stitch.type === "sk2p"
+              ? columns[columns.length - 1]
+              : columns.length % 2 === 1
+                ? columns[half]
+                : (columns[half - 1] + columns[half]) / 2;
+        expect(cells.get(stitch.id)!.column).toBe(expected);
       }
     }
   });
 
-  it("a k2tog sits half way between the two columns that produced it", () => {
+  it("a k2tog leans right: it stands on the right of its two, with a gap to its left", () => {
     for (const hat of ["sww25-aal-ower-toorie", "sww24-islesburgh-toorie"]) {
       const { stitches, cells } = laid(hat);
       const taken = stitches.filter((stitch) => stitch.type === "k2tog");
       expect(taken.length).toBeGreaterThan(0);
       for (const stitch of taken) {
-        const [left, right] = stitch.links
+        const [right, left] = stitch.links
           .slice(0, 2)
           .map((id) => cells.get(id)!.column);
-        expect(cells.get(stitch.id)!.column).toBe((left + right) / 2);
+        // Column 1 is the chart's right-hand edge.
+        expect(right).toBeLessThan(left);
+        expect(cells.get(stitch.id)!.column).toBe(right);
       }
     }
   });
@@ -140,28 +146,46 @@ describe("the chart hangs every stitch over what it was worked into", () => {
     }
   });
 
-  it("a stitch that becomes two sits between the two it becomes", () => {
+  it("a make-one sits over the gap between two stitches it was picked up from", () => {
     const { stitches, rounds, cells } = laid("sww25-aal-ower-toorie");
     const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
 
     // The round that takes the 130 stitch rib to a 162 stitch body, on 32
-    // make-ones. A make-one is worked into nothing, so it belongs to the
-    // stitch beside it: one rib stitch, two stitches above.
-    const grown = rounds.find((round) =>
+    // make-ones. Each is picked up from the strand between two stitches, so
+    // the stitches either side stand straight over their own, and there is
+    // nothing at all under the make-one.
+    const grownAt = rounds.findIndex((round) =>
       round.some((id) => byId.get(id)!.type === "m1"),
-    )!;
+    );
+    const grown = rounds[grownAt];
+    const below = new Set(rounds[grownAt - 1].map((id) => cells.get(id)!.column));
     const made = grown.filter((id) => byId.get(id)!.type === "m1");
     expect(made.length).toBe(32);
 
     for (const id of made) {
       const beside = grown[grown.indexOf(id) - 1];
       const parent = byId.get(beside)!.links[0];
-      // Half a column in from each of them, rather than under one of the two.
-      expect(cells.get(parent)!.column).toBeCloseTo(
-        (cells.get(beside)!.column + cells.get(id)!.column) / 2,
-        9,
-      );
-      expect(cells.get(parent)!.column % 1).toBe(0.5);
+      expect(cells.get(parent)!.column).toBe(cells.get(beside)!.column);
+      expect(below.has(cells.get(id)!.column)).toBe(false);
+    }
+  });
+
+  it("a KFB keeps its column, and the stitch it makes sits in a gap to its left", () => {
+    const { stitches, rounds, cells } = laid("sww23-buggiflooer-beanie");
+    const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
+    const kfbs = stitches.filter((stitch) => stitch.type === "kfb");
+    expect(kfbs.length).toBeGreaterThan(0);
+    for (const kfb of kfbs) {
+      const made = byId.get(kfb.id + 1)!;
+      expect(made.type).toBe("m1");
+      const at = cells.get(kfb.id)!;
+      expect(at.column).toBe(cells.get(kfb.links[0])!.column);
+      // To its left, which is up the columns from the right-hand edge; usually
+      // the very next one, unless a later increase has opened a gap there.
+      const madeAt = cells.get(made.id)!.column;
+      expect(madeAt).toBeGreaterThan(at.column);
+      const below = new Set(rounds[at.round - 2].map((id) => cells.get(id)!.column));
+      expect(below.has(madeAt)).toBe(false);
     }
   });
 
@@ -170,20 +194,18 @@ describe("the chart hangs every stitch over what it was worked into", () => {
 
     // The rib is 130 stitches under a 162 stitch body, and used to sit
     // against one edge of the chart with dead space beside it. Now it spans
-    // the full width, with half a column of slack either side of each of the
-    // 32 stitches an increase is about to be made beside.
+    // the full width, with a column left open for each of the 32 stitches
+    // about to be made.
     const rib = rounds[0];
     expect(rib.length).toBe(130);
     expect(cells.get(rib[0])!.column).toBe(1);
     expect(cells.get(rib[rib.length - 1])!.column).toBe(162);
 
-    const slack = rib
+    const gaps = rib
       .slice(1)
-      .filter(
-        (id, index) =>
-          cells.get(id)!.column - cells.get(rib[index])!.column > 1,
-      );
-    expect(slack.length).toBe(64);
+      .map((id, index) => cells.get(id)!.column - cells.get(rib[index])!.column)
+      .filter((step) => step > 1);
+    expect(gaps).toEqual(Array(32).fill(2));
   });
 
   it("stays inside its own width, which is its widest round", () => {

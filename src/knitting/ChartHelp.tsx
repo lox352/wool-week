@@ -1,14 +1,13 @@
 import React, { useMemo } from "react";
 import { Stitch } from "../types/Stitch";
 import { StitchType } from "../types/StitchType";
-import { markFor } from "../helpers/stitch-marks";
+import { Mark, forkMark, markFor } from "../helpers/stitch-marks";
 import { Palette, yarnFor } from "./palette";
 import { indexRounds, runInstruction, upcomingRuns } from "./progress";
 import { KeyEntry, stitchKey } from "./stitch-key";
 import type { StitchKeyId, StitchNote } from "../data/hats/types";
 
-const Cell: React.FC<{ type: StitchType; x: number }> = ({ type, x }) => {
-  const mark = markFor(type);
+const Cell: React.FC<{ type?: StitchType; mark?: Mark; x: number }> = ({ type, mark = type && markFor(type), x }) => {
   return (
     <g transform={`translate(${x} 0)`}>
       <rect width="1" height="1" className="key-cell" />
@@ -22,16 +21,23 @@ const Cell: React.FC<{ type: StitchType; x: number }> = ({ type, x }) => {
 
 /** A KFB is drawn as the pair of cells it makes: the stitch, and the new one to its left. */
 const Swatch: React.FC<{ entry: KeyEntry }> = ({ entry }) => {
-  const cells: StitchType[] = entry.id === "kfb" ? ["m1", "kfb"] : [entry.type];
+  const pair = entry.id === "kfb";
   return (
     <svg
       className="key-swatch"
-      width={24 * cells.length}
+      width={pair ? 48 : 24}
       height="24"
-      viewBox={`-0.04 -0.04 ${cells.length + 0.08} 1.08`}
+      viewBox={`-0.04 -0.04 ${(pair ? 2 : 1) + 0.08} 1.08`}
       aria-hidden="true"
     >
-      {cells.map((type, i) => <Cell key={i} type={type} x={i} />)}
+      {pair ? (
+        <>
+          <Cell x={0} />
+          <Cell x={1} mark={forkMark(0.5, [0.5, -0.5])} />
+        </>
+      ) : (
+        <Cell type={entry.type} x={0} />
+      )}
     </svg>
   );
 };
