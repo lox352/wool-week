@@ -118,6 +118,11 @@ describe("what the hats are knitted in", () => {
         colourway.shades.forEach((shade) => {
           const where = `${hat.id} · ${colourway.id} · ${shade.slot}`;
           if (!shade.wool) {
+            if (hat.id === "sww18-merrie-dancers-toorie" && colourway.yarn === "DK") {
+              expect(colourway.sizeIds).toEqual(["yw1"]);
+              expect(shade.source).toBe("approximate");
+              return;
+            }
             // Historical, one-off or otherwise unavailable shades stay
             // explicit approximations rather than being forced onto a
             // different current yarn.
@@ -162,6 +167,11 @@ describe("what the hats are knitted in", () => {
       hat.colourways.forEach((colourway) =>
         colourway.shades.forEach((shade) => {
           if (!shade.wool) {
+            if (hat.id === "sww18-merrie-dancers-toorie" && colourway.yarn === "DK") {
+              expect(colourway.sizeIds).toEqual(["yw1"]);
+              expect(shade.source).toBe("approximate");
+              return;
+            }
             if (colourway.brand === "Uradale Yarns") {
               expect(hat.id).toBe("sww19-roadside-beanie");
               expect(["Forget-me-not", "Sea Pink"]).toContain(shade.name);

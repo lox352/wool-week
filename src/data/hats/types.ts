@@ -115,6 +115,8 @@ export interface Shade {
 
 export interface Colourway {
   id: string;
+  /** Yarn-weight variants may only be used with these sizes. */
+  sizeIds?: string[];
   /** As the pattern names it, e.g. "Vintage". */
   name: string;
   brand: string;

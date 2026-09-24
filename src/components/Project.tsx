@@ -159,8 +159,8 @@ const ProjectView: React.FC<{
   const { stitches, rounds, roundHeight, roundLabels, turns, index } =
     useHat(hat, size.id);
 
-  const colourway =
-    hat.colourways.find((c) => c.id === project.colourwayId) ?? hat.colourways[0];
+  const colourways = hat.colourways.filter(c => !c.sizeIds || c.sizeIds.includes(size.id));
+  const colourway = colourways.find((c) => c.id === project.colourwayId) ?? colourways[0];
   const palette = useMemo(
     () => paletteOf(colourway, project.shades, hat.charts),
     [colourway, project.shades, hat.charts],
@@ -239,7 +239,7 @@ const ProjectView: React.FC<{
               at once; a row below changes any of them afterwards.
             */}
             <div className="chooser">
-              {hat.colourways.map((option) => {
+              {colourways.map((option) => {
                 const optionPalette = paletteOf(option, {}, hat.charts);
                 return (
                   <button

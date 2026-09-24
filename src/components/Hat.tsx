@@ -102,8 +102,8 @@ const HatPage: React.FC<{
     (window as unknown as { __hatSizeIds?: string[] }).__hatSizeIds =
       hat.sizes.map((candidate) => candidate.id);
   }, [hat]);
-  const colourway =
-    hat.colourways.find((c) => c.id === colourwayId) ?? hat.colourways[0];
+  const colourways = hat.colourways.filter(c => !c.sizeIds || c.sizeIds.includes(size.id));
+  const colourway = colourways.find((c) => c.id === colourwayId) ?? colourways[0];
   const palette = useMemo(
     () => paletteOf(colourway, own, hat.charts),
     [colourway, own, hat],
@@ -185,7 +185,7 @@ const HatPage: React.FC<{
       <section className="section">
         <h2>Colourway</h2>
         <div className="chooser">
-          {hat.colourways.map((option) => {
+          {colourways.map((option) => {
             const optionPalette = paletteOf(option, {}, hat.charts);
             return (
               <button
