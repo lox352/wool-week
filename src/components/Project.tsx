@@ -9,6 +9,7 @@ import {
   Project as SavedProject,
   knittingParam,
   readProject,
+  projectsChanged,
   writeProject,
 } from "../helpers/projects";
 import PageLayout from "./ui/PageLayout";
@@ -50,7 +51,12 @@ const Project: React.FC = () => {
       }
     };
     window.addEventListener("storage", refresh);
-    return () => window.removeEventListener("storage", refresh);
+    const refreshLocal = () => setProject(projectId ? readProject(projectId) : undefined);
+    window.addEventListener(projectsChanged, refreshLocal);
+    return () => {
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener(projectsChanged, refreshLocal);
+    };
   }, [projectId]);
 
   const setProgress = useCallback(

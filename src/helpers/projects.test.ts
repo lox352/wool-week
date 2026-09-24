@@ -26,3 +26,16 @@ it("rejects stale progress instead of overwriting a newer saved version", () => 
   expect(readProject(old.id)?.progress).toBe(10);
   expect(getStorageNotice()).toContain("another tab");
 });
+
+it("recovers failed saves as copies when another tab changed the persisted project", () => {
+  const original = startProject("h", "s", "c");
+  const fail = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw new Error("full"); });
+  writeProject({ ...original, progress: 5 });
+  fail.mockRestore();
+  const otherTab = { ...original, progress: 20, updatedAt: new Date(Date.now() + 5000).toISOString() };
+  localStorage.setItem(original.id, JSON.stringify(otherTab));
+  retrySaving();
+  expect(readProject(original.id)?.progress).toBe(20);
+  expect(listProjects().find(p => p.id !== original.id)?.progress).toBe(5);
+  expect(getStorageNotice()).toContain("recovered copy");
+});

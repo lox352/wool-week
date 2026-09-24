@@ -29,6 +29,8 @@ export interface Project {
 
 const prefix = "project-";
 const pending = new Map<string, Project>();
+// The exact persisted value when saving first failed; undefined means unreadable.
+const pendingBase = new Map<string, string | null | undefined>();
 let storageNotice = "";
 export const storageChanged = "projectStorageChanged";
 export const getStorageNotice = () => storageNotice;
@@ -37,11 +39,21 @@ const notice = (message: string) => {
   queueMicrotask(() => window.dispatchEvent(new Event(storageChanged)));
 };
 export const retrySaving = () => {
+  let recovered = false;
   for (const project of pending.values()) {
-    try { localStorage.setItem(project.id, JSON.stringify(project)); pending.delete(project.id); }
+    try {
+      const raw = localStorage.getItem(project.id);
+      const conflict = raw !== pendingBase.get(project.id);
+      const saved = conflict ? { ...project, id: `${prefix}${crypto.randomUUID()}`,
+        name: `Recovered copy${project.name ? `: ${project.name}` : ""}` } : project;
+      localStorage.setItem(saved.id, JSON.stringify(saved));
+      pending.delete(project.id);
+      pendingBase.delete(project.id);
+      recovered ||= conflict;
+    }
     catch { notice("Progress is not being saved. Keep this tab open and export a backup before leaving."); return; }
   }
-  notice("");
+  notice(recovered ? "Another tab changed this project while saving was unavailable. Your unsaved work was saved as a separate recovered copy in My projects." : "");
   notifyChanged();
 };
 
@@ -119,13 +131,21 @@ export const writeProject = (project: Project): Project => {
     return saved;
   }
   const updated = { ...project, version: currentVersion, updatedAt: new Date(Math.max(Date.now(), Date.parse(project.updatedAt) + 1)).toISOString() };
+  if (pending.has(updated.id)) {
+    pending.set(updated.id, updated);
+    retrySaving();
+    return readProject(updated.id) ?? updated;
+  }
+  let base: string | null | undefined;
   try {
+    base = localStorage.getItem(updated.id);
     localStorage.setItem(updated.id, JSON.stringify(updated));
     pending.delete(updated.id);
     if (pending.size === 0) notice("");
     notifyChanged();
   } catch {
     pending.set(updated.id, updated);
+    pendingBase.set(updated.id, base);
     notice("Progress is not being saved. Keep this tab open and export a backup before leaving.");
   }
   return updated;
@@ -154,6 +174,7 @@ export const deleteProject = (id: string) => {
   try {
     localStorage.removeItem(storageKeyFor(id));
     pending.delete(storageKeyFor(id));
+    pendingBase.delete(storageKeyFor(id));
     notifyChanged();
   } catch {
     notice("The project could not be deleted from browser storage. Please try again.");
