@@ -59,7 +59,7 @@ test("progress survives reload, undo and confirmed jumps; a second tab stays in 
   const other = await context.newPage();
   await other.goto(page.url());
   await page.getByRole("button", { name: "Go to round/stitch", exact: true }).click();
-  await page.getByRole("dialog").getByLabel("Round", { exact: true }).selectOption("3");
+  await page.getByRole("dialog").getByRole("combobox", { name: "Round", exact: true }).selectOption("3");
   await page.getByLabel("Next stitch", { exact: true }).fill("4");
   await page.getByRole("button", { name: "Confirm position", exact: true }).click();
   await expect(position(page)).toContainText("Round 3, stitch 4.");
