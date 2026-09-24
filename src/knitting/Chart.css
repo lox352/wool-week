@@ -5,7 +5,6 @@
   padding: 0.75rem;
 }
 
-.chart-controls { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
 .chart-help { margin: 1rem 0; }
 .chart-help summary { cursor: pointer; min-height: 44px; }
 .chart-help li { margin: .4rem 0; }

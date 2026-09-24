@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Stitch } from "../types/Stitch";
 import { layOut } from "./layout";
 import { Palette } from "./palette";
@@ -6,6 +6,7 @@ import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
 import { StitchLegend, TextRound } from "./ChartHelp";
 import { useSettings } from "../helpers/settings";
+import { maxCell, minCell, usePinchZoom } from "./usePinchZoom";
 import "./Chart.css";
 
 
@@ -118,6 +119,9 @@ const Chart: React.FC<ChartProps> = ({
     return Object.fromEntries(Object.entries(palette).map(([key, yarn]) => [key, String(names.indexOf(`${yarn.name}|${yarn.hex}`) + 1)]));
   }, [palette]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const zoomTo = useCallback((cell: number) => setZoom(Math.round(cell)), []);
+  usePinchZoom(scrollRef, sheetRef, cellSize, zoomTo, follow);
   const baseRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLCanvasElement>(null);
   const nextId = follow ? progress + 1 : undefined;
@@ -271,14 +275,23 @@ const Chart: React.FC<ChartProps> = ({
 
   return (
     <div className="chart-frame">
-      <div className="chart-controls screen-only">
-        <label>Chart zoom <select value={zoom} onChange={e => setZoom(Number(e.target.value))}>
-          <option value={16}>100%</option><option value={22}>140%</option><option value={30}>190%</option>
-        </select></label>
-      </div>
       {contrast && <ul className="chart-yarn-numbers">{Object.entries(palette).filter(([key], i, entries) => entries.findIndex(([other]) => yarnLabels[other] === yarnLabels[key]) === i).map(([key, yarn]) => <li key={key}>{yarnLabels[key]}: {yarn.name}</li>)}</ul>}
-      <div className="chart-scroll" ref={scrollRef} tabIndex={0} role="region" aria-label="Scrollable knitting chart">
+      <div
+        className="chart-scroll"
+        ref={scrollRef}
+        tabIndex={0}
+        role="region"
+        aria-label="Scrollable knitting chart. Plus and minus zoom it."
+        onKeyDown={(event) => {
+          if (event.metaKey || event.ctrlKey || event.altKey) return;
+          const step = event.key === "+" || event.key === "=" ? 4 : event.key === "-" ? -4 : 0;
+          if (!step) return;
+          event.preventDefault();
+          zoomTo(Math.min(maxCell, Math.max(minCell, cellSize + step)));
+        }}
+      >
         <div
+          ref={sheetRef}
           className="chart-sheets"
           style={{ width, height }}
           role="img"
@@ -329,7 +342,7 @@ const Chart: React.FC<ChartProps> = ({
       <p className="chart-caption">
         {layout.columns} stitches at its widest, {layout.rounds} rounds. Read
         from the bottom right, working right to left; scroll sideways to see a
-        whole round. Where a round is shorter than the one below it, stitches
+        whole round, and pinch to zoom. Where a round is shorter than the one below it, stitches
         have been decreased away.
       </p>
       {marked.length > 0 && (

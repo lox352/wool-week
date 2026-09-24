@@ -39,7 +39,10 @@ test("DK selection, accessible chart controls and text instructions", async ({ p
   await page.goto(pattern);
   await page.getByRole("button", { name: "Yarn weight 1 · DK", exact: true }).click();
   await expect(page.getByRole("button", { name: "Yarn weight 1 · DK", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await page.getByLabel("Chart zoom").selectOption("30");
+  const sheetWidth = () => page.locator(".chart-sheets").evaluate(node => node.offsetWidth);
+  const unzoomed = await sheetWidth();
+  await page.getByRole("region", { name: /Scrollable knitting chart/ }).press("+");
+  await expect.poll(sheetWidth).toBeGreaterThan(unzoomed);
   const settings = await openSettings(page);
   await settings.getByRole("switch", { name: "High contrast chart" }).check();
   await settings.getByRole("switch", { name: "Written round instructions" }).check();
