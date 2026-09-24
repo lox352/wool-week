@@ -28,6 +28,22 @@ export interface Project {
 }
 
 const prefix = "project-";
+const pending = new Map<string, Project>();
+let storageNotice = "";
+export const storageChanged = "projectStorageChanged";
+export const getStorageNotice = () => storageNotice;
+const notice = (message: string) => {
+  storageNotice = message;
+  queueMicrotask(() => window.dispatchEvent(new Event(storageChanged)));
+};
+export const retrySaving = () => {
+  for (const project of pending.values()) {
+    try { localStorage.setItem(project.id, JSON.stringify(project)); pending.delete(project.id); }
+    catch { notice("Progress is not being saved. Keep this tab open and export a backup before leaving."); return; }
+  }
+  notice("");
+  notifyChanged();
+};
 
 /** Fired after any write, so open views can re-read. */
 export const projectsChanged = "projectsChanged";
@@ -41,7 +57,7 @@ export const storageKeyFor = (id: string) =>
 export const bareIdFor = (id: string) => id.replace(new RegExp(`^${prefix}`), "");
 
 export const notifyChanged = () =>
-  window.dispatchEvent(new CustomEvent(projectsChanged));
+  queueMicrotask(() => window.dispatchEvent(new CustomEvent(projectsChanged)));
 
 const isProject = (value: unknown): value is Project => {
   if (typeof value !== "object" || value === null) return false;
@@ -61,6 +77,7 @@ const isProject = (value: unknown): value is Project => {
  * anything that cannot be understood is reported as missing rather than thrown.
  */
 export const readProject = (id: string): Project | undefined => {
+  if (pending.has(storageKeyFor(id))) return pending.get(storageKeyFor(id));
   try {
     const raw = localStorage.getItem(storageKeyFor(id));
     if (!raw) return undefined;
@@ -83,23 +100,28 @@ export const readProject = (id: string): Project | undefined => {
 };
 
 export const listProjects = (): Project[] => {
-  const out: Project[] = [];
+  const out = new Map(pending);
+  try {
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (!key?.startsWith(prefix)) continue;
     const project = readProject(key);
-    if (project) out.push(project);
+    if (project) out.set(project.id, project);
   }
-  return out.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  } catch { notice("Browser storage is unavailable. Keep this tab open and export a backup before leaving."); }
+  return [...out.values()].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 };
 
 export const writeProject = (project: Project): Project => {
   const updated = { ...project, version: currentVersion, updatedAt: new Date().toISOString() };
   try {
     localStorage.setItem(updated.id, JSON.stringify(updated));
+    pending.delete(updated.id);
+    if (pending.size === 0) notice("");
     notifyChanged();
   } catch {
-    // A browser with no room left is not worth interrupting a knitter over.
+    pending.set(updated.id, updated);
+    notice("Progress is not being saved. Keep this tab open and export a backup before leaving.");
   }
   return updated;
 };
@@ -113,7 +135,7 @@ export const startProject = (
 ): Project =>
   writeProject({
     version: currentVersion,
-    id: `${prefix}${Date.now()}`,
+    id: `${prefix}${crypto.randomUUID()}`,
     hatId,
     sizeId,
     colourwayId,
@@ -126,9 +148,10 @@ export const startProject = (
 export const deleteProject = (id: string) => {
   try {
     localStorage.removeItem(storageKeyFor(id));
+    pending.delete(storageKeyFor(id));
     notifyChanged();
   } catch {
-    // Nothing to do.
+    notice("The project could not be deleted from browser storage. Please try again.");
   }
 };
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./PageLayout.css";
+import StorageNotice from "../StorageNotice";
 
 interface PageLayoutProps {
   /** Rendered as the page's only h1, unless showTitle is false. */
@@ -34,6 +35,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
       </Link>
       {aside}
     </header>
+    <StorageNotice />
     {eyebrow && <p className="eyebrow screen-only">{eyebrow}</p>}
     {showTitle && <h1 className="page-title">{title}</h1>}
     {lede && <p className="lede screen-only">{lede}</p>}

@@ -141,6 +141,8 @@ select {
   outline-offset: 2px;
 }
 
+.storage-notice { border: 2px solid var(--crimson); padding: 1rem; margin: 1rem 0; }
+
 @media print {
   .screen-only {
     display: none !important;
