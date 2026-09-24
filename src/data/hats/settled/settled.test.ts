@@ -3,7 +3,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { buildHat } from "../../../knitting/engine";
-import { hatById } from "../index";
+import { hatById, hats } from "../index";
+import { loadSettled } from "./index";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const files = readdirSync(here).filter((name) => name.endsWith(".json"));
@@ -17,9 +18,13 @@ const targetOf = (file: string) => {
 };
 
 describe("the settled positions", () => {
-  it("cover every hat, or none", () => {
-    expect(files.length === 0 || files.length >= 1).toBe(true);
-  });
+  for (const hat of hats) for (const size of hat.sizes) {
+    it(`loads matching geometry for ${hat.id}/${size.id}`, async () => {
+      const positions = await loadSettled(hat.id, size.id);
+      expect(positions, "Run npm run settle for the missing size").toBeDefined();
+      expect(positions).toHaveLength(buildHat(hat, size.id).stitches.length);
+    });
+  }
 
   files.forEach((file) => {
     const { hatId, sizeId } = targetOf(file);
