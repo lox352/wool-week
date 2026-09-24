@@ -120,6 +120,7 @@ export const stitchKey = (
       const note = notes[id];
       return {
         ...standard[id],
+        abbreviation: note?.abbreviation ?? standard[id].abbreviation,
         label: note?.label ?? standard[id].label,
         how: note?.how ?? standard[id].how,
         note: note?.note,

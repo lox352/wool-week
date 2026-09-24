@@ -32,6 +32,21 @@ const sww25: HatPattern = {
   patternUrl: "https://www.ravelry.com/patterns/library/aal-ower-toorie",
   credit: "© Shetland Guild of Spinners, Knitters, Weavers and Dyers",
   hashtag: "#AalOwerToorie",
+  // The stitches as this pattern's own abbreviations define them.
+  stitchNotes: {
+    k1tbl: { abbreviation: "k1tbl", how: "Knit 1 stitch through the back of the loop." },
+    m1: {
+      how:
+        "Pick up the bar between stitches with the left needle from front " +
+        "to back, and knit it through the back of the loop.",
+    },
+    k2tog: { how: "Knit 2 stitches together as if they are 1 stitch." },
+    s2kp: {
+      how:
+        "Slip 2 stitches together as if to knit, knit 1 in the colour shown, " +
+        "then pass both slipped stitches over.",
+    },
+  },
   slots: ["A", "B", "C", "D", "E", "F", "G", "H"],
 
   sizes: [

@@ -190,10 +190,12 @@ export type StitchKeyId =
 /**
  * What a pattern says about one of its stitches, for the symbol key.
  *
- * `label` and `how` replace the key's own wording where the pattern puts it
- * differently; `note` is added underneath, for anything peculiar to this hat.
+ * `abbreviation`, `label` and `how` replace the key's own wording where the
+ * pattern puts it differently - its abbreviations list is the place to take
+ * them from; `note` is added underneath, for anything peculiar to this hat.
  */
 export interface StitchNote {
+  abbreviation?: string;
   label?: string;
   how?: string;
   note?: string;

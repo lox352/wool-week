@@ -32,3 +32,15 @@ describe("the stitch-symbol key", () => {
     expect(kfb?.note).toMatch(/m1/);
   });
 });
+
+describe("the key in a pattern's own words", () => {
+  it("uses 2021's back-to-front make-one", () => {
+    const m1 = keyOf("sww21-da-crofters-kep").find((entry) => entry.id === "m1");
+    expect(m1?.how).toMatch(/back to front/);
+  });
+
+  it("calls 2023's centred decrease a CDD, as its pattern does", () => {
+    const cdd = keyOf("sww23-buggiflooer-beanie").find((entry) => entry.id === "s2kp");
+    expect(cdd?.abbreviation).toBe("CDD");
+  });
+});
