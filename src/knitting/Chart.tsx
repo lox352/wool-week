@@ -5,6 +5,7 @@ import { Palette } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
 import { StitchLegend, TextRound } from "./ChartHelp";
+import { useSettings } from "../helpers/settings";
 import "./Chart.css";
 
 
@@ -105,7 +106,7 @@ const Chart: React.FC<ChartProps> = ({
   turns,
 }) => {
   const [zoom, setZoom] = useState(16);
-  const [contrast, setContrast] = useState(false);
+  const { highContrast: contrast } = useSettings();
   const [textRound, setTextRound] = useState(1);
   const [showText, setShowText] = useState(false);
   const cellSize = contrast ? Math.max(28, zoom) : zoom;
@@ -274,7 +275,6 @@ const Chart: React.FC<ChartProps> = ({
         <label>Chart zoom <select value={zoom} onChange={e => setZoom(Number(e.target.value))}>
           <option value={16}>100%</option><option value={22}>140%</option><option value={30}>190%</option>
         </select></label>
-        <label><input type="checkbox" checked={contrast} onChange={e => setContrast(e.target.checked)} /> High contrast with numbered yarns</label>
       </div>
       {contrast && <ul className="chart-yarn-numbers">{Object.entries(palette).filter(([key], i, entries) => entries.findIndex(([other]) => yarnLabels[other] === yarnLabels[key]) === i).map(([key, yarn]) => <li key={key}>{yarnLabels[key]}: {yarn.name}</li>)}</ul>}
       <div className="chart-scroll" ref={scrollRef} tabIndex={0} role="region" aria-label="Scrollable knitting chart">

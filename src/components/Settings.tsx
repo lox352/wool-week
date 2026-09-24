@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { downloadBackup, parseBackup, restoreBackup } from "../helpers/backups";
 import { getStorageNotice, type Project } from "../helpers/projects";
+import { updateSettings, useSettings } from "../helpers/settings";
 import Button from "./ui/Button";
 import Dialog from "./ui/Dialog";
 import "./Settings.css";
@@ -22,6 +23,43 @@ export const SettingRow: React.FC<{
     <div className="setting-control">{children}</div>
   </li>
 );
+
+const Toggle: React.FC<{ label: string; checked: boolean; onChange: (on: boolean) => void }> = ({
+  label,
+  checked,
+  onChange,
+}) => (
+  <input
+    type="checkbox"
+    role="switch"
+    className="switch"
+    aria-label={label}
+    checked={checked}
+    onChange={(event) => onChange(event.target.checked)}
+  />
+);
+
+const ChartSettings: React.FC = () => {
+  const settings = useSettings();
+  const headingId = useId();
+  return (
+    <section className="settings-group" aria-labelledby={headingId}>
+      <h3 id={headingId}>Chart</h3>
+      <ul>
+        <SettingRow
+          title="High contrast"
+          detail="Draw the chart in white with each yarn numbered, for when the colours are hard to tell apart."
+        >
+          <Toggle
+            label="High contrast chart"
+            checked={settings.highContrast}
+            onChange={(highContrast) => updateSettings({ highContrast })}
+          />
+        </SettingRow>
+      </ul>
+    </section>
+  );
+};
 
 const Backups: React.FC = () => {
   const [pending, setPending] = useState<Project[]>();
@@ -152,6 +190,7 @@ const Settings: React.FC = () => {
                 Done
               </Button>
             </div>
+            <ChartSettings />
             <Backups />
           </div>
         )}

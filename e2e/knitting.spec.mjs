@@ -40,7 +40,8 @@ test("DK selection, accessible chart controls and text instructions", async ({ p
   await page.getByRole("button", { name: "Yarn weight 1 · DK", exact: true }).click();
   await expect(page.getByRole("button", { name: "Yarn weight 1 · DK", exact: true })).toHaveAttribute("aria-pressed", "true");
   await page.getByLabel("Chart zoom").selectOption("30");
-  await page.getByLabel("High contrast with numbered yarns").check();
+  await (await openSettings(page)).getByRole("switch", { name: "High contrast chart" }).check();
+  await page.getByRole("button", { name: "Done", exact: true }).click();
   await expect(page.locator(".chart-yarn-numbers li")).not.toHaveCount(0);
   await page.getByText("Text round instructions", { exact: true }).click();
   await expect(page.getByText(/Cast on 108 stitches/)).toBeVisible();
