@@ -102,8 +102,8 @@ def extract(path):
     a, b, c, d, e = chart_images(doc)
     cc_a = {r: ("C" if r <= 4 or r >= 8 else "D") for r in range(1, 11)}
     cc_c = {
-        **{r: "C" for r in range(1, 7)},
-        **{r: "D" for r in range(7, 10)},
+        **{r: "C" for r in range(1, 6)},
+        **{r: "D" for r in range(6, 10)},
         **{r: "E" for r in range(10, 13)},
         13: "F",
         **{r: "E" for r in range(14, 17)},
