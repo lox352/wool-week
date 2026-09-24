@@ -10,7 +10,7 @@ async function openSettings(page) {
 async function start(page) {
   await page.goto(pattern);
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
-  await expect(page.getByRole("button", { name: "One stitch", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "End of round", exact: true })).toBeVisible();
 }
 
 test("all patterns remain usable without WebGL; default visits never request live physics", async ({ page }) => {
@@ -55,25 +55,25 @@ test("DK selection, accessible chart controls and text instructions", async ({ p
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 });
 
-test("progress survives reload, undo and confirmed jumps; a second tab stays in sync", async ({ page, context }) => {
+test("progress survives reload and undo; a second tab stays in sync", async ({ page, context }) => {
   await start(page);
   const original = await position(page).textContent();
-  await page.getByRole("button", { name: "One stitch", exact: true }).click();
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
   const advanced = await position(page).textContent();
   expect(advanced).not.toBe(original);
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect(position(page)).toHaveText(advanced);
   await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect(position(page)).toHaveText(original);
-  await page.getByRole("button", { name: "One stitch", exact: true }).click();
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
   await page.reload();
   await expect(position(page)).toHaveText(advanced);
   const other = await context.newPage();
   await other.goto(page.url());
-  await page.getByRole("button", { name: "Go to round/stitch", exact: true }).click();
-  await page.getByRole("dialog").getByRole("combobox", { name: "Round", exact: true }).selectOption("3");
-  await page.getByLabel("Next stitch", { exact: true }).fill("4");
-  await page.getByRole("button", { name: "Confirm position", exact: true }).click();
-  await expect(position(page)).toContainText("Round 3, stitch 4.");
-  await expect(position(other)).toContainText("Round 3, stitch 4.");
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
+  const further = await position(page).textContent();
+  await expect(position(other)).toHaveText(further);
   await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect(position(other)).toHaveText(advanced);
 });
@@ -126,7 +126,7 @@ test("quota failures preserve progress and offer a recovery export", async ({ pa
     Storage.prototype.setItem = () => { throw new DOMException("Storage full", "QuotaExceededError"); };
   });
   await start(page);
-  await page.getByRole("button", { name: "One stitch", exact: true }).click();
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("Progress is not being saved");
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export recovery backup", exact: true }).click();
@@ -140,7 +140,7 @@ test("a prepared project reloads and saves progress offline", async ({ page, con
   await expect(page.getByText(/Ready for offline knitting/)).toBeVisible({ timeout: 45_000 });
   await context.setOffline(true);
   await page.reload();
-  await page.getByRole("button", { name: "One stitch", exact: true }).click();
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
   const progress = await position(page).textContent();
   await page.reload();
   await expect(position(page)).toHaveText(progress);

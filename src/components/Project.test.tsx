@@ -16,7 +16,7 @@ it("saves once per action under StrictMode and undoes more than one step", async
   const root = createRoot(host);
   const saves = vi.spyOn(Storage.prototype, "setItem");
   const click = async (label: string) => {
-    const button = [...host.querySelectorAll("button")].find(b => b.textContent === label);
+    const button = [...host.querySelectorAll("button")].find(b => b.textContent?.trim() === label);
     expect(button, label).toBeDefined();
     await act(async () => button!.click());
   };
@@ -27,16 +27,16 @@ it("saves once per action under StrictMode and undoes more than one step", async
     await act(async () => summary.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true })));
     expect(saves).not.toHaveBeenCalled();
     summary.remove();
-    await click("One stitch");
+    await click("End of round");
     expect(saves).toHaveBeenCalledTimes(1);
-    expect(readProject(project.id)?.progress).toBe(1);
+    expect(readProject(project.id)?.progress).toBe(120);
     expect(getStorageNotice()).toBe("");
     await click("End of round");
     expect(saves).toHaveBeenCalledTimes(2);
-    expect(readProject(project.id)?.progress).toBe(120);
+    expect(readProject(project.id)?.progress).toBe(240);
     await click("Undo");
     expect(saves).toHaveBeenCalledTimes(3);
-    expect(readProject(project.id)?.progress).toBe(1);
+    expect(readProject(project.id)?.progress).toBe(120);
     await click("Undo");
     expect(readProject(project.id)?.progress).toBe(0);
   } finally { await act(async () => root.unmount()); host.remove(); }
