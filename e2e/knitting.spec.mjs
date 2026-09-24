@@ -76,6 +76,7 @@ test("backup restores copies and rename/delete require their dialogs", async ({ 
   const buffer = await readFile(await download.path());
   expect(JSON.parse(buffer.toString()).projects).toHaveLength(1);
   await page.getByRole("link", { name: "Wool Week Toories", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Wool Week Toories", level: 1, exact: true })).toBeVisible();
   await page.getByLabel("Import project backup").setInputFiles({ name: "backup.json", mimeType: "application/json", buffer });
   await page.getByRole("button", { name: "Restore copies", exact: true }).click();
   await expect(page.getByRole("button", { name: "Rename", exact: true })).toHaveCount(2);
