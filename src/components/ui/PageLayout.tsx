@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./PageLayout.css";
 import StorageNotice from "../StorageNotice";
+import ProjectBackup from "../ProjectBackup";
 
 interface PageLayoutProps {
   /** Rendered as the page's only h1, unless showTitle is false. */
@@ -41,6 +42,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
     {lede && <p className="lede screen-only">{lede}</p>}
     {children}
     <footer className="colophon screen-only">
+      <ProjectBackup />
       <p>
         An unofficial companion for knitters who have bought these patterns.
         The designs belong to their designers and are sold to fund{" "}
