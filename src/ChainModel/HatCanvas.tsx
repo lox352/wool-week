@@ -3,6 +3,7 @@ import { Stitch } from "../types/Stitch";
 import { Point } from "../types/Point";
 import { Palette } from "../knitting/palette";
 import type { SettleMetrics } from "../helpers/settling";
+import PreviewBoundary from "../components/PreviewBoundary";
 
 /**
  * The 3D stage, loaded on demand, in one of two forms.
@@ -57,7 +58,8 @@ const HatCanvas: React.FC<HatCanvasProps> = ({
   ...rest
 }) => (
   <div style={{ height: `${hatCanvasHeight}px` }}>
-    <Suspense fallback={null}>
+    <PreviewBoundary>
+    <Suspense fallback={<p role="status">Loading 3D preview…</p>}>
       {settle ? (
         <SettlingHat
           {...rest}
@@ -71,6 +73,7 @@ const HatCanvas: React.FC<HatCanvasProps> = ({
         <SettledHat {...rest} settled={settled ?? nowhere} />
       )}
     </Suspense>
+    </PreviewBoundary>
   </div>
 );
 
