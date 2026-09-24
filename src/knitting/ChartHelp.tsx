@@ -35,6 +35,8 @@ export function TextRound({ stitches, rounds, round, labels, palette }: {
   const runs = upcomingRuns(stitches, (ids[0] ?? 1) - 1, index, ids.length)
     .filter(run => run.startId <= (ids.at(-1) ?? 0));
   return <div><p>Round {round}: {labels?.[round - 1]}. Read in working order.</p>
-    <ol>{runs.map(run => <li key={run.startId}>{runInstruction(run)} in {yarnFor(palette, run.slot).name}</li>)}</ol>
+    <ol>{runs.map(run => <li key={run.startId}>{labels?.[round - 1]?.includes("cast on")
+      ? `Cast on ${run.endId - run.startId + 1} stitches`
+      : runInstruction(run)} in {yarnFor(palette, run.slot).name}</li>)}</ol>
   </div>;
 }
