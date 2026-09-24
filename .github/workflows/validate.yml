@@ -22,3 +22,11 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Desktop and mobile knitting regression tests
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failures
+          path: test-results/
