@@ -16,3 +16,10 @@ it("rejects malformed and future-version backups without writes", () => {
   expect(() => parseBackup('{"format":"wool-week-projects","version":1,"projects":[{}]}')).toThrow();
   expect(listProjects()).toHaveLength(0);
 });
+
+it("rejects a colourway incompatible with the selected yarn-weight variant", () => {
+  const hat = hats.find(h => h.year === 2018)!;
+  const wrong = startProject(hat.id, "yw1", hat.colourways.find(c => c.sizeIds?.includes("yw2"))!.id);
+  expect(() => parseBackup(backupText())).toThrow("colourway");
+  expect(listProjects()).toEqual([wrong]);
+});

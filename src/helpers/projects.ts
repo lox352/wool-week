@@ -74,11 +74,21 @@ export const notifyChanged = () =>
 const isProject = (value: unknown): value is Project => {
   if (typeof value !== "object" || value === null) return false;
   const candidate = value as Partial<Project>;
+  const validDate = (date: unknown) => date === undefined ||
+    (typeof date === "string" && Number.isFinite(Date.parse(date)));
+  if (!validDate(candidate.startedAt) || !validDate(candidate.updatedAt) ||
+    (candidate.name !== undefined && typeof candidate.name !== "string") ||
+    (candidate.version !== undefined && candidate.version !== currentVersion)) return false;
+  if (candidate.shades !== undefined) {
+    if (!candidate.shades || typeof candidate.shades !== "object" || Array.isArray(candidate.shades)) return false;
+    if (Object.values(candidate.shades).some(shade => !shade || typeof shade !== "object" ||
+      Object.values(shade).some(v => typeof v !== "string"))) return false;
+  }
   return (
     typeof candidate.hatId === "string" &&
     typeof candidate.sizeId === "string" &&
     typeof candidate.colourwayId === "string" &&
-    typeof candidate.progress === "number"
+    typeof candidate.progress === "number" && Number.isSafeInteger(candidate.progress) && candidate.progress >= 0
   );
 };
 

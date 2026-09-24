@@ -19,6 +19,14 @@ it("never collides when starting projects in the same millisecond", () => {
   expect(startProject("h", "s", "c").id).not.toBe(startProject("h", "s", "c").id);
 });
 
+it("ignores malformed storage entries without breaking the project list", () => {
+  const good = startProject("h", "s", "c");
+  for (const bad of [{ updatedAt: 123 }, { progress: -1 }, { progress: 1.5 }, { shades: { A: { name: 7 } } }]) {
+    localStorage.setItem("project-bad", JSON.stringify({ ...good, ...bad }));
+    expect(listProjects()).toEqual([good]);
+  }
+});
+
 it("rejects stale progress instead of overwriting a newer saved version", () => {
   const old = startProject("h", "s", "c");
   const newer = writeProject({ ...old, progress: 10 });

@@ -13,7 +13,7 @@ export function parseBackup(text: string): Project[] {
   return data.projects.map((p: Project) => {
     const hat = p && hatById(p.hatId);
     if (!hat || !hat.sizes.some(s => s.id === p.sizeId) ||
-      !hat.colourways.some(c => c.id === p.colourwayId) ||
+      !hat.colourways.some(c => c.id === p.colourwayId && (!c.sizeIds || c.sizeIds.includes(p.sizeId))) ||
       p.version !== currentVersion || !Number.isSafeInteger(p.progress) || p.progress < 0 ||
       p.progress >= buildHat(hat, p.sizeId).stitches.length ||
       (p.name !== undefined && (typeof p.name !== "string" || p.name.length > 200)) ||
