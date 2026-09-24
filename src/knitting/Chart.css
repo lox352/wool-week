@@ -5,6 +5,14 @@
   padding: 0.75rem;
 }
 
+.chart-controls { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+.chart-help { margin: 1rem 0; }
+.chart-help summary { cursor: pointer; min-height: 44px; }
+.chart-help li { margin: .4rem 0; }
+.chart-help li svg { vertical-align: middle; margin-right: .6rem; }
+.chart-help select { max-width: 100%; }
+.chart-yarn-numbers { display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; }
+
 .chart-scroll {
   overflow-x: auto;
   overflow-y: hidden;

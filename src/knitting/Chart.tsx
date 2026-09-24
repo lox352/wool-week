@@ -1,12 +1,12 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Stitch } from "../types/Stitch";
 import { layOut } from "./layout";
 import { Palette } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
+import { StitchLegend, TextRound } from "./ChartHelp";
 import "./Chart.css";
 
-const cellSize = 13;
 
 /** How many turns are below a round: which region it is in, and its parity. */
 const regionsBelow = (turns: number[], round: number): number =>
@@ -104,11 +104,24 @@ const Chart: React.FC<ChartProps> = ({
   labels,
   turns,
 }) => {
+  const [zoom, setZoom] = useState(16);
+  const [contrast, setContrast] = useState(false);
+  const [textRound, setTextRound] = useState(1);
+  const [showText, setShowText] = useState(false);
+  const cellSize = contrast ? Math.max(28, zoom) : zoom;
+  const shownPalette = useMemo(() => contrast ? Object.fromEntries(
+    Object.entries(palette).map(([key, yarn]) => [key, { ...yarn, hex: "#ffffff" }]),
+  ) : palette, [palette, contrast]);
+  const yarnLabels = useMemo(() => {
+    const names = [...new Set(Object.values(palette).map(yarn => `${yarn.name}|${yarn.hex}`))];
+    return Object.fromEntries(Object.entries(palette).map(([key, yarn]) => [key, String(names.indexOf(`${yarn.name}|${yarn.hex}`) + 1)]));
+  }, [palette]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const baseRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLCanvasElement>(null);
   const nextId = follow ? progress + 1 : undefined;
-  const drawWith = useMemo(() => renderer(), []);
+  const preferredRenderer = useMemo(() => renderer(), []);
+  const drawWith = contrast ? "svg" : preferredRenderer;
 
   const layout = useMemo(() => layOut(stitches, rounds), [stitches, rounds]);
   /*
@@ -171,7 +184,7 @@ const Chart: React.FC<ChartProps> = ({
     );
     // Size is derived from the same values this already depends on.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [drawn, layout, palette, width, height, ratio]);
+  }, [drawn, layout, palette, width, height, ratio, drawWith]);
 
   /*
    * And the two things that change as you knit, on a sheet of their own over
@@ -198,7 +211,7 @@ const Chart: React.FC<ChartProps> = ({
       token("--crimson", "#bb2c43"),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [layout, rounds, progress, nextId, ratio, width, height]);
+  }, [layout, rounds, progress, nextId, ratio, width, height, drawWith]);
 
   /*
    * A chart is read from the bottom right, so that is where it opens. Only
@@ -225,7 +238,7 @@ const Chart: React.FC<ChartProps> = ({
       left: Math.max(x - scroller.clientWidth / 2 + cellSize / 2, 0),
       behavior: reducedMotion() ? "auto" : "smooth",
     });
-  }, [at, layout]);
+  }, [at, layout, cellSize]);
 
   /*
    * And down the page, but only when the round changes. Within a round the
@@ -251,13 +264,20 @@ const Chart: React.FC<ChartProps> = ({
     window.scrollBy({ top: delta, behavior: reducedMotion() ? "auto" : "smooth" });
     // Re-aim only when the round changes; the rest is in the closure.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusRound]);
+  }, [focusRound, cellSize]);
 
   if (layout.rounds === 0) return <p>This pattern has no stitches to chart.</p>;
 
   return (
     <div className="chart-frame">
-      <div className="chart-scroll" ref={scrollRef}>
+      <div className="chart-controls screen-only">
+        <label>Chart zoom <select value={zoom} onChange={e => setZoom(Number(e.target.value))}>
+          <option value={16}>100%</option><option value={22}>140%</option><option value={30}>190%</option>
+        </select></label>
+        <label><input type="checkbox" checked={contrast} onChange={e => setContrast(e.target.checked)} /> High contrast with numbered yarns</label>
+      </div>
+      {contrast && <ul className="chart-yarn-numbers">{Object.entries(palette).filter(([key], i, entries) => entries.findIndex(([other]) => yarnLabels[other] === yarnLabels[key]) === i).map(([key, yarn]) => <li key={key}>{yarnLabels[key]}: {yarn.name}</li>)}</ul>}
+      <div className="chart-scroll" ref={scrollRef} tabIndex={0} role="region" aria-label="Scrollable knitting chart">
         <div
           className="chart-sheets"
           style={{ width, height }}
@@ -283,7 +303,8 @@ const Chart: React.FC<ChartProps> = ({
               stitches={drawn}
               rounds={rounds}
               layout={layout}
-              palette={palette}
+              palette={shownPalette}
+              yarnLabels={contrast ? yarnLabels : undefined}
               progress={progress}
               nextStitchId={nextId}
               cell={cellSize}
@@ -297,6 +318,14 @@ const Chart: React.FC<ChartProps> = ({
           )}
         </div>
       </div>
+      <StitchLegend stitches={stitches} />
+      <details className="chart-help" onToggle={e => setShowText(e.currentTarget.open)}>
+        <summary>Text round instructions</summary>
+        <label>Read round <select value={follow && focusRound ? focusRound : textRound} disabled={follow && !!focusRound} onChange={e => setTextRound(Number(e.target.value))}>
+          {rounds.map((_, i) => <option key={i} value={i + 1}>{i + 1} · {labels?.[i]}</option>)}
+        </select></label>
+        {showText && <TextRound stitches={stitches} rounds={rounds} round={follow && focusRound ? focusRound : textRound} labels={labels} palette={palette} />}
+      </details>
       <p className="chart-caption">
         {layout.columns} stitches at its widest, {layout.rounds} rounds. Read
         from the bottom right, working right to left; scroll sideways to see a

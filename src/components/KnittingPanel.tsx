@@ -197,6 +197,10 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
 
   return (
     <div className="knitting-panel">
+      <p className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+        Round {position.round}, stitch {position.stitchInRound}.
+        {run && ` ${runInstruction(run)} in ${yarnFor(palette, run.slot).name}.`}
+      </p>
       <div className="knitting-readout">
         <span className="knitting-figure">
           <em>{position.round}</em>
