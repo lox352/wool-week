@@ -167,8 +167,8 @@ const Home: React.FC = () => {
           })}
         </ul>
         <p className="quiet">
-          Earlier years are not here yet. The site is built so that adding one
-          is a matter of adding its chart.
+          {hats.length} Shetland Wool Week hats, {Math.min(...hats.map(hat => hat.year))}–{Math.max(...hats.map(hat => hat.year))}.
+          Choose a hat to explore its sizes, wool and chart.
         </p>
       </section>
 
