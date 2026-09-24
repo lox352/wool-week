@@ -15,6 +15,13 @@
   border-bottom: 1px solid var(--rule);
 }
 
+.masthead-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
 .masthead-title {
   font-family: var(--display);
   text-transform: uppercase;

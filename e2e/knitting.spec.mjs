@@ -3,6 +3,10 @@ import { readFile } from "node:fs/promises";
 
 const pattern = "#/hat/sww18-merrie-dancers-toorie";
 const position = page => page.locator(".knitting-panel [role=status]");
+async function openSettings(page) {
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  return page.getByRole("dialog", { name: "Settings", exact: true });
+}
 async function start(page) {
   await page.goto(pattern);
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
@@ -71,14 +75,16 @@ test("progress survives reload, undo and confirmed jumps; a second tab stays in 
 test("backup restores copies and rename/delete require their dialogs", async ({ page }) => {
   await start(page);
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Export project backup", exact: true }).click();
+  await (await openSettings(page)).getByRole("button", { name: "Save", exact: true }).click();
   const download = await downloadPromise;
   const buffer = await readFile(await download.path());
   expect(JSON.parse(buffer.toString()).projects).toHaveLength(1);
+  await page.getByRole("button", { name: "Done", exact: true }).click();
   await page.getByRole("link", { name: "Wool Week Toories", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Wool Week Toories", level: 1, exact: true })).toBeVisible();
-  await page.getByLabel("Import project backup").setInputFiles({ name: "backup.json", mimeType: "application/json", buffer });
+  await (await openSettings(page)).getByLabel("Import project backup").setInputFiles({ name: "backup.json", mimeType: "application/json", buffer });
   await page.getByRole("button", { name: "Restore copies", exact: true }).click();
+  await page.getByRole("button", { name: "Done", exact: true }).click();
   await expect(page.getByRole("button", { name: "Rename", exact: true })).toHaveCount(2);
   await page.getByRole("button", { name: "Rename", exact: true }).first().click();
   await page.getByRole("textbox", { name: "Name this project" }).fill("Regression test hat");
