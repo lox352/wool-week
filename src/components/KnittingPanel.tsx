@@ -14,6 +14,7 @@ import {
 import { Palette, inkOn, yarnFor } from "../knitting/palette";
 import Button from "./ui/Button";
 import "./KnittingPanel.css";
+import JumpTo from "./JumpTo";
 
 interface KnittingPanelProps {
   stitches: Stitch[];
@@ -184,6 +185,7 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
           </span>
         </div>
         <div className="knitting-actions">
+          <JumpTo stitches={stitches} index={index} progress={progress} onJump={setProgress} />
           <Button variant="quiet" onClick={onUndo} disabled={!canUndo}>
             Undo
           </Button>
@@ -249,6 +251,7 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
       </div>
 
       <div className="knitting-actions">
+        <JumpTo stitches={stitches} index={index} progress={progress} onJump={setProgress} />
         <Button variant="quiet" onClick={() => step(-1)} disabled={progress <= 0}>
           Back
         </Button>
