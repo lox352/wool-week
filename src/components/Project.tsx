@@ -27,16 +27,21 @@ import "./Project.css";
  *
  * Progress is written straight to storage on every change, because the thing
  * that actually happens to a knitting app is that the phone locks mid-round.
- * Undo is one step and lives only in memory, which is the right size for the
- * mistake it exists to fix - a stitch counted twice.
+ * Undo steps back through every change made in this visit, and lives only in
+ * memory: it is for a run tapped twice or a jump to the wrong stitch, not a
+ * record of the project.
  */
+/** How many changes Undo can step back through. */
+const undoLimit = 100;
+
 const Project: React.FC = () => {
   const { projectId } = useParams();
   const [params, setParams] = useSearchParams();
   const [project, setProject] = useState<SavedProject | undefined>(() =>
     projectId ? readProject(projectId) : undefined,
   );
-  const [previous, setPrevious] = useState<number>();
+  /** Where progress was before each change, most recent last. */
+  const [history, setHistory] = useState<number[]>([]);
   const currentProject = useRef(project);
   const adopt = useCallback((next: SavedProject | undefined) => {
     currentProject.current = next;
@@ -52,17 +57,17 @@ const Project: React.FC = () => {
 
   useEffect(() => {
     adopt(projectId ? readProject(projectId) : undefined);
-    setPrevious(undefined);
+    setHistory([]);
     const refresh = (event: StorageEvent) => {
       if (event.key === null || event.key === `project-${projectId}`) {
         adopt(projectId ? readProject(projectId) : undefined);
-        setPrevious(undefined);
+        setHistory([]);
       }
     };
     window.addEventListener("storage", refresh);
     const refreshLocal = () => {
       const next = projectId ? readProject(projectId) : undefined;
-      if (next?.updatedAt !== currentProject.current?.updatedAt) setPrevious(undefined);
+      if (next?.updatedAt !== currentProject.current?.updatedAt) setHistory([]);
       adopt(next);
     };
     window.addEventListener(projectsChanged, refreshLocal);
@@ -75,18 +80,23 @@ const Project: React.FC = () => {
   const setProgress = useCallback(
     (next: number) => {
       change((current) => {
-        setPrevious(current.progress);
-        return { ...current, progress: Math.max(next, 0) };
+        const progress = Math.max(next, 0);
+        if (progress !== current.progress) {
+          const from = current.progress;
+          setHistory((past) => [...past.slice(-(undoLimit - 1)), from]);
+        }
+        return { ...current, progress };
       });
     },
     [change],
   );
 
   const undo = useCallback(() => {
+    const previous = history.at(-1);
     if (previous === undefined) return;
     change(current => ({ ...current, progress: previous }));
-    setPrevious(undefined);
-  }, [previous, change]);
+    setHistory((past) => past.slice(0, -1));
+  }, [history, change]);
 
   const setColourway = useCallback((colourwayId: string) => {
     change(current => ({ ...current, colourwayId }));
@@ -134,7 +144,7 @@ const Project: React.FC = () => {
       }}
       setProgress={setProgress}
       undo={undo}
-      canUndo={previous !== undefined}
+      canUndo={history.length > 0}
       setColourway={setColourway}
       setShade={setShade}
       restoreShades={restoreShades}
