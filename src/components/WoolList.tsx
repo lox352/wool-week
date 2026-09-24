@@ -66,7 +66,9 @@ const WoolList: React.FC<WoolListProps> = ({
                 <strong>{ball.yarn.name}</strong>
                 {ball.yarn.code ? ` (${ball.yarn.code})` : ""}
                 <span className="quiet wool-row-count">
-                  {ball.balls} ball{ball.balls === 1 ? "" : "s"}
+                  {ball.slots.some(slot => overrides[slot])
+                    ? "Substituted yarn · quantity not calculated"
+                    : `${ball.balls} ball${ball.balls === 1 ? "" : "s"} in the original pattern`}
                   {overrides[ball.slots[0]] ? " · yours" : ""}
                   {ball.yarn.approximate ? " · colour approximate" : ""}
                 </span>
@@ -79,6 +81,8 @@ const WoolList: React.FC<WoolListProps> = ({
 
       {yours && (
         <p className="wool-list-restore">
+          Original ball counts do not transfer to substituted wool. Check yarn weight,
+          metres per ball and your swatch; combining colours also combines their yarn requirements.{" "}
           <Button variant="quiet" onClick={onRestoreAll}>
             Back to {colourway.name} throughout
           </Button>
