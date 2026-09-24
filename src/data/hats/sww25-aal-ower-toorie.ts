@@ -29,7 +29,7 @@ const sww25: HatPattern = {
     "diamond grid, so the design runs on horizontally, vertically and " +
     "diagonally - aal ower - and the name is a nod to Guild members, who " +
     "come from all over Shetland.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://www.ravelry.com/patterns/library/aal-ower-toorie",
   credit: "© Shetland Guild of Spinners, Knitters, Weavers and Dyers",
   hashtag: "#AalOwerToorie",
   slots: ["A", "B", "C", "D", "E", "F", "G", "H"],

@@ -76,7 +76,7 @@ const sww18: HatPattern = {
     "pattern. Its dark background carries colours that remind me of the " +
     "northern lights, or merrie dancers in Shetland dialect, and a familiar " +
     "sight to fishermen.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://www.ravelry.com/patterns/library/merrie-dancers-toorie-2",
   credit: "© Elizabeth Johnston (Shetland Handspun)",
   hashtag: "#merriedancerstoorie",
   slots: ["A", "B", "C", "D", "E"],

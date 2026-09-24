@@ -29,7 +29,7 @@ const sww24: HatPattern = {
     "mother Margaret's knitted lace. The colourways come from the natural " +
     "shades of the family's own flock, and from the heather hills and sunset " +
     "views off the farm.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://www.ravelry.com/patterns/library/islesburgh-toorie",
   credit: "© The Doull Family",
   hashtag: "#IslesburghToorie",
   slots: ["A", "B", "C", "D", "E"],

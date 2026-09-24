@@ -30,7 +30,7 @@ const sww19: HatPattern = {
     "his family croft in Hamnavoe on Burra Isle. Created for Shetland Wool " +
     "Week's tenth year, the beanie was designed and knitted by Sandra " +
     "Manson and charted by Ella Gordon.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://www.ravelry.com/patterns/library/roadside-beanie-2",
   credit: "© Sandra Manson; charted by Ella Gordon; for Oliver Henry",
   hashtag: "#roadsidebeanie",
   slots: ["A", "B", "C", "D", "E", "F", "G"],

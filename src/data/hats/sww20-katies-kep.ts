@@ -55,7 +55,7 @@ const sww20: HatPattern = {
     "to us as alive as they are, and the hat is Wilma's tribute to all of " +
     "them - the designers and artists of Shetland whose names are known, and " +
     "the many more whose names are not.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://www.ravelry.com/patterns/library/katies-kep",
   credit: "© Wilma Malcolmson",
   hashtag: "#katieskep",
   slots: ["A", "B", "C", "D", "E"],

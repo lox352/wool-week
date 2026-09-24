@@ -42,7 +42,7 @@ const sww15: HatPattern = {
     "the hat, which makes a very firm, cosy garment that keeps out the wind. " +
     "The pattern was written for double pointed needles, as is traditional " +
     "in Shetland, but it knits just as well on a circular.",
-  patternUrl: "https://www.shetlandwoolweek.com/",
+  patternUrl: "https://www.ravelry.com/patterns/library/baa-ble-hat",
   credit: "© Donna Smith",
   slots: ["A", "B", "C", "D"],
 
