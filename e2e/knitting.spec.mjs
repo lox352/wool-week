@@ -78,6 +78,26 @@ test("progress survives reload, undo and confirmed jumps; a second tab stays in 
   await expect(position(other)).toHaveText(advanced);
 });
 
+test("tapping a stitch on the chart carries on from it, and can be undone", async ({ page }) => {
+  await start(page);
+  const original = await position(page).textContent();
+  // Round 20, the fourth stitch from the right-hand edge.
+  await page.locator(".chart-sheets").evaluate(sheet => {
+    const cell = 16;
+    const box = sheet.getBoundingClientRect();
+    const columns = Math.round((box.width - Math.round(cell * 2.2)) / cell);
+    sheet.dispatchEvent(new MouseEvent("click", { bubbles: true,
+      clientX: box.left + (columns - 3.5) * cell, clientY: box.bottom - 19.5 * cell }));
+  });
+  const picker = page.getByRole("dialog", { name: "Round 20, stitch 4" });
+  await expect(picker).toBeVisible();
+  await picker.getByRole("button", { name: "Knit up to here" }).click();
+  await expect(position(page)).toContainText("Round 20, stitch 4.");
+  await expect(picker).toBeHidden();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect(position(page)).toHaveText(original);
+});
+
 test("backup restores copies and rename/delete require their dialogs", async ({ page }) => {
   await start(page);
   const downloadPromise = page.waitForEvent("download");

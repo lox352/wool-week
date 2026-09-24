@@ -303,6 +303,7 @@ const ProjectView: React.FC<{
           palette={palette}
           progress={project.progress}
           follow={knitting}
+          onJump={knitting ? setProgress : undefined}
           labels={roundLabels}
           turns={turns}
           stitchNotes={hat.stitchNotes}

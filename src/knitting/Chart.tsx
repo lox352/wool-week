@@ -5,6 +5,8 @@ import { Palette } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
 import { StitchLegend, TextRound } from "./ChartHelp";
+import StitchPicker from "./StitchPicker";
+import { stitchAtPoint } from "./jump";
 import { useSettings } from "../helpers/settings";
 import type { HatPattern } from "../data/hats/types";
 import { maxCell, minCell, usePinchZoom } from "./usePinchZoom";
@@ -81,6 +83,11 @@ interface ChartProps {
    * opposite faces of the tube, and so the other way about the hat.
    */
   turns?: number[];
+  /**
+   * Makes the chart tappable: tap a stitch to carry on from it. Given the
+   * progress to move to, which is the stitch before the one tapped.
+   */
+  onJump?: (progress: number) => void;
   /** What the pattern says about its stitches, for the symbol key. */
   stitchNotes?: HatPattern["stitchNotes"];
 }
@@ -109,7 +116,10 @@ const Chart: React.FC<ChartProps> = ({
   labels,
   turns,
   stitchNotes,
+  onJump,
 }) => {
+  const [picked, setPicked] = useState<number>();
+  const closePicker = useCallback(() => setPicked(undefined), []);
   const [zoom, setZoom] = useState(16);
   const { highContrast: contrast, writtenRounds } = useSettings();
   const [textRound, setTextRound] = useState(1);
@@ -296,8 +306,22 @@ const Chart: React.FC<ChartProps> = ({
       >
         <div
           ref={sheetRef}
-          className="chart-sheets"
+          className={`chart-sheets${onJump ? " chart-pickable" : ""}`}
           style={{ width, height }}
+          onClick={
+            onJump &&
+            ((event) => {
+              const box = event.currentTarget.getBoundingClientRect();
+              const id = stitchAtPoint(
+                layout,
+                rounds,
+                cellSize,
+                event.clientX - box.left,
+                event.clientY - box.top,
+              );
+              setPicked(id === picked ? undefined : id);
+            })
+          }
           role="img"
           aria-label={
             `The chart: ${layout.columns} stitches at its widest and ` +
@@ -333,6 +357,18 @@ const Chart: React.FC<ChartProps> = ({
               <canvas ref={overlayRef} style={{ width, height }} />
             </>
           )}
+          {onJump && picked !== undefined && (
+            <StitchPicker
+              id={picked}
+              stitches={stitches}
+              rounds={rounds}
+              layout={layout}
+              cell={cellSize}
+              progress={progress}
+              onJump={onJump}
+              onClose={closePicker}
+            />
+          )}
         </div>
       </div>
       <StitchLegend stitches={stitches} notes={stitchNotes} />
@@ -346,7 +382,7 @@ const Chart: React.FC<ChartProps> = ({
       <p className="chart-caption">
         {layout.columns} stitches at its widest, {layout.rounds} rounds. Read
         from the bottom right, working right to left; scroll sideways to see a
-        whole round, and pinch to zoom. Where a round is shorter than the one below it, stitches
+        whole round, and pinch to zoom.{onJump && " Tap a stitch to carry on from there."} Where a round is shorter than the one below it, stitches
         have been decreased away.
       </p>
       {marked.length > 0 && (
