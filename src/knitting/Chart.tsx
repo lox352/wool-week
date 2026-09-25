@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Stitch } from "../types/Stitch";
 import { layOut } from "./layout";
-import { Palette } from "./palette";
+import { Palette, yarnFor } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
 import { StitchLegend, TextRound } from "./ChartHelp";
 import StitchPicker from "./StitchPicker";
+import { keyEntryAt } from "./stitch-key";
 import { stitchAtPoint } from "./jump";
 import { useSettings } from "../helpers/settings";
 import type { HatPattern } from "../data/hats/types";
@@ -354,10 +355,9 @@ const Chart: React.FC<ChartProps> = ({
       >
         <div
           ref={sheetRef}
-          className={`chart-sheets${onJump ? " chart-pickable" : ""}`}
+          className="chart-sheets chart-pickable"
           style={{ width, height }}
           onClick={
-            onJump &&
             ((event) => {
               const box = event.currentTarget.getBoundingClientRect();
               const id = stitchAtPoint(
@@ -406,8 +406,10 @@ const Chart: React.FC<ChartProps> = ({
               <canvas ref={overlayRef} style={{ width, height }} />
             </>
           )}
-          {onJump && picked !== undefined && (
+          {picked !== undefined && (
             <StitchPicker
+              entry={keyEntryAt(stitches, picked, stitchNotes)}
+              yarn={stitches[picked] && yarnFor(palette, stitches[picked].slot)}
               id={picked}
               stitches={stitches}
               rounds={rounds}

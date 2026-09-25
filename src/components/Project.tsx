@@ -4,7 +4,8 @@ import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
 import { paletteOf, yarnFor } from "../knitting/palette";
-import { totals, positionOf } from "../knitting/progress";
+import { totals, positionOf, currentRun } from "../knitting/progress";
+import { keyEntryAt } from "../knitting/stitch-key";
 import {
   Project as SavedProject,
   chartPath,
@@ -20,6 +21,7 @@ import ProgressRing from "./ProgressRing";
 import HatModel from "./HatModel";
 import Chart from "../knitting/Chart";
 import KnittingPanel from "./KnittingPanel";
+import { KeyRail, KeySheet } from "./KnitKey";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
@@ -275,6 +277,28 @@ const ProjectView: React.FC<{
   const askedScroll = trialParams.get("scroll");
   const scrollTrial =
     askedScroll === "a" || askedScroll === "b" || askedScroll === "c" ? askedScroll : "now";
+  // Trial: three ways to keep the key to hand while knitting, "?key=a" to "c".
+  const askedKey = trialParams.get("key");
+  const keyTrial = askedKey === "b" || askedKey === "c" ? askedKey : "a";
+  const [keyOpen, setKeyOpen] = useState(false);
+  const closeKey = useCallback(() => setKeyOpen(false), []);
+  useEffect(() => {
+    if (!knitting) setKeyOpen(false);
+  }, [knitting]);
+  const run = currentRun(stitches, project.progress, index);
+  const currentStitch = run ? keyEntryAt(stitches, run.startId, hat.stitchNotes)?.id : undefined;
+  // The next stitch in this round that is not a plain knit, for the rail to
+  // explain before you reach it.
+  const comingStitch = useMemo(() => {
+    const round = index.roundOf.get(project.progress + 1);
+    const ids = round === undefined ? [] : index.rounds[round - 1];
+    for (const id of ids) {
+      if (id <= project.progress) continue;
+      const entry = keyEntryAt(stitches, id, hat.stitchNotes);
+      if (entry && entry.id !== "k1") return entry.id;
+    }
+    return undefined;
+  }, [index, project.progress, stitches, hat.stitchNotes]);
   // The panel's height, for a chart window that has to fit above it.
   useLayoutEffect(() => {
     const panel = document.querySelector<HTMLElement>(".knitting-panel");
@@ -303,6 +327,14 @@ const ProjectView: React.FC<{
         className={scrollTrial === "b" && knitting ? "knit-screen" : undefined}
       >
         <section className={`section chart-page chart-page-${scrollTrial}`}>
+          {knitting && keyTrial === "b" && (
+            <KeyRail
+              stitches={stitches}
+              palette={palette}
+              notes={hat.stitchNotes}
+              current={comingStitch}
+            />
+          )}
           <Chart
             contained={scrollTrial === "a" || scrollTrial === "b"}
             holdHeight={scrollTrial === "c"}
@@ -339,6 +371,9 @@ const ProjectView: React.FC<{
             onStop={() => setKnitting(false)}
             canUndo={canUndo}
             onUndo={undo}
+            notes={hat.stitchNotes}
+            keyStyle={keyTrial}
+            onOpenKey={() => setKeyOpen(true)}
           />
         ) : (
           <ChartPageFoot
@@ -350,6 +385,15 @@ const ProjectView: React.FC<{
             finished={position.finished}
             overview={overviewPath(project.id)}
             onKnit={() => setKnitting(true)}
+          />
+        )}
+        {knitting && keyOpen && (
+          <KeySheet
+            stitches={stitches}
+            palette={palette}
+            notes={hat.stitchNotes}
+            current={currentStitch}
+            onClose={closeKey}
           />
         )}
       </PageLayout>

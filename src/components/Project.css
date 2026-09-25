@@ -264,7 +264,7 @@
   overflow: hidden;
 }
 
-.knit-screen > :not(.chart-page, .knitting-panel) {
+.knit-screen > :not(.chart-page, .knitting-panel, .key-sheet) {
   display: none;
 }
 

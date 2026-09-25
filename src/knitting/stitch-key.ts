@@ -130,3 +130,28 @@ export const stitchKey = (
       };
     });
 };
+
+/**
+ * The key's entry for one stitch of the chart, in this pattern's words.
+ *
+ * The make-one that is the second loop of a KFB is part of the KFB, and is
+ * explained as one.
+ */
+export const keyEntryAt = (
+  stitches: Stitch[],
+  id: number,
+  notes: Partial<Record<StitchKeyId, StitchNote>> = {},
+): KeyEntry | undefined => {
+  const stitch = stitches[id];
+  if (!stitch || stitch.type === "join") return undefined;
+  const type: StitchKeyId = pairedWithKfb(stitches, id) ? "kfb" : stitch.type;
+  const note = notes[type];
+  return {
+    ...standard[type],
+    abbreviation: note?.abbreviation ?? standard[type].abbreviation,
+    label: note?.label ?? standard[type].label,
+    how: note?.how ?? standard[type].how,
+    note: note?.note,
+    lean: note?.lean,
+  };
+};

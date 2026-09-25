@@ -245,3 +245,27 @@
   margin-top: 0.55rem;
   border-top: 2.5px solid var(--crimson);
 }
+
+.stitch-picker-what {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem;
+  align-items: start;
+  font-size: 0.88rem;
+}
+
+.stitch-picker-what > div:only-child {
+  grid-column: 1 / -1;
+}
+
+.stitch-picker-what p {
+  margin: 0.2rem 0 0;
+  color: var(--ink-soft);
+  line-height: 1.35;
+}
+
+.stitch-picker-yarn {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+}

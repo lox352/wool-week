@@ -4,9 +4,13 @@ import { ChartLayout } from "./layout";
 import { cellAt, chartSize } from "./draw-chart";
 import { progressBefore } from "./jump";
 import Button from "../components/ui/Button";
+import { KeyEntry } from "./stitch-key";
+import { Swatch } from "./ChartHelp";
 
 /** How wide the bubble is, so it can be kept on the chart. */
 const bubbleWidth = 208;
+/** Wider when it also explains the stitch. */
+const explainingWidth = 272;
 
 /**
  * The bubble over a stitch tapped on the chart, offering to carry on from it.
@@ -23,9 +27,13 @@ const StitchPicker: React.FC<{
   layout: ChartLayout;
   cell: number;
   progress: number;
-  onJump: (progress: number) => void;
+  /** Absent when you are not knitting: then it only says what the stitch is. */
+  onJump?: (progress: number) => void;
   onClose: () => void;
-}> = ({ id, stitches, rounds, layout, cell, progress, onJump, onClose }) => {
+  /** What the stitch is and how to work it, and the yarn it is worked in. */
+  entry?: KeyEntry;
+  yarn?: { name: string; hex: string };
+}> = ({ id, stitches, rounds, layout, cell, progress, onJump, onClose, entry, yarn }) => {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -39,9 +47,11 @@ const StitchPicker: React.FC<{
   const target = progressBefore(stitches, rounds, at.round, at.index);
   const { x, y } = cellAt(layout, at.round, at.column, cell);
   const { width } = chartSize(layout, cell);
+  const explains = entry !== undefined && entry.id !== "k1";
+  const bubble = explains ? explainingWidth : bubbleWidth;
   const left = Math.min(
-    Math.max(x + cell / 2 - bubbleWidth / 2, 4),
-    Math.max(width - bubbleWidth - 4, 4),
+    Math.max(x + cell / 2 - bubble / 2, 4),
+    Math.max(width - bubble - 4, 4),
   );
   // Above the stitch, unless that would run off the top of the chart.
   const below = y < 96;
@@ -60,7 +70,7 @@ const StitchPicker: React.FC<{
         aria-label={`Round ${at.round}, stitch ${at.index}`}
         style={{
           left,
-          width: bubbleWidth,
+          width: bubble,
           top: below ? y + cell + 8 : undefined,
           bottom: below ? undefined : layout.rounds * cell - y + 8,
         }}
@@ -79,7 +89,25 @@ const StitchPicker: React.FC<{
             ×
           </button>
         </div>
-        {here ? (
+        {entry && (
+          <div className="stitch-picker-what">
+            {explains && <Swatch entry={entry} />}
+            <div>
+              <strong>
+                {entry.label}
+                {entry.abbreviation && <span className="stitch-abbr"> {entry.abbreviation}</span>}
+              </strong>
+              {yarn && (
+                <span className="stitch-picker-yarn">
+                  <span className="swatch" style={{ background: yarn.hex }} /> {yarn.name}
+                </span>
+              )}
+              {explains && <p>{entry.how}</p>}
+              {explains && entry.note && <p className="stitch-note">{entry.note}</p>}
+            </div>
+          </div>
+        )}
+        {!onJump ? null : here ? (
           <p className="stitch-picker-note">This is the next stitch to work.</p>
         ) : (
           <Button
