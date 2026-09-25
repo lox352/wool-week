@@ -1,7 +1,10 @@
 .page {
+  /* The page's side and foot padding, which full-width strips reach back across. */
+  --gutter: 1rem;
+  --foot: 4rem;
   max-width: 1060px;
   margin: 0 auto;
-  padding: 1.5rem 1rem 4rem;
+  padding: 1.5rem var(--gutter) var(--foot);
 }
 
 .masthead {
@@ -54,6 +57,8 @@
 
 @media (max-width: 620px) {
   .page {
-    padding: 1rem 0.9rem 3rem;
+    --gutter: 0.9rem;
+    --foot: 3rem;
+    padding: 1rem var(--gutter) var(--foot);
   }
 }

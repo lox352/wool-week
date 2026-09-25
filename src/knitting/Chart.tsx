@@ -9,7 +9,7 @@ import StitchPicker from "./StitchPicker";
 import { stitchAtPoint } from "./jump";
 import { useSettings } from "../helpers/settings";
 import type { HatPattern } from "../data/hats/types";
-import { maxCell, minCell, usePinchZoom } from "./usePinchZoom";
+import { usePinchZoom } from "./usePinchZoom";
 import "./Chart.css";
 
 
@@ -136,7 +136,13 @@ const Chart: React.FC<ChartProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const zoomTo = useCallback((cell: number) => setZoom(Math.round(cell)), []);
-  usePinchZoom(scrollRef, sheetRef, cellSize, zoomTo, follow);
+  const zoomAt = usePinchZoom(scrollRef, sheetRef, cellSize, zoomTo);
+  /*
+   * The cell size the follow below reads, kept out of its dependencies: a
+   * zoom leaves the chart where it lands, and only knitting moves it.
+   */
+  const cellNow = useRef(cellSize);
+  cellNow.current = cellSize;
   const baseRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLCanvasElement>(null);
   const nextId = follow ? progress + 1 : undefined;
@@ -254,12 +260,13 @@ const Chart: React.FC<ChartProps> = ({
   useEffect(() => {
     const scroller = scrollRef.current;
     if (!scroller || !at) return;
-    const { x } = cellAt(layout, at.round, at.column, cellSize);
+    const cell = cellNow.current;
+    const { x } = cellAt(layout, at.round, at.column, cell);
     scroller.scrollTo({
-      left: Math.max(x - scroller.clientWidth / 2 + cellSize / 2, 0),
+      left: Math.max(x - scroller.clientWidth / 2 + cell / 2, 0),
       behavior: reducedMotion() ? "auto" : "smooth",
     });
-  }, [at, layout, cellSize]);
+  }, [at, layout]);
 
   /*
    * And down the page, but only when the round changes. Within a round the
@@ -270,6 +277,7 @@ const Chart: React.FC<ChartProps> = ({
   useEffect(() => {
     const sheets = scrollRef.current?.querySelector(".chart-sheets");
     if (!sheets || focusRound === undefined) return;
+    const cellSize = cellNow.current;
     const { y } = cellAt(layout, focusRound, 1, cellSize);
     /*
      * The panel is stuck to the bottom of the screen while you work, so the
@@ -285,7 +293,7 @@ const Chart: React.FC<ChartProps> = ({
     window.scrollBy({ top: delta, behavior: reducedMotion() ? "auto" : "smooth" });
     // Re-aim only when the round changes; the rest is in the closure.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusRound, cellSize]);
+  }, [focusRound]);
 
   if (layout.rounds === 0) return <p>This pattern has no stitches to chart.</p>;
 
@@ -303,7 +311,11 @@ const Chart: React.FC<ChartProps> = ({
           const step = event.key === "+" || event.key === "=" ? 4 : event.key === "-" ? -4 : 0;
           if (!step) return;
           event.preventDefault();
-          zoomTo(Math.min(maxCell, Math.max(minCell, cellSize + step)));
+          // About the middle of what is showing of the chart.
+          const view = event.currentTarget.getBoundingClientRect();
+          const top = Math.max(view.top, 0);
+          const bottom = Math.min(view.bottom, window.innerHeight);
+          zoomAt(cellSize + step, view.left + view.width / 2, (top + bottom) / 2);
         }}
       >
         <div
