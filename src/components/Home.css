@@ -23,18 +23,7 @@
   overflow: hidden;
 }
 
-.project-card-body {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  text-decoration: none;
-  color: inherit;
-}
 
-.project-card-body:hover {
-  background: var(--paper-sunk);
-}
 
 .project-card-text {
   display: flex;
@@ -52,13 +41,7 @@
   font-size: 0.87rem;
 }
 
-.project-card-yarns {
-  display: flex;
-  gap: 2px;
-  flex: none;
-}
 
-.project-card-yarns .swatch,
 .swatch {
   width: 14px;
   height: 22px;
@@ -116,8 +99,44 @@
   font-size: 0.85rem;
 }
 
-@media (max-width: 620px) {
-  .project-card-body {
-    flex-wrap: wrap;
-  }
+
+/* Project cards with the hat's body on top, like the hat cards below them. */
+.project-list {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.project-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.project-card-link:hover .project-card-text {
+  background: var(--paper-sunk);
+}
+
+.project-card-picture {
+  position: relative;
+  display: block;
+}
+
+.project-card-link .project-card-text {
+  padding: 0.85rem 1rem 0.6rem;
+}
+
+/* How far through the whole hat, along the foot of the picture. */
+.project-card-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: rgb(0 0 0 / 0.18);
+}
+
+.project-card-bar span {
+  display: block;
+  height: 100%;
+  background: var(--crimson);
 }

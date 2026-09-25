@@ -13,12 +13,11 @@ import {
 } from "../helpers/projects";
 import { hatStitches } from "../knitting/useHat";
 import { indexRounds, totals } from "../knitting/progress";
-import { paletteOf, yarnFor } from "../knitting/palette";
+import { paletteOf } from "../knitting/palette";
 import PageLayout from "./ui/PageLayout";
 import Button from "./ui/Button";
 import Dialog from "./ui/Dialog";
 import NameDialog from "./ui/NameDialog";
-import ProgressRing from "./ProgressRing";
 import BodyStrip from "./BodyStrip";
 import "./Home.css";
 
@@ -55,10 +54,48 @@ const ProjectCard: React.FC<{
   const palette = paletteOf(colourway, project.shades, hat.charts);
   const done = counts.percent >= 100;
 
+  const actions = (
+    <div className="project-card-actions">
+      <Button
+        variant="primary"
+        onClick={() => navigate(done ? overviewPath(id) : chartPath(id, true))}
+      >
+        {done ? "See it" : counts.worked > 0 ? "Keep knitting" : "Start knitting"}
+      </Button>
+      <Button variant="quiet" onClick={onRename}>
+        Rename
+      </Button>
+      <Button variant="quiet" onClick={onDelete}>
+        Delete
+      </Button>
+    </div>
+  );
+  const status = done
+    ? `Finished · ${counts.total.toLocaleString()} stitches`
+    : `${counts.worked.toLocaleString()} of ${counts.total.toLocaleString()} stitches · started ${formatDate(project.startedAt)}`;
+
+  const { stitches, rounds } = hatStitches(hat, project.sizeId);
+
+  /*
+   * The hat's body in this project's own wool, filling in as it is knitted:
+   * what is done in colour, what is still to come faded, and a line along
+   * its foot for how far through the whole hat that is.
+   */
   return (
     <li className="project-card">
-      <Link to={`/project/${id}`} className="project-card-body">
-        <ProgressRing percent={counts.percent} />
+      <Link to={overviewPath(id)} className="project-card-link">
+        <span className="project-card-picture">
+          <BodyStrip
+            stitches={stitches}
+            rounds={rounds}
+            palette={palette}
+            progress={project.progress}
+            className="hat-card-body"
+          />
+          <span className="project-card-bar" aria-hidden="true">
+            <span style={{ width: `${counts.percent}%` }} />
+          </span>
+        </span>
         <span className="project-card-text">
           <strong>{project.name ?? hat.name}</strong>
           <span className="quiet">
@@ -66,36 +103,12 @@ const ProjectCard: React.FC<{
           </span>
           <span className="quiet">
             {done
-              ? `Finished · ${counts.total.toLocaleString()} stitches`
-              : `${counts.worked.toLocaleString()} of ${counts.total.toLocaleString()} stitches · started ${formatDate(project.startedAt)}`}
+              ? status
+              : `${counts.worked > 0 && counts.percent < 1 ? "Under 1" : Math.floor(counts.percent)}% knitted · ${status}`}
           </span>
         </span>
-        <span className="project-card-yarns" aria-hidden="true">
-          {colourway.shades.map((shade) => (
-            <span
-              key={shade.slot}
-              className="swatch"
-              style={{ background: yarnFor(palette, shade.slot).hex }}
-            />
-          ))}
-        </span>
       </Link>
-      <div className="project-card-actions">
-        <Button
-          variant="primary"
-          onClick={() =>
-            navigate(done ? overviewPath(id) : chartPath(id, true))
-          }
-        >
-          {done ? "See it" : counts.worked > 0 ? "Keep knitting" : "Start knitting"}
-        </Button>
-        <Button variant="quiet" onClick={onRename}>
-          Rename
-        </Button>
-        <Button variant="quiet" onClick={onDelete}>
-          Delete
-        </Button>
-      </div>
+      {actions}
     </li>
   );
 };
