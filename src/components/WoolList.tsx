@@ -25,6 +25,10 @@ interface WoolListProps {
   overrides: Overrides;
   onChange: (slots: SlotId[], chosen: Chosen | undefined) => void;
   onRestoreAll: () => void;
+  /** Shown in a row, beside the ball: where its yarns are knitted. */
+  rowPreview?: (slots: SlotId[]) => React.ReactNode;
+  /** Shown in the picker while a ball is being chosen. */
+  pickerPreview?: (slots: SlotId[]) => React.ReactNode;
 }
 
 /** "Yarn A", or "Yarns A, C and G". */
@@ -39,6 +43,8 @@ const WoolList: React.FC<WoolListProps> = ({
   overrides,
   onChange,
   onRestoreAll,
+  rowPreview,
+  pickerPreview,
 }) => {
   /** Which ball is being chosen, by the yarns it does. */
   const [picking, setPicking] = useState<SlotId[] | undefined>();
@@ -73,6 +79,7 @@ const WoolList: React.FC<WoolListProps> = ({
                   {ball.yarn.approximate ? " · colour approximate" : ""}
                 </span>
               </span>
+              {rowPreview?.(ball.slots)}
               <span className="wool-row-change">Change</span>
             </button>
           </li>
@@ -97,6 +104,7 @@ const WoolList: React.FC<WoolListProps> = ({
           suggest={colourway.wool}
           onChoose={(choice) => onChange(chosen.slots, choice)}
           onClose={() => setPicking(undefined)}
+          preview={pickerPreview?.(chosen.slots)}
         />
       )}
     </>

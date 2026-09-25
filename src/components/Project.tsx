@@ -23,6 +23,8 @@ import KnittingPanel from "./KnittingPanel";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
+import BodyStrip from "./BodyStrip";
+import { PreviewBanner, colourPreviews, usePreviewVariant } from "./ColourPreview";
 import "./Project.css";
 
 /**
@@ -202,6 +204,11 @@ const ProjectView: React.FC<{
   const counts = totals(index, project.progress);
   const position = positionOf(stitches, project.progress, index);
 
+  const variant = usePreviewVariant();
+  const stageRef = useRef<HTMLDivElement>(null);
+  const choicesRef = useRef<HTMLElement>(null);
+  const woolPreviews = colourPreviews(variant, { stitches, rounds }, palette);
+
   const title = project.name ?? hat.name;
   const eyebrow = `Shetland Wool Week ${hat.year} · ${size.label} · ${colourway.name}`;
   const knitLabel = counts.worked > 0 ? "Keep knitting" : "Start knitting";
@@ -284,18 +291,8 @@ const ProjectView: React.FC<{
     );
   }
 
-  return (
-    <PageLayout
-      title={title}
-      eyebrow={eyebrow}
-      aside={
-        <Link to={chartPath(project.id, !position.finished)} className="btn btn-primary">
-          {position.finished ? "Open the chart" : knitLabel}
-        </Link>
-      }
-    >
-      <div className="project-layout">
-        <div className="project-stage">
+  const stageEl = (
+        <div className="project-stage" ref={stageRef}>
           <HatModel
             hatId={hat.id}
             sizeId={size.id}
@@ -313,6 +310,8 @@ const ProjectView: React.FC<{
             The wool fills in as you knit. Drag to turn it.
           </p>
         </div>
+  );
+  const figuresEl = (
         <div className="project-figures">
           <ProgressRing percent={counts.percent} />
           <dl className="measurements">
@@ -337,11 +336,9 @@ const ProjectView: React.FC<{
             </div>
           </dl>
         </div>
-      </div>
-
-      <div className="peerie-rule" aria-hidden="true" />
-
-      <section className="section">
+  );
+  const woolEl = (
+      <section className="section" ref={choicesRef}>
         <h2>Your wool</h2>
         {/*
           The pattern's own colourways first, because they are where most
@@ -359,14 +356,18 @@ const ProjectView: React.FC<{
                 aria-pressed={option.id === colourway.id}
                 onClick={() => setColourway(option.id)}
               >
-                <span className="colourway-swatches" aria-hidden="true">
-                  {option.shades.map((shade) => (
-                    <span
-                      key={shade.slot}
-                      style={{ background: yarnFor(optionPalette, shade.slot).hex }}
-                    />
-                  ))}
-                </span>
+                {variant === "swatches" ? (
+                  <BodyStrip stitches={stitches} rounds={rounds} palette={optionPalette} className="colourway-motif" />
+                ) : (
+                  <span className="colourway-swatches" aria-hidden="true">
+                    {option.shades.map((shade) => (
+                      <span
+                        key={shade.slot}
+                        style={{ background: yarnFor(optionPalette, shade.slot).hex }}
+                      />
+                    ))}
+                  </span>
+                )}
                 <strong>{option.name}</strong>
                 <span className="quiet">{option.brand}</span>
               </button>
@@ -379,8 +380,43 @@ const ProjectView: React.FC<{
           overrides={project.shades ?? {}}
           onChange={setShade}
           onRestoreAll={restoreShades}
+          {...woolPreviews}
         />
       </section>
+  );
+
+  return (
+    <PageLayout
+      title={title}
+      eyebrow={eyebrow}
+      aside={
+        <Link to={chartPath(project.id, !position.finished)} className="btn btn-primary">
+          {position.finished ? "Open the chart" : knitLabel}
+        </Link>
+      }
+    >
+      {variant === "sticky" ? (
+        <div className="preview-sticky">
+          {stageEl}
+          <div>
+            {figuresEl}
+            <div className="peerie-rule" aria-hidden="true" />
+            {woolEl}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="project-layout">
+            {stageEl}
+            {figuresEl}
+          </div>
+          <div className="peerie-rule" aria-hidden="true" />
+          {woolEl}
+        </>
+      )}
+      {variant === "banner" && (
+        <PreviewBanner body={{ stitches, rounds }} palette={palette} stage={stageRef} choices={choicesRef} />
+      )}
 
       <NextStep
         title={position.finished ? "All knitted" : counts.worked > 0 ? "Carry on" : "Ready to cast on?"}
