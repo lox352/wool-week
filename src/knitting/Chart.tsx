@@ -283,28 +283,82 @@ const Chart: React.FC<ChartProps> = ({
   }, [aim]);
 
   /*
-   * And again whenever the window changes size while you knit. It is sized to
-   * fit above the panel, and the panel can grow after the aim above: when its
-   * fonts arrive on a fresh load, when a round brings a hint or a turn, when
-   * the phone is turned. Aimed for the old size, the stitch can end up below
-   * the new bottom edge, which on the first round is where it always is.
+   * When the window changes size. Scroll positions are counted from the top
+   * left, so on their own they hold the top left corner still, and a window
+   * grown even for a moment, as a phone may while it takes a screenshot, has
+   * its scroll cut back to fit and left there when it shrinks again. But a
+   * chart is read from the bottom right: that is the corner to hold. So the
+   * window keeps the distance it had from the chart's bottom and right edges,
+   * as last seen at its settled size, or, while you knit, re-aims at the
+   * stitch; the panel it sits above can grow after the aim (fonts arriving on
+   * a fresh load, a hint or a turn, a rotation), which on the first round
+   * would leave the stitch just below the window.
+   *
+   * Not when the knitting opens or closes, though, which moves the window on
+   * purpose and holds the chart where it was by itself.
    */
   const aimRef = useRef(aim);
   aimRef.current = aim;
-  const following = contained && at !== undefined;
+  const followingRef = useRef(false);
+  followingRef.current = contained && at !== undefined;
+  const toggled = useRef(false);
+  const wasFollowing = useRef(follow);
+  useLayoutEffect(() => {
+    if (wasFollowing.current === follow) return;
+    wasFollowing.current = follow;
+    // For the resize this commit makes, which is seen in the frame after it.
+    toggled.current = true;
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => {
+        toggled.current = false;
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [follow]);
   useEffect(() => {
     const scroller = scrollRef.current;
-    if (!following || !scroller || typeof ResizeObserver === "undefined") return;
-    let size = `${scroller.clientWidth}x${scroller.clientHeight}`;
+    const sheet = sheetRef.current;
+    if (!contained || !scroller || !sheet || typeof ResizeObserver === "undefined") return;
+    let width = scroller.clientWidth;
+    let height = scroller.clientHeight;
+    let right = 0;
+    let bottom = 0;
+    const settled = () => scroller.clientWidth === width && scroller.clientHeight === height;
+    const note = () => {
+      right = scroller.scrollWidth - scroller.clientWidth - scroller.scrollLeft;
+      bottom = scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop;
+    };
+    note();
+    // A scroll the browser makes to fit a window mid-resize is not yours.
+    const onScroll = () => {
+      if (settled()) note();
+    };
     const watch = new ResizeObserver(() => {
-      const now = `${scroller.clientWidth}x${scroller.clientHeight}`;
-      if (now === size) return;
-      size = now;
-      aimRef.current("auto");
+      // Only the chart changed, in a zoom: where it landed is where it is.
+      if (settled()) {
+        note();
+        return;
+      }
+      width = scroller.clientWidth;
+      height = scroller.clientHeight;
+      if (toggled.current) {
+        toggled.current = false;
+        note();
+      } else if (followingRef.current) {
+        aimRef.current("auto");
+      } else {
+        scroller.scrollLeft = scroller.scrollWidth - scroller.clientWidth - right;
+        scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight - bottom;
+      }
     });
     watch.observe(scroller);
-    return () => watch.disconnect();
-  }, [following]);
+    watch.observe(sheet);
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      watch.disconnect();
+      scroller.removeEventListener("scroll", onScroll);
+    };
+  }, [contained]);
 
   /*
    * And down the page, but only when the round changes. Within a round the

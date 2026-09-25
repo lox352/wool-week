@@ -143,6 +143,23 @@ test("knitting fills the screen, says how to work the round's stitches, and clos
   expect(Math.abs(after.left - before.left)).toBeLessThan(2);
 });
 
+test("the chart keeps its bottom right corner when its window is resized for a moment", async ({ page }) => {
+  await start(page);
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
+  await page.reload();
+  const gaps = () => page.locator(".chart-scroll").evaluate(scroller => ({
+    right: Math.round(scroller.scrollWidth - scroller.clientWidth - scroller.scrollLeft),
+    bottom: Math.round(scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop),
+  }));
+  await expect.poll(gaps).toEqual({ right: 0, bottom: 0 });
+  // Much larger and back, as a phone taking a full-page screenshot may.
+  const size = page.viewportSize();
+  await page.setViewportSize({ width: size.width * 2, height: size.height * 2 });
+  await page.waitForTimeout(200);
+  await page.setViewportSize(size);
+  await expect.poll(gaps).toEqual({ right: 0, bottom: 0 });
+});
+
 test("the key explains the turn, on a hat that is turned inside out", async ({ page }) => {
   await page.goto("#/hat/sww26-birsie-beanny");
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();

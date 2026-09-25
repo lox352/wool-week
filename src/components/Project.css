@@ -248,7 +248,12 @@
 .chart-scroll.chart-scroll-contained {
   overflow: auto;
   overscroll-behavior: contain;
-  height: 68dvh;
+  /*
+   * Of the screen as it is with the browser's bars showing, which does not
+   * change as they come and go on a scroll.
+   */
+  height: 68vh;
+  height: 68svh;
 }
 
 /*
