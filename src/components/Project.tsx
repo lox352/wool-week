@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
@@ -172,6 +172,20 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
     change(current => ({ ...current, shades: undefined }));
   }, [change]);
 
+  /*
+   * Opening or closing the knitting hides or shows the page title above the
+   * chart. Hold the chart where it is on screen rather than letting it jump
+   * by the title's height.
+   */
+  const chartHeld = useRef<number>();
+  useLayoutEffect(() => {
+    const was = chartHeld.current;
+    chartHeld.current = undefined;
+    const sheet = document.querySelector(".chart-sheets");
+    if (was === undefined || !sheet) return;
+    window.scrollBy({ top: sheet.getBoundingClientRect().top - was, behavior: "instant" });
+  }, [knitting]);
+
   if (!project || !hat) {
     return (
       <PageLayout title="No such project">
@@ -196,6 +210,7 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
       project={project}
       knitting={knitting}
       setKnitting={(on) => {
+        chartHeld.current = document.querySelector(".chart-sheets")?.getBoundingClientRect().top;
         const next = new URLSearchParams(params);
         if (on) next.set(knittingParam, "1");
         else next.delete(knittingParam);
@@ -255,15 +270,42 @@ const ProjectView: React.FC<{
   const choicesRef = useRef<HTMLElement>(null);
   const body = useMemo(() => ({ stitches, rounds }), [stitches, rounds]);
 
+  // Trial: three ways to stop the chart page jumping, "?scroll=a" to "c".
+  const [trialParams] = useSearchParams();
+  const askedScroll = trialParams.get("scroll");
+  const scrollTrial =
+    askedScroll === "a" || askedScroll === "b" || askedScroll === "c" ? askedScroll : "now";
+  // The panel's height, for a chart window that has to fit above it.
+  useLayoutEffect(() => {
+    const panel = document.querySelector<HTMLElement>(".knitting-panel");
+    const root = document.documentElement;
+    if (!knitting || !panel || typeof ResizeObserver === "undefined") return;
+    const measure = () => root.style.setProperty("--panel-h", `${panel.offsetHeight}px`);
+    measure();
+    const watch = new ResizeObserver(measure);
+    watch.observe(panel);
+    return () => {
+      watch.disconnect();
+      root.style.removeProperty("--panel-h");
+    };
+  }, [knitting, view]);
+
   const title = project.name ?? hat.name;
   const eyebrow = `Shetland Wool Week ${hat.year} · ${size.label} · ${colourway.name}`;
   const knitLabel = counts.worked > 0 ? "Keep knitting" : "Start knitting";
 
   if (view === "chart") {
     return (
-      <PageLayout title={title} eyebrow={eyebrow} showTitle={!knitting}>
-        <section className="section chart-page">
+      <PageLayout
+        title={title}
+        eyebrow={eyebrow}
+        showTitle={!knitting}
+        className={scrollTrial === "b" && knitting ? "knit-screen" : undefined}
+      >
+        <section className={`section chart-page chart-page-${scrollTrial}`}>
           <Chart
+            contained={scrollTrial === "a" || scrollTrial === "b"}
+            holdHeight={scrollTrial === "c"}
             stitches={stitches}
             rounds={rounds}
             palette={palette}

@@ -32,6 +32,9 @@ export function usePinchZoom(
   sheetRef: RefObject<HTMLDivElement>,
   cell: number,
   setCell: (cell: number) => void,
+  /** The chart scrolls both ways in a box of its own, not down the page. */
+  contained = false,
+  holdHeight = false,
 ) {
   const gesture = useRef<Gesture>();
   const settle = useRef<{
@@ -40,6 +43,8 @@ export function usePinchZoom(
     originY: number;
     screenX: number;
     screenY: number;
+    /** How tall the chart's box was before the zoom. */
+    height: number;
   }>();
   const current = useRef(cell);
   current.current = cell;
@@ -86,6 +91,7 @@ export function usePinchZoom(
         originY: g.originY,
         screenX: g.screenX,
         screenY: g.screenY,
+        height: scroller.offsetHeight,
       };
       setCell(next);
     };
@@ -152,6 +158,17 @@ export function usePinchZoom(
     sheet.style.transform = "";
     sheet.style.willChange = "";
     if (!done || !scroller) return;
+    if (holdHeight) {
+      // Zooming out leaves the chart's old height standing, as blank space
+      // below it, so the page never gets shorter under you and has nowhere
+      // to jump to. Zooming back in past it lets it go.
+      if (done.ratio < 1) {
+        const before = Number.parseFloat(scroller.style.minHeight) || 0;
+        scroller.style.minHeight = `${Math.max(before, done.height)}px`;
+      } else if (sheet.offsetHeight >= (Number.parseFloat(scroller.style.minHeight) || 0)) {
+        scroller.style.minHeight = "";
+      }
+    }
     /*
      * Measured rather than worked out: a browser may already have moved the
      * page itself to keep something else still as the chart grew (scroll
@@ -160,11 +177,15 @@ export function usePinchZoom(
      */
     const box = sheet.getBoundingClientRect();
     scroller.scrollLeft += box.left + done.originX * done.ratio - done.screenX;
+    if (contained) {
+      scroller.scrollTop += box.top + done.originY * done.ratio - done.screenY;
+      return;
+    }
     window.scrollBy({
       top: box.top + done.originY * done.ratio - done.screenY,
       behavior: "instant",
     });
-  }, [cell, scrollRef, sheetRef]);
+  }, [cell, scrollRef, sheetRef, contained, holdHeight]);
 
   /** Zoom to a cell size about a point on screen, holding that point still. */
   return useCallback(
@@ -179,9 +200,10 @@ export function usePinchZoom(
         originY: clientY - box.top,
         screenX: clientX,
         screenY: clientY,
+        height: scrollRef.current?.offsetHeight ?? 0,
       };
       setCell(wanted);
     },
-    [sheetRef, setCell],
+    [scrollRef, sheetRef, setCell],
   );
 }

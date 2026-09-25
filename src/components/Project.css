@@ -240,3 +240,65 @@
 .chart-foot p {
   margin: 0;
 }
+
+/* Trial A and B: the chart scrolls in a window of its own. */
+.chart-scroll.chart-scroll-contained {
+  overflow: auto;
+  overscroll-behavior: contain;
+  height: 68dvh;
+}
+
+.chart-page:has(~ .knitting-panel) .chart-scroll-contained {
+  /* Knitting: whatever is left of the screen above the panel. */
+  height: calc(100dvh - var(--panel-h, 22rem) - 2.5rem);
+}
+
+/* Trial B: knitting fills the screen, and the page does not scroll. */
+.page.knit-screen {
+  position: fixed;
+  inset: 0;
+  max-width: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.knit-screen > :not(.chart-page, .knitting-panel) {
+  display: none;
+}
+
+.knit-screen .chart-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.knit-screen .chart-frame {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+.knit-screen .chart-frame > :not(.chart-scroll, .chart-yarn-numbers),
+.knit-screen .chart-key {
+  display: none;
+}
+
+.knit-screen .chart-scroll.chart-scroll-contained {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  padding: 0.5rem;
+}
+
+.knit-screen .knitting-panel {
+  position: relative;
+  margin: 0;
+}

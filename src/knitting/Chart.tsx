@@ -90,6 +90,14 @@ interface ChartProps {
   onJump?: (progress: number) => void;
   /** What the pattern says about its stitches, for the symbol key. */
   stitchNotes?: HatPattern["stitchNotes"];
+  /**
+   * Scroll the chart inside a window of its own, both ways, rather than
+   * letting it run down the page. Zooming then changes only what is inside
+   * the window, never the height of the page.
+   */
+  contained?: boolean;
+  /** Trial: keep the page, but never let a zoom out shorten it. */
+  holdHeight?: boolean;
 }
 
 /**
@@ -117,6 +125,8 @@ const Chart: React.FC<ChartProps> = ({
   turns,
   stitchNotes,
   onJump,
+  contained = false,
+  holdHeight = false,
 }) => {
   const [picked, setPicked] = useState<number>();
   const makeOneLean = stitchNotes?.m1?.lean;
@@ -136,7 +146,7 @@ const Chart: React.FC<ChartProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const zoomTo = useCallback((cell: number) => setZoom(Math.round(cell)), []);
-  const zoomAt = usePinchZoom(scrollRef, sheetRef, cellSize, zoomTo);
+  const zoomAt = usePinchZoom(scrollRef, sheetRef, cellSize, zoomTo, contained, holdHeight);
   /*
    * The cell size the follow below reads, kept out of its dependencies: a
    * zoom leaves the chart where it lands, and only knitting moves it.
@@ -251,7 +261,8 @@ const Chart: React.FC<ChartProps> = ({
     if (!scroller || opened.current) return;
     opened.current = true;
     scroller.scrollLeft = scroller.scrollWidth;
-  }, []);
+    if (contained) scroller.scrollTop = scroller.scrollHeight;
+  }, [contained]);
 
   const at = nextId === undefined ? undefined : layout.cells.get(nextId);
 
@@ -275,10 +286,33 @@ const Chart: React.FC<ChartProps> = ({
    */
   const focusRound = at?.round;
   useEffect(() => {
-    const sheets = scrollRef.current?.querySelector(".chart-sheets");
-    if (!sheets || focusRound === undefined) return;
+    const scroller = scrollRef.current;
+    const sheets = scroller?.querySelector(".chart-sheets");
+    if (!scroller || !sheets || focusRound === undefined) return;
     const cellSize = cellNow.current;
     const { y } = cellAt(layout, focusRound, 1, cellSize);
+    if (contained) {
+      /*
+       * Bring the window itself fully into view above the panel, then move
+       * the chart inside it: the round a few rows up from its bottom edge.
+       * Sideways too, in the same call, since two smooth scrolls of the one
+       * box cancel each other.
+       */
+      const panel = document.querySelector<HTMLElement>(".knitting-panel");
+      const floor = window.innerHeight - (panel?.offsetHeight ?? 0);
+      const box = scroller.getBoundingClientRect();
+      const below = box.bottom - floor;
+      const above = box.top;
+      const page = below > 1 ? below : above < 0 ? above : 0;
+      if (page) window.scrollBy({ top: page, behavior: "instant" });
+      const x = at ? cellAt(layout, at.round, at.column, cellSize).x : scroller.scrollLeft;
+      scroller.scrollTo({
+        left: Math.max(x - scroller.clientWidth / 2 + cellSize / 2, 0),
+        top: Math.max(y + cellSize - (scroller.clientHeight - clearance * cellSize), 0),
+        behavior: reducedMotion() ? "auto" : "smooth",
+      });
+      return;
+    }
     /*
      * The panel is stuck to the bottom of the screen while you work, so the
      * part of the page you can see ends at its top edge. Its height, not
@@ -301,7 +335,7 @@ const Chart: React.FC<ChartProps> = ({
     <div className="chart-frame">
       {contrast && <ul className="chart-yarn-numbers">{Object.entries(palette).filter(([key], i, entries) => entries.findIndex(([other]) => yarnLabels[other] === yarnLabels[key]) === i).map(([key, yarn]) => <li key={key}>{yarnLabels[key]}: {yarn.name}</li>)}</ul>}
       <div
-        className="chart-scroll"
+        className={`chart-scroll${contained ? " chart-scroll-contained" : ""}`}
         ref={scrollRef}
         tabIndex={0}
         role="region"
