@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { hats, hatById } from "../data/hats";
 import {
   Project,
@@ -13,12 +13,11 @@ import {
 } from "../helpers/projects";
 import { hatStitches } from "../knitting/useHat";
 import { indexRounds, totals } from "../knitting/progress";
-import { paletteOf, yarnFor } from "../knitting/palette";
+import { paletteOf } from "../knitting/palette";
 import PageLayout from "./ui/PageLayout";
 import Button from "./ui/Button";
 import Dialog from "./ui/Dialog";
 import NameDialog from "./ui/NameDialog";
-import ProgressRing from "./ProgressRing";
 import BodyStrip from "./BodyStrip";
 import "./Home.css";
 
@@ -42,15 +41,11 @@ const describe = (project: Project) => {
   return { hat, counts, colourway, size, index };
 };
 
-/** Card layouts on trial: "?card=a", "b" or "c". */
-type CardLook = "current" | "a" | "b" | "c";
-
 const ProjectCard: React.FC<{
   project: Project;
   onRename: () => void;
   onDelete: () => void;
-  look: CardLook;
-}> = ({ project, onRename, onDelete, look }) => {
+}> = ({ project, onRename, onDelete }) => {
   const navigate = useNavigate();
   const described = describe(project);
   if (!described) return null;
@@ -79,47 +74,28 @@ const ProjectCard: React.FC<{
     ? `Finished · ${counts.total.toLocaleString()} stitches`
     : `${counts.worked.toLocaleString()} of ${counts.total.toLocaleString()} stitches · started ${formatDate(project.startedAt)}`;
 
-  if (look !== "current") {
-    const { stitches, rounds } = hatStitches(hat, project.sizeId);
-    return (
-      <li className={`project-card project-card-${look}`}>
-        <Link to={overviewPath(id)} className="project-card-link">
-          <span className="project-card-picture">
-            <BodyStrip
-              stitches={stitches}
-              rounds={rounds}
-              palette={palette}
-              progress={look === "c" ? project.progress : undefined}
-              className="hat-card-body"
-            />
-            {look === "a" && (
-              <span className="project-card-bar" aria-hidden="true">
-                <span style={{ width: `${counts.percent}%` }} />
-              </span>
-            )}
-            {look === "b" && <ProgressRing percent={counts.percent} />}
-          </span>
-          <span className="project-card-text">
-            <strong>{project.name ?? hat.name}</strong>
-            <span className="quiet">
-              {hat.year} · {size.label} · {colourway.name}
-            </span>
-            <span className="quiet">
-              {look === "c" && !done
-                ? `${counts.worked > 0 && counts.percent < 1 ? "Under 1" : Math.floor(counts.percent)}% knitted · ${status}`
-                : status}
-            </span>
-          </span>
-        </Link>
-        {actions}
-      </li>
-    );
-  }
+  const { stitches, rounds } = hatStitches(hat, project.sizeId);
 
+  /*
+   * The hat's body in this project's own wool, filling in as it is knitted:
+   * what is done in colour, what is still to come faded, and a line along
+   * its foot for how far through the whole hat that is.
+   */
   return (
     <li className="project-card">
-      <Link to={`/project/${id}`} className="project-card-body">
-        <ProgressRing percent={counts.percent} />
+      <Link to={overviewPath(id)} className="project-card-link">
+        <span className="project-card-picture">
+          <BodyStrip
+            stitches={stitches}
+            rounds={rounds}
+            palette={palette}
+            progress={project.progress}
+            className="hat-card-body"
+          />
+          <span className="project-card-bar" aria-hidden="true">
+            <span style={{ width: `${counts.percent}%` }} />
+          </span>
+        </span>
         <span className="project-card-text">
           <strong>{project.name ?? hat.name}</strong>
           <span className="quiet">
@@ -127,44 +103,17 @@ const ProjectCard: React.FC<{
           </span>
           <span className="quiet">
             {done
-              ? `Finished · ${counts.total.toLocaleString()} stitches`
-              : `${counts.worked.toLocaleString()} of ${counts.total.toLocaleString()} stitches · started ${formatDate(project.startedAt)}`}
+              ? status
+              : `${counts.worked > 0 && counts.percent < 1 ? "Under 1" : Math.floor(counts.percent)}% knitted · ${status}`}
           </span>
         </span>
-        <span className="project-card-yarns" aria-hidden="true">
-          {colourway.shades.map((shade) => (
-            <span
-              key={shade.slot}
-              className="swatch"
-              style={{ background: yarnFor(palette, shade.slot).hex }}
-            />
-          ))}
-        </span>
       </Link>
-      <div className="project-card-actions">
-        <Button
-          variant="primary"
-          onClick={() =>
-            navigate(done ? overviewPath(id) : chartPath(id, true))
-          }
-        >
-          {done ? "See it" : counts.worked > 0 ? "Keep knitting" : "Start knitting"}
-        </Button>
-        <Button variant="quiet" onClick={onRename}>
-          Rename
-        </Button>
-        <Button variant="quiet" onClick={onDelete}>
-          Delete
-        </Button>
-      </div>
+      {actions}
     </li>
   );
 };
 
 const Home: React.FC = () => {
-  const [params] = useSearchParams();
-  const asked = params.get("card");
-  const look: CardLook = asked === "a" || asked === "b" || asked === "c" ? asked : "current";
   const [projects, setProjects] = useState<Project[]>([]);
   const [renaming, setRenaming] = useState<Project>();
   const [deleting, setDeleting] = useState<Project>();
@@ -195,14 +144,13 @@ const Home: React.FC = () => {
       {projects.length > 0 && (
         <section className="section">
           <h2>On your needles</h2>
-          <ul className={`project-list${look === "current" ? "" : " project-list-cards"}`}>
+          <ul className="project-list">
             {projects.map((project) => (
               <ProjectCard
                 key={project.id}
                 project={project}
                 onRename={() => setRenaming(project)}
                 onDelete={() => setDeleting(project)}
-                look={look}
               />
             ))}
           </ul>
