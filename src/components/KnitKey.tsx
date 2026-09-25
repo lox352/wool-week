@@ -13,7 +13,8 @@ const FullKey: React.FC<{
   palette: Palette;
   notes?: Notes;
   current?: string;
-}> = ({ stitches, palette, notes, current }) => {
+  turns?: number[];
+}> = ({ stitches, palette, notes, current, turns }) => {
   // The stitch in hand first, where it is seen without scrolling.
   const entries = useMemo(() => {
     const all = stitchKey(stitches, notes);
@@ -31,7 +32,7 @@ const FullKey: React.FC<{
           </li>
         ))}
       </ul>
-      <KeyList entries={entries} current={current} />
+      <KeyList entries={entries} current={current} turns={turns} />
     </div>
   );
 };
@@ -48,8 +49,10 @@ export const KeySheet: React.FC<{
   palette: Palette;
   notes?: Notes;
   current?: string;
+  /** Rounds after which the work is turned inside out. */
+  turns?: number[];
   onClose: () => void;
-}> = ({ stitches, palette, notes, current, onClose }) => {
+}> = ({ stitches, palette, notes, current, turns, onClose }) => {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -66,7 +69,7 @@ export const KeySheet: React.FC<{
         </button>
       </div>
       <div className="key-sheet-body">
-        <FullKey stitches={stitches} palette={palette} notes={notes} current={current} />
+        <FullKey stitches={stitches} palette={palette} notes={notes} current={current} turns={turns} />
       </div>
     </div>
   );

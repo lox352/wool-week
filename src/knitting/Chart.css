@@ -276,3 +276,9 @@
   font-size: 0.82rem;
   color: var(--ink-soft);
 }
+
+/* The turn in the key: the chart's crimson rule, across a cell. */
+.key-turn {
+  stroke: var(--crimson);
+  stroke-width: 0.12;
+}

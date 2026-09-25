@@ -143,6 +143,17 @@ test("knitting fills the screen, says how to work the round's stitches, and clos
   expect(Math.abs(after.left - before.left)).toBeLessThan(2);
 });
 
+test("the key explains the turn, on a hat that is turned inside out", async ({ page }) => {
+  await page.goto("#/hat/sww26-birsie-beanny");
+  await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
+  await page.getByRole("button", { name: "Key", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Key" })).toContainText("Turn the work inside out");
+  await page.getByRole("button", { name: "Close the key" }).click();
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
+  await page.getByText("Stitch-symbol key", { exact: true }).click();
+  await expect(page.locator(".stitch-key")).toContainText("turned inside out after round 51");
+});
+
 test("starting to knit brings the stitch into view, and keeps it there when the panel grows", async ({ page }) => {
   await start(page);
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
