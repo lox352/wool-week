@@ -45,7 +45,7 @@ export const Swatch: React.FC<{ entry: KeyEntry }> = ({ entry }) => {
 };
 
 /** What the crimson rule across the chart means, and why it is there. */
-export function TurnText({ turns }: { turns: number[] }) {
+function TurnText({ turns }: { turns: number[] }) {
   return (
     <>
       The work is turned inside out after {turns.length === 1 ? "round" : "rounds"}{" "}
