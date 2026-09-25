@@ -18,19 +18,15 @@
   transform: none;
 }
 
-/* The body, scaled up square and cut to whatever fits. */
+/* The body, scaled up square and repeated to fill the strip. */
 .body-strip {
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
-  background: var(--paper-sunk);
-}
-
-.body-strip canvas {
   display: block;
-  height: 100%;
+  background-color: var(--paper-sunk);
+  /* Scaled up square to the strip's height, and repeated round the hat. */
+  background-size: auto 100%;
+  background-repeat: repeat-x;
+  background-position: center;
   image-rendering: pixelated;
-  flex: none;
 }
 
 .preview-banner .body-strip {
