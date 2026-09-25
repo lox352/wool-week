@@ -128,3 +128,12 @@
   gap: 0.5rem;
   font-size: 0.9rem;
 }
+
+.yarn-picker-preview {
+  padding: 0 1rem;
+}
+
+.yarn-picker-preview p {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+}

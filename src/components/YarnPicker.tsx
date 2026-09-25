@@ -34,6 +34,11 @@ interface YarnPickerProps {
   suggest?: string;
   onChoose: (chosen: Chosen | undefined) => void;
   onClose: () => void;
+  /**
+   * Something to show the choice by, above the wool. With one, choosing a
+   * shade tries it rather than closing, so several can be compared.
+   */
+  preview?: React.ReactNode;
 }
 
 type Library = {
@@ -59,6 +64,7 @@ const YarnPicker: React.FC<YarnPickerProps> = ({
   suggest,
   onChoose,
   onClose,
+  preview,
 }) => {
   const dialog = useRef<HTMLDialogElement>(null);
   const [library, setLibrary] = useState<Library>();
@@ -121,7 +127,7 @@ const YarnPicker: React.FC<YarnPickerProps> = ({
       code: wool.code,
       hex: wool.hex,
     });
-    onClose();
+    if (!preview) onClose();
   };
 
   return (
@@ -147,6 +153,12 @@ const YarnPicker: React.FC<YarnPickerProps> = ({
           Done
         </Button>
       </div>
+      {preview && (
+        <div className="yarn-picker-preview">
+          {preview}
+          <p className="quiet">Tap a shade to try it; Done keeps it.</p>
+        </div>
+      )}
 
       <div className="yarn-picker-controls">
         <label>

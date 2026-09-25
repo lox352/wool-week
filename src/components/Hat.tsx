@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Link,
   useNavigate,
@@ -8,7 +8,7 @@ import {
 import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
-import { ballsOf, paletteOf, yarnFor, type Overrides } from "../knitting/palette";
+import { ballsOf, paletteOf, type Overrides } from "../knitting/palette";
 import { totals } from "../knitting/progress";
 import { chartPath, startProject } from "../helpers/projects";
 import PageLayout from "./ui/PageLayout";
@@ -17,6 +17,8 @@ import HatModel from "./HatModel";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
+import BodyStrip from "./BodyStrip";
+import { PreviewBanner } from "./ColourPreview";
 import "./Hat.css";
 
 /**
@@ -95,6 +97,8 @@ const HatPage: React.FC<{
 }) => {
   const hat = hatById(hatId)!;
   const size = hat.sizes.find((s) => s.id === sizeId) ?? hat.sizes[0];
+  const stageRef = useRef<HTMLDivElement>(null);
+  const choicesRef = useRef<HTMLElement>(null);
   const { stitches, rounds, roundHeight, index } =
     useHat(hat, size.id);
 
@@ -136,19 +140,9 @@ const HatPage: React.FC<{
     navigate(chartPath(project.id, true));
   };
 
-  return (
-    <PageLayout
-      title={hat.name}
-      eyebrow={`Shetland Wool Week ${hat.year}`}
-      lede={`By ${hat.designer}`}
-      aside={
-        <Button variant="primary" onClick={start}>
-          Start knitting this
-        </Button>
-      }
-    >
-      <div className="hat-layout">
-        <div className="hat-stage">
+  const body = useMemo(() => ({ stitches, rounds }), [stitches, rounds]);
+  const stageEl = (
+        <div className="hat-stage" ref={stageRef}>
           <HatModel
             hatId={hat.id}
             sizeId={size.id}
@@ -167,7 +161,8 @@ const HatPage: React.FC<{
             {rounds.length} rounds.
           </p>
         </div>
-
+  );
+  const aboutEl = (
         <div className="hat-about">
           <p>{hat.story}</p>
           <p>
@@ -178,11 +173,9 @@ const HatPage: React.FC<{
             {hat.hashtag ? ` · ${hat.hashtag}` : ""}
           </p>
         </div>
-      </div>
-
-      <div className="peerie-rule" aria-hidden="true" />
-
-      <section className="section">
+  );
+  const colourEl = (
+      <section className="section" ref={choicesRef}>
         <h2>Colourway</h2>
         <div className="chooser">
           {colourways.map((option) => {
@@ -195,20 +188,7 @@ const HatPage: React.FC<{
                 aria-pressed={option.id === colourway.id}
                 onClick={() => setColourwayId(option.id)}
               >
-                <span className="colourway-swatches" aria-hidden="true">
-                  {/*
-                    The colourway's own wool, not the pattern's full set of
-                    yarns: a hat drawn in parts can be offered in a colourway
-                    that uses fewer than the pattern names, and 2026's last two
-                    do. Asking for a yarn it has not got draws a grey blank.
-                  */}
-                  {option.shades.map((shade) => (
-                    <span
-                      key={shade.slot}
-                      style={{ background: yarnFor(optionPalette, shade.slot).hex }}
-                    />
-                  ))}
-                </span>
+                                <BodyStrip {...body} palette={optionPalette} className="colourway-motif" />
                 <strong>{option.name}</strong>
                 <span className="quiet">{option.brand}</span>
               </button>
@@ -223,6 +203,8 @@ const HatPage: React.FC<{
           overrides={own}
           onChange={choose}
           onRestoreAll={() => setOwn({})}
+          body={body}
+          palette={palette}
         />
 
         <p className="quiet">
@@ -245,7 +227,8 @@ const HatPage: React.FC<{
             : ""}
         </p>
       </section>
-
+  );
+  const sizeEl = (
       <section className="section">
         <h2>Size</h2>
         <div className="chooser">
@@ -298,6 +281,27 @@ const HatPage: React.FC<{
               "the needles and tension."}
         </p>
       </section>
+  );
+
+  return (
+    <PageLayout
+      title={hat.name}
+      eyebrow={`Shetland Wool Week ${hat.year}`}
+      lede={`By ${hat.designer}`}
+      aside={
+        <Button variant="primary" onClick={start}>
+          Start knitting this
+        </Button>
+      }
+    >
+          <div className="hat-layout">
+            {stageEl}
+            {aboutEl}
+          </div>
+          <div className="peerie-rule" aria-hidden="true" />
+          {colourEl}
+          {sizeEl}
+      <PreviewBanner body={body} palette={palette} stage={stageRef} choices={choicesRef} />
 
       <NextStep
         title="Ready to cast on?"

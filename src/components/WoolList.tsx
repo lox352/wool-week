@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Colourway, SlotId } from "../data/hats/types";
-import { ballsOf, inkOn, type Overrides } from "../knitting/palette";
+import { ballsOf, inkOn, type Overrides, type Palette } from "../knitting/palette";
 import Button from "./ui/Button";
 import YarnPicker, { type Chosen } from "./YarnPicker";
+import BodyStrip from "./BodyStrip";
+import { type Body } from "./ColourPreview";
 import "./WoolList.css";
 
 /**
@@ -25,6 +27,12 @@ interface WoolListProps {
   overrides: Overrides;
   onChange: (slots: SlotId[], chosen: Chosen | undefined) => void;
   onRestoreAll: () => void;
+  /**
+   * The hat's body in the wool being chosen: shown beside each ball with
+   * only its yarns lit, and in the picker while a ball is being chosen.
+   */
+  body: Body;
+  palette: Palette;
 }
 
 /** "Yarn A", or "Yarns A, C and G". */
@@ -39,6 +47,8 @@ const WoolList: React.FC<WoolListProps> = ({
   overrides,
   onChange,
   onRestoreAll,
+  body,
+  palette,
 }) => {
   /** Which ball is being chosen, by the yarns it does. */
   const [picking, setPicking] = useState<SlotId[] | undefined>();
@@ -73,6 +83,12 @@ const WoolList: React.FC<WoolListProps> = ({
                   {ball.yarn.approximate ? " · colour approximate" : ""}
                 </span>
               </span>
+              <BodyStrip
+                {...body}
+                palette={palette}
+                highlight={ball.slots}
+                className="wool-row-motif"
+              />
               <span className="wool-row-change">Change</span>
             </button>
           </li>
@@ -97,6 +113,7 @@ const WoolList: React.FC<WoolListProps> = ({
           suggest={colourway.wool}
           onChoose={(choice) => onChange(chosen.slots, choice)}
           onClose={() => setPicking(undefined)}
+          preview={<BodyStrip {...body} palette={palette} className="picker-preview" />}
         />
       )}
     </>
