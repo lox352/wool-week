@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import { SlotId } from "../data/hats/types";
 import { Stitch } from "../types/Stitch";
 import { Palette, yarnFor } from "../knitting/palette";
@@ -9,8 +9,8 @@ import { Palette, yarnFor } from "../knitting/palette";
  *
  * Not a chart - a chart is one repeat of one band - but the band a knitter
  * spends most of the hat on, whole, with every yarn in it. Drawn a pixel a
- * stitch onto a canvas and scaled up square, because it is thousands of
- * stitches and is redrawn on every change of wool.
+ * stitch and scaled up square, because it is thousands of stitches and is
+ * redrawn on every change of wool.
  */
 const BodyStrip: React.FC<{
   stitches: Stitch[];
@@ -22,8 +22,6 @@ const BodyStrip: React.FC<{
   progress?: number;
   className?: string;
 }> = ({ stitches, rounds, palette, highlight, progress, className }) => {
-  const canvas = useRef<HTMLCanvasElement>(null);
-
   /** The rounds at the hat's full width, from the first to the last. */
   const body = useMemo(() => {
     const widest = Math.max(...rounds.map((round) => round.length));
@@ -33,10 +31,23 @@ const BodyStrip: React.FC<{
     return rounds.slice(first, last + 1);
   }, [rounds]);
 
-  useLayoutEffect(() => {
-    const element = canvas.current;
-    const ctx = element?.getContext("2d");
-    if (!element || !ctx || body.length === 0) return;
+  /*
+   * Painted once per change of wool or progress, a pixel a stitch, and used
+   * as the strip's background: scaled up square to the strip's height and
+   * repeated sideways to fill it. A round goes all the way round the hat, so
+   * the next repeat along is simply more of the hat - which is what lets a
+   * strip wider than the body's own proportions be filled edge to edge.
+   */
+  const picture = useMemo(() => {
+    if (body.length === 0 || typeof document === "undefined") return undefined;
+    const element = document.createElement("canvas");
+    let ctx: CanvasRenderingContext2D | null = null;
+    try {
+      ctx = element.getContext("2d");
+    } catch {
+      // No canvas here (a test environment): the plain ground shows instead.
+    }
+    if (!ctx) return undefined;
     const width = body[0].length;
     element.width = width;
     element.height = body.length;
@@ -56,13 +67,15 @@ const BodyStrip: React.FC<{
         ctx.fillRect(width - 1 - position, y, 1, 1);
       });
     });
-    ctx.globalAlpha = 1;
+    return element.toDataURL();
   }, [body, stitches, palette, highlight, progress]);
 
   return (
-    <div className={["body-strip", className].filter(Boolean).join(" ")}>
-      <canvas ref={canvas} aria-hidden="true" />
-    </div>
+    <div
+      className={["body-strip", className].filter(Boolean).join(" ")}
+      style={picture ? { backgroundImage: `url(${picture})` } : undefined}
+      aria-hidden="true"
+    />
   );
 };
 
