@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { hats, hatById } from "../data/hats";
 import {
   Project,
@@ -42,11 +42,15 @@ const describe = (project: Project) => {
   return { hat, counts, colourway, size, index };
 };
 
+/** Card layouts on trial: "?card=a", "b" or "c". */
+type CardLook = "current" | "a" | "b" | "c";
+
 const ProjectCard: React.FC<{
   project: Project;
   onRename: () => void;
   onDelete: () => void;
-}> = ({ project, onRename, onDelete }) => {
+  look: CardLook;
+}> = ({ project, onRename, onDelete, look }) => {
   const navigate = useNavigate();
   const described = describe(project);
   if (!described) return null;
@@ -54,6 +58,63 @@ const ProjectCard: React.FC<{
   const id = bareIdFor(project.id);
   const palette = paletteOf(colourway, project.shades, hat.charts);
   const done = counts.percent >= 100;
+
+  const actions = (
+    <div className="project-card-actions">
+      <Button
+        variant="primary"
+        onClick={() => navigate(done ? overviewPath(id) : chartPath(id, true))}
+      >
+        {done ? "See it" : counts.worked > 0 ? "Keep knitting" : "Start knitting"}
+      </Button>
+      <Button variant="quiet" onClick={onRename}>
+        Rename
+      </Button>
+      <Button variant="quiet" onClick={onDelete}>
+        Delete
+      </Button>
+    </div>
+  );
+  const status = done
+    ? `Finished · ${counts.total.toLocaleString()} stitches`
+    : `${counts.worked.toLocaleString()} of ${counts.total.toLocaleString()} stitches · started ${formatDate(project.startedAt)}`;
+
+  if (look !== "current") {
+    const { stitches, rounds } = hatStitches(hat, project.sizeId);
+    return (
+      <li className={`project-card project-card-${look}`}>
+        <Link to={overviewPath(id)} className="project-card-link">
+          <span className="project-card-picture">
+            <BodyStrip
+              stitches={stitches}
+              rounds={rounds}
+              palette={palette}
+              progress={look === "c" ? project.progress : undefined}
+              className="hat-card-body"
+            />
+            {look === "a" && (
+              <span className="project-card-bar" aria-hidden="true">
+                <span style={{ width: `${counts.percent}%` }} />
+              </span>
+            )}
+            {look === "b" && <ProgressRing percent={counts.percent} />}
+          </span>
+          <span className="project-card-text">
+            <strong>{project.name ?? hat.name}</strong>
+            <span className="quiet">
+              {hat.year} · {size.label} · {colourway.name}
+            </span>
+            <span className="quiet">
+              {look === "c" && !done
+                ? `${counts.worked > 0 && counts.percent < 1 ? "Under 1" : Math.floor(counts.percent)}% knitted · ${status}`
+                : status}
+            </span>
+          </span>
+        </Link>
+        {actions}
+      </li>
+    );
+  }
 
   return (
     <li className="project-card">
@@ -101,6 +162,9 @@ const ProjectCard: React.FC<{
 };
 
 const Home: React.FC = () => {
+  const [params] = useSearchParams();
+  const asked = params.get("card");
+  const look: CardLook = asked === "a" || asked === "b" || asked === "c" ? asked : "current";
   const [projects, setProjects] = useState<Project[]>([]);
   const [renaming, setRenaming] = useState<Project>();
   const [deleting, setDeleting] = useState<Project>();
@@ -131,13 +195,14 @@ const Home: React.FC = () => {
       {projects.length > 0 && (
         <section className="section">
           <h2>On your needles</h2>
-          <ul className="project-list">
+          <ul className={`project-list${look === "current" ? "" : " project-list-cards"}`}>
             {projects.map((project) => (
               <ProjectCard
                 key={project.id}
                 project={project}
                 onRename={() => setRenaming(project)}
                 onDelete={() => setDeleting(project)}
+                look={look}
               />
             ))}
           </ul>

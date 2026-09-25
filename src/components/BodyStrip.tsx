@@ -18,8 +18,10 @@ const BodyStrip: React.FC<{
   palette: Palette;
   /** Fade every stitch but these yarns', to show where they are knitted. */
   highlight?: SlotId[];
+  /** Fade every stitch not yet knitted: the id of the last one worked. */
+  progress?: number;
   className?: string;
-}> = ({ stitches, rounds, palette, highlight, className }) => {
+}> = ({ stitches, rounds, palette, highlight, progress, className }) => {
   const canvas = useRef<HTMLCanvasElement>(null);
 
   /** The rounds at the hat's full width, from the first to the last. */
@@ -44,13 +46,18 @@ const BodyStrip: React.FC<{
       const y = body.length - 1 - index;
       round.forEach((id, position) => {
         const yarn = yarnFor(palette, stitches[id]?.slot ?? "");
-        ctx.globalAlpha = lit && !lit.has(yarn) ? 0.14 : 1;
+        ctx.globalAlpha =
+          (lit && !lit.has(yarn)) || (progress !== undefined && id > progress)
+            ? progress !== undefined
+              ? 0.3
+              : 0.14
+            : 1;
         ctx.fillStyle = yarn.hex;
         ctx.fillRect(width - 1 - position, y, 1, 1);
       });
     });
     ctx.globalAlpha = 1;
-  }, [body, stitches, palette, highlight]);
+  }, [body, stitches, palette, highlight, progress]);
 
   return (
     <div className={["body-strip", className].filter(Boolean).join(" ")}>

@@ -121,3 +121,58 @@
     flex-wrap: wrap;
   }
 }
+
+/* Project cards with the hat's body on top, like the hat cards below them. */
+.project-list-cards {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.project-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.project-card-link:hover .project-card-text {
+  background: var(--paper-sunk);
+}
+
+.project-card-picture {
+  position: relative;
+  display: block;
+}
+
+.project-card-link .project-card-text {
+  padding: 0.85rem 1rem 0.6rem;
+}
+
+/* A: progress as a line along the foot of the picture. */
+.project-card-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: rgb(0 0 0 / 0.18);
+}
+
+.project-card-bar span {
+  display: block;
+  height: 100%;
+  background: var(--crimson);
+}
+
+/* B: the ring as a badge on the picture's lower edge. */
+.project-card-b .project-card-picture .progress-ring {
+  position: absolute;
+  left: 0.85rem;
+  bottom: -1.1rem;
+  background: var(--paper-raised);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--paper-raised);
+}
+
+.project-card-b .project-card-text {
+  padding-top: 1.4rem;
+}
