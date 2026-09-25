@@ -222,6 +222,7 @@ const sww26: HatPattern = {
   stitchNotes: {
     k1tbl: { abbreviation: "k tbl", how: "Knit the stitch through the back loop." },
     m1: {
+      lean: "left",
       how:
         "Pick up the bar between stitches with the left needle from front " +
         "to back, and knit it through the back of the loop.",

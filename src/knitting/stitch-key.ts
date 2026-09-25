@@ -21,6 +21,8 @@ export interface KeyEntry {
   how: string;
   /** Anything this particular pattern says about it. */
   note?: string;
+  /** Which way it leans, where the pattern says: see StitchNote.lean. */
+  lean?: "left" | "right";
 }
 
 const standard: Record<StitchKeyId, Omit<KeyEntry, "note">> = {
@@ -124,6 +126,7 @@ export const stitchKey = (
         label: note?.label ?? standard[id].label,
         how: note?.how ?? standard[id].how,
         note: note?.note,
+        lean: note?.lean,
       };
     });
 };

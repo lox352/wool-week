@@ -35,6 +35,16 @@ const sww17: HatPattern = {
     "https://www.shetlandwoolweek.com/wp-content/uploads/2017/10/Bousta-Beanie-hat-pattern.pdf",
   credit: "© Gudrun Johnston",
   hashtag: "#boustabeanie",
+  // The stitches as this pattern's own abbreviations define them.
+  stitchNotes: {
+    m1: {
+      lean: "left",
+      how:
+        "Lift the strand between stitches from front to back onto the left " +
+        "needle, and knit this loop through the back.",
+    },
+    k2tog: { how: "Knit the next 2 stitches together." },
+  },
   slots: ["A", "B", "C"],
 
   sizes: [

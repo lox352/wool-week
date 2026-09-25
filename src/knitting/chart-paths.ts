@@ -267,12 +267,13 @@ export const markPaths = (
   layout: ChartLayout,
   palette: Palette,
   cell: number,
+  makeOneLean?: "left" | "right",
 ): { ink: string; strokes: string; dots: string }[] => {
   const groups = new Map<string, { strokes: string[]; dots: string[] }>();
   const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
 
   for (const stitch of stitches) {
-    const mark = markAt(stitch, byId, layout);
+    const mark = markAt(stitch, byId, layout, makeOneLean);
     if (!mark) continue;
     const at = layout.cells.get(stitch.id);
     if (!at) continue;

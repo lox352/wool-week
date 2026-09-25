@@ -196,6 +196,13 @@ export type StitchKeyId =
  */
 export interface StitchNote {
   abbreviation?: string;
+  /**
+   * Which way a make-one leans, where the pattern's definition settles it:
+   * lifted front to back and knitted through the back loop it leans left;
+   * back to front and knitted through the front, right. The chart tilts the
+   * make-one's mark to match.
+   */
+  lean?: "left" | "right";
   label?: string;
   how?: string;
   note?: string;

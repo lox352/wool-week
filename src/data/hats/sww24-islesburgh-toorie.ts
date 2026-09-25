@@ -35,6 +35,7 @@ const sww24: HatPattern = {
   // The stitches as this pattern's own abbreviations define them.
   stitchNotes: {
     m1: {
+      lean: "left",
       how:
         "Pick up the bar between stitches with the left needle from front " +
         "to back, and knit it through the back of the loop.",

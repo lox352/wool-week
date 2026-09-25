@@ -44,3 +44,15 @@ describe("the key in a pattern's own words", () => {
     expect(cdd?.abbreviation).toBe("CDD");
   });
 });
+
+describe("which way a make-one leans", () => {
+  it("follows each pattern's own definition", () => {
+    const lean = (id: string) => keyOf(id).find((entry) => entry.id === "m1")?.lean;
+    expect(lean("sww20-katies-kep")).toBe("right");
+    expect(lean("sww21-da-crofters-kep")).toBe("right");
+    expect(lean("sww17-bousta-beanie")).toBe("left");
+    expect(lean("sww24-islesburgh-toorie")).toBe("left");
+    // 2019 lifts "the bar" without saying which way round.
+    expect(lean("sww19-roadside-beanie")).toBeUndefined();
+  });
+});

@@ -33,6 +33,16 @@ const sww19: HatPattern = {
   patternUrl: "https://www.ravelry.com/patterns/library/roadside-beanie-2",
   credit: "© Sandra Manson; charted by Ella Gordon; for Oliver Henry",
   hashtag: "#roadsidebeanie",
+  // The stitches as this pattern's own abbreviations define them. Its
+  // make-one does not say which way the bar is lifted, so it is not leant.
+  stitchNotes: {
+    m1: {
+      how:
+        "Use the left needle to lift the bar between stitches, and knit into " +
+        "the front of it.",
+    },
+    k2tog: { how: "Knit 2 stitches together as if they were one." },
+  },
   slots: ["A", "B", "C", "D", "E", "F", "G"],
   sizes: [{
     id: "one",

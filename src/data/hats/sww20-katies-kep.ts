@@ -58,6 +58,23 @@ const sww20: HatPattern = {
   patternUrl: "https://www.ravelry.com/patterns/library/katies-kep",
   credit: "© Wilma Malcolmson",
   hashtag: "#katieskep",
+  // The stitches as this pattern's own abbreviations define them.
+  stitchNotes: {
+    m1: {
+      lean: "right",
+      how:
+        "Pick up the strand between stitches with the left needle from back " +
+        "to front, and knit it.",
+      note:
+        "Picked up from back to front and knitted through the front, this " +
+        "make-one leans to the right, unlike the front-to-back one many " +
+        "patterns use.",
+    },
+    k2tog: { how: "Knit 2 stitches together as if they were one stitch." },
+    sk2p: {
+      how: "Slip 1, knit 2 stitches together, then pass the slipped stitch over.",
+    },
+  },
   slots: ["A", "B", "C", "D", "E"],
 
   sizes: [

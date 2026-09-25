@@ -96,6 +96,7 @@ export const drawChart = (
   cell: number,
   ink = "#a29a91",
   turns: number[] = [],
+  makeOneLean?: "left" | "right",
 ) => {
   const turnsAt = new Set(turns);
   const { width, height } = chartSize(layout, cell);
@@ -163,7 +164,7 @@ export const drawChart = (
       ctx.stroke();
     }
 
-    const mark = markAt(stitch, byId, layout);
+    const mark = markAt(stitch, byId, layout, makeOneLean);
     if (!mark) continue;
     const ink = inkOn(yarn.hex);
     if (mark.dot) {
