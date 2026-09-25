@@ -8,6 +8,7 @@
 
 .project-stage,
 .hat-stage {
+  min-width: 0;
   background: var(--paper-raised);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
@@ -126,7 +127,12 @@
 @media (max-width: 820px) {
   .project-layout,
   .hat-layout {
-    grid-template-columns: 1fr;
+    /*
+     * Not a plain 1fr, which will not shrink below its contents: after a
+     * phone turns back from landscape the 3D canvas still has its wider
+     * width, and would hold the column - and the page - open at it.
+     */
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

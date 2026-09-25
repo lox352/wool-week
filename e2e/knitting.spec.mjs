@@ -35,6 +35,19 @@ test("all patterns remain usable without WebGL; default visits never request liv
   expect(physics).toEqual([]);
 });
 
+test("the 3D hat shrinks back when a phone turns from landscape to portrait", async ({ page }) => {
+  await page.goto(pattern);
+  const stage = page.locator(".hat-stage");
+  await expect(stage).toBeVisible();
+  const size = page.viewportSize();
+  const before = await stage.evaluate(node => node.getBoundingClientRect().width);
+  await page.setViewportSize({ width: Math.max(size.width, size.height) + 200, height: Math.min(size.width, size.height) });
+  await page.waitForTimeout(800);
+  await page.setViewportSize(size);
+  await expect.poll(() => stage.evaluate(node => Math.round(node.getBoundingClientRect().width))).toBe(Math.round(before));
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+});
+
 test("DK selection, accessible chart controls and text instructions", async ({ page }) => {
   await page.goto(pattern);
   await page.getByRole("button", { name: "Yarn weight 1 · DK", exact: true }).click();
