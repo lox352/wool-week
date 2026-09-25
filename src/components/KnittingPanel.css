@@ -201,3 +201,46 @@
   font-size: 0.9rem;
   line-height: 1.35;
 }
+
+/*
+ * The chart page when you are not knitting: the same strip along the bottom,
+ * holding the way back into the knitting and the ways out of the chart.
+ */
+.chart-page-status {
+  margin: 0 0 0.7rem;
+  font-size: 0.9rem;
+}
+
+.chart-page-actions {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    "home . overview"
+    "resume resume resume";
+  gap: 0.6rem 0.75rem;
+  align-items: center;
+}
+
+.chart-page-actions > :nth-child(1) {
+  grid-area: home;
+}
+
+.chart-page-actions > :nth-child(2) {
+  grid-area: overview;
+}
+
+.chart-page-resume {
+  grid-area: resume;
+}
+
+@media (min-width: 621px) {
+  .chart-page-actions {
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas: "home overview resume";
+    gap: 0.75rem 1.25rem;
+  }
+  .chart-page-resume {
+    justify-self: end;
+    min-width: 18rem;
+  }
+}

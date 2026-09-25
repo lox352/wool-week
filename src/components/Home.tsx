@@ -5,7 +5,8 @@ import {
   Project,
   bareIdFor,
   deleteProject,
-  knittingParam,
+  chartPath,
+  overviewPath,
   listProjects,
   projectsChanged,
   renameProject,
@@ -83,9 +84,7 @@ const ProjectCard: React.FC<{
         <Button
           variant="primary"
           onClick={() =>
-            navigate(
-              done ? `/project/${id}` : `/project/${id}?${knittingParam}=1`,
-            )
+            navigate(done ? overviewPath(id) : chartPath(id, true))
           }
         >
           {done ? "See it" : counts.worked > 0 ? "Keep knitting" : "Start knitting"}

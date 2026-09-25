@@ -129,3 +129,41 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* The closing call to action: what comes next, and the way there. */
+.next-step {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  padding: 1.25rem 1.4rem;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-top: 2px solid var(--crimson);
+  border-radius: var(--radius);
+}
+
+.next-step h2 {
+  margin: 0 0 0.25rem;
+}
+
+.next-step p {
+  margin: 0;
+}
+
+.next-step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 620px) {
+  .next-step-actions {
+    width: 100%;
+  }
+  .next-step-actions .btn {
+    flex: 1 1 auto;
+  }
+}

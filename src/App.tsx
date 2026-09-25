@@ -11,7 +11,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/hat/:hatId" element={<Hat />} />
-        <Route path="/project/:projectId" element={<Project />} />
+        <Route path="/project/:projectId" element={<Project view="overview" />} />
+        <Route path="/project/:projectId/chart" element={<Project view="chart" />} />
       </Routes>
     </HashRouter>
   );

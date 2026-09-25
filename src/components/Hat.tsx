@@ -10,13 +10,13 @@ import { SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
 import { ballsOf, paletteOf, yarnFor, type Overrides } from "../knitting/palette";
 import { totals } from "../knitting/progress";
-import { bareIdFor, knittingParam, startProject } from "../helpers/projects";
+import { chartPath, startProject } from "../helpers/projects";
 import PageLayout from "./ui/PageLayout";
 import Button from "./ui/Button";
 import HatModel from "./HatModel";
-import Chart from "../knitting/Chart";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
+import NextStep from "./ui/NextStep";
 import "./Hat.css";
 
 /**
@@ -95,7 +95,7 @@ const HatPage: React.FC<{
 }) => {
   const hat = hatById(hatId)!;
   const size = hat.sizes.find((s) => s.id === sizeId) ?? hat.sizes[0];
-  const { stitches, rounds, roundHeight, roundLabels, turns, index } =
+  const { stitches, rounds, roundHeight, index } =
     useHat(hat, size.id);
 
   useEffect(() => {
@@ -130,19 +130,19 @@ const HatPage: React.FC<{
     [setOwn],
   );
 
+  // A project is made only now, so browsing hats never leaves one behind.
+  const start = () => {
+    const project = startProject(hat.id, size.id, colourway.id, own);
+    navigate(chartPath(project.id, true));
+  };
+
   return (
     <PageLayout
       title={hat.name}
       eyebrow={`Shetland Wool Week ${hat.year}`}
       lede={`By ${hat.designer}`}
       aside={
-        <Button
-          variant="primary"
-          onClick={() => {
-            const project = startProject(hat.id, size.id, colourway.id, own);
-            navigate(`/project/${bareIdFor(project.id)}?${knittingParam}=1`);
-          }}
-        >
+        <Button variant="primary" onClick={start}>
           Start knitting this
         </Button>
       }
@@ -293,24 +293,24 @@ const HatPage: React.FC<{
         <p className="quiet">
           {hat.sizes.some((option) => option.sections)
             ? "This pattern changes its stitch counts and round sequence by size; " +
-              "the chart above follows the size you selected."
+              "the chart follows the size you select."
             : "Every size of this hat uses the same knitting; the size is in " +
               "the needles and tension."}
         </p>
       </section>
 
-      <section className="section">
-        <h2>The chart</h2>
-        <Chart
-          stitches={stitches}
-          rounds={rounds}
-          palette={palette}
-          progress={0}
-          labels={roundLabels}
-          turns={turns}
-          stitchNotes={hat.stitchNotes}
-        />
-      </section>
+      <NextStep
+        title="Ready to cast on?"
+        detail={
+          `${colourway.name}, ${size.label.toLowerCase()} size: ` +
+          `${counts.total.toLocaleString()} stitches over ${rounds.length} rounds. ` +
+          "Your progress is saved in this browser as you go."
+        }
+      >
+        <Button variant="primary" size="lg" onClick={start}>
+          Start knitting
+        </Button>
+      </NextStep>
     </PageLayout>
   );
 };

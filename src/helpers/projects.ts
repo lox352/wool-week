@@ -63,6 +63,13 @@ export const projectsChanged = "projectsChanged";
 /** Marks a link as "open this straight into knitting mode". */
 export const knittingParam = "knitting";
 
+/** A project's overview: the hat, its progress and its wool. */
+export const overviewPath = (id: string) => `/project/${bareIdFor(id)}`;
+
+/** A project's chart page, optionally opened straight into knitting. */
+export const chartPath = (id: string, knitting = false) =>
+  `/project/${bareIdFor(id)}/chart${knitting ? `?${knittingParam}=1` : ""}`;
+
 export const storageKeyFor = (id: string) =>
   id.startsWith(prefix) ? id : `${prefix}${id}`;
 
