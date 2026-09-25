@@ -57,11 +57,13 @@ function TurnText({ turns }: { turns: number[] }) {
   );
 }
 
-/** The rule as the key draws it: across a cell, between two rounds. */
+/**
+ * The rule as the key draws it: a line on its own, as on the chart, where it
+ * runs between two rounds rather than through any cell.
+ */
 const TurnSwatch: React.FC = () => (
-  <svg className="key-swatch" width="24" height="24" viewBox="-0.04 -0.04 1.08 1.08" aria-hidden="true">
-    <rect width="1" height="1" className="key-cell" />
-    <line x1="-0.04" y1="0.5" x2="1.04" y2="0.5" className="key-turn" />
+  <svg className="key-swatch" width="24" height="24" viewBox="0 0 1 1" aria-hidden="true">
+    <line x1="0" y1="0.5" x2="1" y2="0.5" className="key-turn" />
   </svg>
 );
 
