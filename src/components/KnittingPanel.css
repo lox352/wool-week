@@ -2,7 +2,8 @@
   position: sticky;
   bottom: 0;
   z-index: 10;
-  margin: 2rem -1rem -4rem;
+  /* Edge to edge, whatever the page's own padding. */
+  margin: 2rem calc(-1 * var(--gutter, 1rem)) calc(-1 * var(--foot, 4rem));
   padding: 0.9rem 1rem 1.1rem;
   background: var(--paper-raised);
   border-top: 2px solid var(--crimson);

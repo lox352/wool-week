@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useLayoutEffect, useRef } from "react";
+import { RefObject, useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 export const minCell = 8;
 export const maxCell = 40;
@@ -11,6 +11,9 @@ interface Gesture {
   /** The point being zoomed about, in the sheet's own pixels at startCell. */
   originX: number;
   originY: number;
+  /** And where that point is on screen, which is where it has to stay. */
+  screenX: number;
+  screenY: number;
 }
 
 /**
@@ -19,18 +22,25 @@ interface Gesture {
  * While fingers are down the sheet is only scaled with a transform, which a
  * browser can do every frame; the chart itself is redrawn at its new cell size
  * once, when the gesture ends. Then the scroll is moved so that the stitch
- * that was under your fingers is still under them.
+ * that was under your fingers is still under them - whether or not you are
+ * knitting: a zoom never goes looking for the stitch you are on.
+ *
+ * Returns a way to zoom about a point without a gesture, for the keys.
  */
 export function usePinchZoom(
   scrollRef: RefObject<HTMLDivElement>,
   sheetRef: RefObject<HTMLDivElement>,
   cell: number,
   setCell: (cell: number) => void,
-  /** Leave the scroll alone afterwards: something else is steering it. */
-  keepScroll: boolean,
 ) {
   const gesture = useRef<Gesture>();
-  const settle = useRef<{ ratio: number; originX: number; originY: number }>();
+  const settle = useRef<{
+    ratio: number;
+    originX: number;
+    originY: number;
+    screenX: number;
+    screenY: number;
+  }>();
   const current = useRef(cell);
   current.current = cell;
 
@@ -46,6 +56,8 @@ export function usePinchZoom(
         cell: current.current,
         originX: clientX - box.left,
         originY: clientY - box.top,
+        screenX: clientX,
+        screenY: clientY,
       };
       sheet.style.transformOrigin = `${gesture.current.originX}px ${gesture.current.originY}px`;
       sheet.style.willChange = "transform";
@@ -72,6 +84,8 @@ export function usePinchZoom(
         ratio: next / g.startCell,
         originX: g.originX,
         originY: g.originY,
+        screenX: g.screenX,
+        screenY: g.screenY,
       };
       setCell(next);
     };
@@ -137,8 +151,37 @@ export function usePinchZoom(
     if (!sheet) return;
     sheet.style.transform = "";
     sheet.style.willChange = "";
-    if (!done || !scroller || keepScroll) return;
-    scroller.scrollLeft += done.originX * (done.ratio - 1);
-    window.scrollBy({ top: done.originY * (done.ratio - 1), behavior: "instant" });
-  }, [cell, scrollRef, sheetRef, keepScroll]);
+    if (!done || !scroller) return;
+    /*
+     * Measured rather than worked out: a browser may already have moved the
+     * page itself to keep something else still as the chart grew (scroll
+     * anchoring), and adding the growth on top of that overshoots. So look
+     * where the point has got to, and move it back.
+     */
+    const box = sheet.getBoundingClientRect();
+    scroller.scrollLeft += box.left + done.originX * done.ratio - done.screenX;
+    window.scrollBy({
+      top: box.top + done.originY * done.ratio - done.screenY,
+      behavior: "instant",
+    });
+  }, [cell, scrollRef, sheetRef]);
+
+  /** Zoom to a cell size about a point on screen, holding that point still. */
+  return useCallback(
+    (next: number, clientX: number, clientY: number) => {
+      const sheet = sheetRef.current;
+      const wanted = Math.round(clamp(next));
+      if (!sheet || wanted === current.current) return;
+      const box = sheet.getBoundingClientRect();
+      settle.current = {
+        ratio: wanted / current.current,
+        originX: clientX - box.left,
+        originY: clientY - box.top,
+        screenX: clientX,
+        screenY: clientY,
+      };
+      setCell(wanted);
+    },
+    [sheetRef, setCell],
+  );
 }

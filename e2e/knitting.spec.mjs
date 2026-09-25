@@ -86,6 +86,35 @@ test("the chart is its own page, and closing the knitting keeps you on it", asyn
   await expect(page.getByRole("heading", { name: "Wool Week Toories", level: 1, exact: true })).toBeVisible();
 });
 
+test("the chart page does not pan sideways, and zooming leaves the chart where it lands", async ({ page }) => {
+  await start(page);
+  const fits = () => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+  expect(await fits()).toBe(true);
+
+  // Look well away from the stitch being worked, then zoom. Focus first:
+  // focusing the chart scrolls it into view, which is not the zoom's doing.
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const chart = page.getByRole("region", { name: /Scrollable knitting chart/ });
+  await chart.focus();
+  await page.waitForTimeout(600);
+  const middle = () => page.evaluate(() => {
+    const scroller = document.querySelector(".chart-scroll").getBoundingClientRect();
+    const box = document.querySelector(".chart-sheets").getBoundingClientRect();
+    const x = scroller.left + scroller.width / 2;
+    const y = Math.max(scroller.top, 0) / 2 + Math.min(scroller.bottom, innerHeight) / 2;
+    return [(x - box.left) / box.width, (y - box.top) / box.height];
+  });
+  const before = await middle();
+  await chart.press("+");
+  await page.waitForTimeout(1200);
+  const after = await middle();
+  expect(Math.abs(after[0] - before[0])).toBeLessThan(0.03);
+  expect(Math.abs(after[1] - before[1])).toBeLessThan(0.03);
+
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
+  expect(await fits()).toBe(true);
+});
+
 test("progress survives reload and undo; a second tab stays in sync", async ({ page, context }) => {
   await start(page);
   const original = await position(page).textContent();
