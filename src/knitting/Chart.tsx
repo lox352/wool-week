@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Stitch } from "../types/Stitch";
 import { layOut } from "./layout";
-import { Palette } from "./palette";
+import { Palette, yarnFor } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
 import { StitchLegend, TextRound } from "./ChartHelp";
 import StitchPicker from "./StitchPicker";
+import { keyEntryAt } from "./stitch-key";
 import { stitchAtPoint } from "./jump";
 import { useSettings } from "../helpers/settings";
 import type { HatPattern } from "../data/hats/types";
@@ -90,6 +91,12 @@ interface ChartProps {
   onJump?: (progress: number) => void;
   /** What the pattern says about its stitches, for the symbol key. */
   stitchNotes?: HatPattern["stitchNotes"];
+  /**
+   * Scroll the chart inside a window of its own, both ways, rather than
+   * letting it run down the page. Zooming then changes only what is inside
+   * the window, never the height of the page.
+   */
+  contained?: boolean;
 }
 
 /**
@@ -117,6 +124,7 @@ const Chart: React.FC<ChartProps> = ({
   turns,
   stitchNotes,
   onJump,
+  contained = false,
 }) => {
   const [picked, setPicked] = useState<number>();
   const makeOneLean = stitchNotes?.m1?.lean;
@@ -136,7 +144,7 @@ const Chart: React.FC<ChartProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const zoomTo = useCallback((cell: number) => setZoom(Math.round(cell)), []);
-  const zoomAt = usePinchZoom(scrollRef, sheetRef, cellSize, zoomTo);
+  const zoomAt = usePinchZoom(scrollRef, sheetRef, cellSize, zoomTo, contained);
   /*
    * The cell size the follow below reads, kept out of its dependencies: a
    * zoom leaves the chart where it lands, and only knitting moves it.
@@ -251,22 +259,32 @@ const Chart: React.FC<ChartProps> = ({
     if (!scroller || opened.current) return;
     opened.current = true;
     scroller.scrollLeft = scroller.scrollWidth;
-  }, []);
+    if (contained) scroller.scrollTop = scroller.scrollHeight;
+  }, [contained]);
 
   const at = nextId === undefined ? undefined : layout.cells.get(nextId);
 
-  // Sideways: keep the stitch being worked in the middle, so the chart follows
-  // the knitter rather than having to be hunted for.
+  /*
+   * Keep the stitch being worked in the middle, sideways, so the chart follows
+   * the knitter rather than having to be hunted for. In a window of its own,
+   * up and down too, in the same call: its round a few rows up from the
+   * bottom edge. A smooth scroll of a box cancels any other still under way
+   * in it, so the two directions cannot be sent separately. The round only
+   * changes once a round, so within one this moves only sideways.
+   */
   useEffect(() => {
     const scroller = scrollRef.current;
     if (!scroller || !at) return;
     const cell = cellNow.current;
-    const { x } = cellAt(layout, at.round, at.column, cell);
+    const { x, y } = cellAt(layout, at.round, at.column, cell);
     scroller.scrollTo({
       left: Math.max(x - scroller.clientWidth / 2 + cell / 2, 0),
+      top: contained
+        ? Math.max(y + cell - (scroller.clientHeight - clearance * cell), 0)
+        : undefined,
       behavior: reducedMotion() ? "auto" : "smooth",
     });
-  }, [at, layout]);
+  }, [at, layout, contained]);
 
   /*
    * And down the page, but only when the round changes. Within a round the
@@ -275,6 +293,8 @@ const Chart: React.FC<ChartProps> = ({
    */
   const focusRound = at?.round;
   useEffect(() => {
+    // A window of its own is followed both ways above.
+    if (contained) return;
     const sheets = scrollRef.current?.querySelector(".chart-sheets");
     if (!sheets || focusRound === undefined) return;
     const cellSize = cellNow.current;
@@ -301,7 +321,7 @@ const Chart: React.FC<ChartProps> = ({
     <div className="chart-frame">
       {contrast && <ul className="chart-yarn-numbers">{Object.entries(palette).filter(([key], i, entries) => entries.findIndex(([other]) => yarnLabels[other] === yarnLabels[key]) === i).map(([key, yarn]) => <li key={key}>{yarnLabels[key]}: {yarn.name}</li>)}</ul>}
       <div
-        className="chart-scroll"
+        className={`chart-scroll${contained ? " chart-scroll-contained" : ""}`}
         ref={scrollRef}
         tabIndex={0}
         role="region"
@@ -320,10 +340,9 @@ const Chart: React.FC<ChartProps> = ({
       >
         <div
           ref={sheetRef}
-          className={`chart-sheets${onJump ? " chart-pickable" : ""}`}
+          className="chart-sheets chart-pickable"
           style={{ width, height }}
           onClick={
-            onJump &&
             ((event) => {
               const box = event.currentTarget.getBoundingClientRect();
               const id = stitchAtPoint(
@@ -372,8 +391,11 @@ const Chart: React.FC<ChartProps> = ({
               <canvas ref={overlayRef} style={{ width, height }} />
             </>
           )}
-          {onJump && picked !== undefined && (
+          {picked !== undefined && (
             <StitchPicker
+              entry={keyEntryAt(stitches, picked, stitchNotes)}
+              labels={labels}
+              yarn={stitches[picked] && yarnFor(palette, stitches[picked].slot)}
               id={picked}
               stitches={stitches}
               rounds={rounds}

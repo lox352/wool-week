@@ -20,7 +20,7 @@ const Cell: React.FC<{ type?: StitchType; mark?: Mark; x: number }> = ({ type, m
 };
 
 /** A KFB is drawn as the pair of cells it makes: the stitch, and the new one to its left. */
-const Swatch: React.FC<{ entry: KeyEntry }> = ({ entry }) => {
+export const Swatch: React.FC<{ entry: KeyEntry }> = ({ entry }) => {
   const pair = entry.id === "kfb";
   return (
     <svg
@@ -58,20 +58,28 @@ export function StitchLegend({ stitches, notes }: {
   return (
     <details className="chart-help">
       <summary>Stitch-symbol key</summary>
-      <ul className="stitch-key">
-        {entries.map((entry) => (
-          <li key={entry.id}>
-            <Swatch entry={entry} />
-            <div>
-              <strong>{entry.label}</strong>
-              {entry.abbreviation && <span className="stitch-abbr"> {entry.abbreviation}</span>}
-              <p>{entry.how}</p>
-              {entry.note && <p className="stitch-note">{entry.note}</p>}
-            </div>
-          </li>
-        ))}
-      </ul>
+      <KeyList entries={entries} />
     </details>
+  );
+}
+
+/** The key's entries, each with its mark and how to work it. */
+export function KeyList({ entries, current }: { entries: KeyEntry[]; current?: string }) {
+  return (
+    <ul className="stitch-key">
+      {entries.map((entry) => (
+        <li key={entry.id} className={entry.id === current ? "stitch-key-current" : undefined}>
+          <Swatch entry={entry} />
+          <div>
+            <strong>{entry.label}</strong>
+            {entry.abbreviation && <span className="stitch-abbr"> {entry.abbreviation}</span>}
+            {entry.id === current && <span className="stitch-key-here"> · you are here</span>}
+            <p>{entry.how}</p>
+            {entry.note && <p className="stitch-note">{entry.note}</p>}
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 

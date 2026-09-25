@@ -32,6 +32,8 @@ export function usePinchZoom(
   sheetRef: RefObject<HTMLDivElement>,
   cell: number,
   setCell: (cell: number) => void,
+  /** The chart scrolls both ways in a box of its own, not down the page. */
+  contained = false,
 ) {
   const gesture = useRef<Gesture>();
   const settle = useRef<{
@@ -160,11 +162,15 @@ export function usePinchZoom(
      */
     const box = sheet.getBoundingClientRect();
     scroller.scrollLeft += box.left + done.originX * done.ratio - done.screenX;
+    if (contained) {
+      scroller.scrollTop += box.top + done.originY * done.ratio - done.screenY;
+      return;
+    }
     window.scrollBy({
       top: box.top + done.originY * done.ratio - done.screenY,
       behavior: "instant",
     });
-  }, [cell, scrollRef, sheetRef]);
+  }, [cell, scrollRef, sheetRef, contained]);
 
   /** Zoom to a cell size about a point on screen, holding that point still. */
   return useCallback(

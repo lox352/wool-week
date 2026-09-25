@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { hatById } from "../data/hats";
 import { buildHat } from "./engine";
-import { stitchKey } from "./stitch-key";
+import { keyEntryAt, pairedWithKfb, stitchKey } from "./stitch-key";
 
 const keyOf = (id: string) => {
   const hat = hatById(id)!;
@@ -54,5 +54,32 @@ describe("which way a make-one leans", () => {
     expect(lean("sww24-islesburgh-toorie")).toBe("left");
     // 2019 lifts "the bar" without saying which way round.
     expect(lean("sww19-roadside-beanie")).toBeUndefined();
+  });
+});
+
+describe("the key's entry for one stitch", () => {
+  const built = (id: string) => {
+    const hat = hatById(id)!;
+    return { hat, stitches: buildHat(hat, hat.sizes[0].id).stitches };
+  };
+
+  it("explains a KFB's second loop as the KFB it belongs to", () => {
+    const { hat, stitches } = built("sww23-buggiflooer-beanie");
+    const second = stitches.findIndex((_, i) => pairedWithKfb(stitches, i));
+    expect(second).toBeGreaterThan(0);
+    expect(keyEntryAt(stitches, second, hat.stitchNotes)?.id).toBe("kfb");
+  });
+
+  it("uses the pattern's words, as the key does", () => {
+    const { hat, stitches } = built("sww21-da-crofters-kep");
+    const m1 = stitches.findIndex((stitch, i) => stitch.type === "m1" && !pairedWithKfb(stitches, i));
+    expect(keyEntryAt(stitches, m1, hat.stitchNotes)?.how).toMatch(/back to front/);
+  });
+
+  it("has nothing to say about the seam", () => {
+    const { stitches } = built("sww15-baa-ble-hat");
+    const seam = stitches.findIndex((stitch) => stitch.type === "join");
+    expect(seam).toBeGreaterThanOrEqual(0);
+    expect(keyEntryAt(stitches, seam)).toBeUndefined();
   });
 });

@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
 import { paletteOf, yarnFor } from "../knitting/palette";
-import { totals, positionOf } from "../knitting/progress";
+import { totals, positionOf, currentRun } from "../knitting/progress";
+import { keyEntryAt } from "../knitting/stitch-key";
 import {
   Project as SavedProject,
   chartPath,
@@ -20,6 +21,7 @@ import ProgressRing from "./ProgressRing";
 import HatModel from "./HatModel";
 import Chart from "../knitting/Chart";
 import KnittingPanel from "./KnittingPanel";
+import { KeySheet } from "./KnitKey";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
@@ -172,6 +174,20 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
     change(current => ({ ...current, shades: undefined }));
   }, [change]);
 
+  /*
+   * Opening or closing the knitting rearranges everything around the chart:
+   * knitting fills the screen, without the header and title above it. Hold
+   * the chart where it is on screen rather than letting it jump.
+   */
+  const chartHeld = useRef<number>();
+  useLayoutEffect(() => {
+    const was = chartHeld.current;
+    chartHeld.current = undefined;
+    const sheet = document.querySelector(".chart-sheets");
+    if (was === undefined || !sheet) return;
+    window.scrollBy({ top: sheet.getBoundingClientRect().top - was, behavior: "instant" });
+  }, [knitting]);
+
   if (!project || !hat) {
     return (
       <PageLayout title="No such project">
@@ -196,6 +212,7 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
       project={project}
       knitting={knitting}
       setKnitting={(on) => {
+        chartHeld.current = document.querySelector(".chart-sheets")?.getBoundingClientRect().top;
         const next = new URLSearchParams(params);
         if (on) next.set(knittingParam, "1");
         else next.delete(knittingParam);
@@ -255,15 +272,30 @@ const ProjectView: React.FC<{
   const choicesRef = useRef<HTMLElement>(null);
   const body = useMemo(() => ({ stitches, rounds }), [stitches, rounds]);
 
+  // The full key, over the lower part of the screen while knitting.
+  const [keyOpen, setKeyOpen] = useState(false);
+  const closeKey = useCallback(() => setKeyOpen(false), []);
+  useEffect(() => {
+    if (!knitting) setKeyOpen(false);
+  }, [knitting]);
+  const run = currentRun(stitches, project.progress, index);
+  const currentStitch = run ? keyEntryAt(stitches, run.startId, hat.stitchNotes)?.id : undefined;
+
   const title = project.name ?? hat.name;
   const eyebrow = `Shetland Wool Week ${hat.year} · ${size.label} · ${colourway.name}`;
   const knitLabel = counts.worked > 0 ? "Keep knitting" : "Start knitting";
 
   if (view === "chart") {
     return (
-      <PageLayout title={title} eyebrow={eyebrow} showTitle={!knitting}>
+      <PageLayout
+        title={title}
+        eyebrow={eyebrow}
+        showTitle={!knitting}
+        className={knitting ? "knit-screen" : undefined}
+      >
         <section className="section chart-page">
           <Chart
+            contained
             stitches={stitches}
             rounds={rounds}
             palette={palette}
@@ -297,6 +329,8 @@ const ProjectView: React.FC<{
             onStop={() => setKnitting(false)}
             canUndo={canUndo}
             onUndo={undo}
+            notes={hat.stitchNotes}
+            onOpenKey={() => setKeyOpen(true)}
           />
         ) : (
           <ChartPageFoot
@@ -308,6 +342,15 @@ const ProjectView: React.FC<{
             finished={position.finished}
             overview={overviewPath(project.id)}
             onKnit={() => setKnitting(true)}
+          />
+        )}
+        {knitting && keyOpen && (
+          <KeySheet
+            stitches={stitches}
+            palette={palette}
+            notes={hat.stitchNotes}
+            current={currentStitch}
+            onClose={closeKey}
           />
         )}
       </PageLayout>

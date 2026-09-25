@@ -240,3 +240,73 @@
 .chart-foot p {
   margin: 0;
 }
+
+/*
+ * The chart scrolls both ways in a window of its own, so zooming it changes
+ * what is in the window and never the length of the page.
+ */
+.chart-scroll.chart-scroll-contained {
+  overflow: auto;
+  overscroll-behavior: contain;
+  height: 68dvh;
+}
+
+/*
+ * Knitting fills the screen: the chart above, the panel below, and no page
+ * to scroll, so nothing can move except what you move.
+ */
+.page.knit-screen {
+  position: fixed;
+  inset: 0;
+  max-width: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* All but the chart and panel is put away; a warning that progress is not
+   being saved is not something to put away. */
+.knit-screen > :not(.chart-page, .knitting-panel, .key-sheet, .storage-notice) {
+  display: none;
+}
+
+.knit-screen > .storage-notice {
+  margin: 0;
+  border-radius: 0;
+}
+
+.knit-screen .chart-page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.knit-screen .chart-frame {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+.knit-screen .chart-frame > :not(.chart-scroll, .chart-yarn-numbers),
+.knit-screen .chart-key {
+  display: none;
+}
+
+.knit-screen .chart-scroll.chart-scroll-contained {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  padding: 0.5rem;
+}
+
+.knit-screen .knitting-panel {
+  position: relative;
+  margin: 0;
+}

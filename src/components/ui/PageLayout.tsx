@@ -13,6 +13,7 @@ interface PageLayoutProps {
   lede?: React.ReactNode;
   aside?: React.ReactNode;
   children: React.ReactNode;
+  className?: string;
 }
 
 /**
@@ -29,8 +30,9 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   lede,
   aside,
   children,
+  className,
 }) => (
-  <div className="page">
+  <div className={className ? `page ${className}` : "page"}>
     <header className="masthead screen-only">
       <Link to="/" className="masthead-title">
         Wool Week Toories

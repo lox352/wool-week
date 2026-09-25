@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Stitch } from "../types/Stitch";
 import {
   Run,
@@ -13,6 +13,9 @@ import {
 } from "../knitting/progress";
 import { Palette, inkOn, yarnFor } from "../knitting/palette";
 import Button from "./ui/Button";
+import { KeyEntry, keyEntryAt, stitchKey } from "../knitting/stitch-key";
+import { Swatch as StitchSwatch } from "../knitting/ChartHelp";
+import type { StitchKeyId, StitchNote } from "../data/hats/types";
 import "./KnittingPanel.css";
 
 interface KnittingPanelProps {
@@ -24,7 +27,50 @@ interface KnittingPanelProps {
   onStop: () => void;
   canUndo: boolean;
   onUndo: () => void;
+  /** What the pattern says about its stitches. */
+  notes?: Partial<Record<StitchKeyId, StitchNote>>;
+  /** Opens the whole key: the colours and every stitch. */
+  onOpenKey?: () => void;
 }
+
+/**
+ * The stitches this round needs explaining, in the key's order: anything but
+ * a plain knit. For the whole round rather than the stitch in hand, so that it
+ * says what is coming before you reach it, and so it does not appear and
+ * vanish every two stitches across a rib, taking the chart's height with it.
+ */
+const roundEntries = (
+  stitches: Stitch[],
+  ids: number[],
+  notes?: Partial<Record<StitchKeyId, StitchNote>>,
+): KeyEntry[] => {
+  const seen = new Map<string, KeyEntry>();
+  ids.forEach((id) => {
+    const entry = keyEntryAt(stitches, id, notes);
+    if (entry && entry.id !== "k1" && !seen.has(entry.id)) seen.set(entry.id, entry);
+  });
+  const order = stitchKey(stitches, notes).map((entry) => entry.id);
+  return [...seen.values()].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+};
+
+/** How to work this round's special stitches, the one in hand marked. */
+const StitchHint: React.FC<{ entries: KeyEntry[]; current?: string }> = ({ entries, current }) => (
+  <ul className="knitting-hint" aria-label="Stitches in this round">
+    {entries.map((entry) => (
+      <li key={entry.id} className={entry.id === current ? "knitting-hint-now" : undefined}>
+        <StitchSwatch entry={entry} />
+        <p>
+          <strong>
+            {entry.label}
+            {entry.abbreviation && <span className="stitch-abbr"> {entry.abbreviation}</span>}
+          </strong>{" "}
+          {entry.how}
+          {entry.note && <span className="stitch-note"> {entry.note}</span>}
+        </p>
+      </li>
+    ))}
+  </ul>
+);
 
 const Swatch: React.FC<{ run: Run; palette: Palette; small?: boolean }> = ({
   run,
@@ -116,9 +162,17 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
   onStop,
   canUndo,
   onUndo,
+  notes,
+  onOpenKey,
 }) => {
   const position = positionOf(stitches, progress, index);
   const run = currentRun(stitches, progress, index);
+  const roundIds = index.rounds[position.round - 1];
+  const inRound = useMemo(
+    () => (roundIds ? roundEntries(stitches, roundIds, notes) : []),
+    [stitches, roundIds, notes],
+  );
+  const current = run ? keyEntryAt(stitches, run.startId, notes)?.id : undefined;
   const ahead = upcomingRuns(stitches, run?.endId ?? progress, index, 2);
   const counts = totals(index, progress);
 
@@ -198,6 +252,9 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
   if (position.finished) {
     return (
       <div className="knitting-panel knitting-panel-done">
+        <div className="knitting-bar" aria-hidden="true">
+          <span style={{ width: "100%" }} />
+        </div>
         <div className="knitting-done">
           <strong>That is the last stitch.</strong>
           <span className="quiet">
@@ -217,6 +274,10 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
 
   return (
     <div className="knitting-panel">
+      {/* How far through the hat, as the panel's top edge. */}
+      <div className="knitting-bar" aria-hidden="true">
+        <span style={{ width: `${counts.percent}%` }} />
+      </div>
       <button
         type="button"
         className="knitting-close"
@@ -271,16 +332,15 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
         <Turn opening={position.stitchInRound === 1} />
       )}
 
-      {position.label && (
-        <p className="knitting-where quiet">{position.label}</p>
-      )}
-
-      <div className="knitting-bar" aria-hidden="true">
-        <span style={{ width: `${counts.percent}%` }} />
-      </div>
+      {inRound.length > 0 && <StitchHint entries={inRound} current={current} />}
 
       <div className="knitting-actions">
         <UndoButton onUndo={onUndo} canUndo={canUndo} />
+        {onOpenKey && (
+          <Button variant="secondary" className="knitting-key" onClick={onOpenKey}>
+            Key
+          </Button>
+        )}
         <Button variant="secondary" className="knitting-round" onClick={finishRound}>
           End of round
         </Button>
