@@ -131,11 +131,34 @@ test("knitting fills the screen, says how to work the round's stitches, and clos
   await expect(picker).toContainText("Knit two together");
   await picker.getByRole("button", { name: "Close" }).click();
 
-  const before = await page.locator(".chart-sheets").evaluate(sheet => sheet.getBoundingClientRect().top);
+  const at = () => page.locator(".chart-sheets").evaluate(sheet => {
+    const box = sheet.getBoundingClientRect();
+    return { left: box.left, top: box.top };
+  });
+  const before = await at();
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
   await expect(page.getByRole("region", { name: "Your progress" })).toBeVisible();
-  const after = await page.locator(".chart-sheets").evaluate(sheet => sheet.getBoundingClientRect().top);
-  expect(Math.abs(after - before)).toBeLessThan(2);
+  const after = await at();
+  expect(Math.abs(after.top - before.top)).toBeLessThan(2);
+  expect(Math.abs(after.left - before.left)).toBeLessThan(2);
+});
+
+test("starting to knit brings the stitch into view, and keeps it there when the panel grows", async ({ page }) => {
+  await start(page);
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
+  await page.reload();
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.getByRole("button", { name: "Start knitting", exact: true }).click();
+  // The first round is the chart's bottom row.
+  const bottomShowing = () => page.evaluate(() => {
+    const window = document.querySelector(".chart-scroll").getBoundingClientRect();
+    const sheet = document.querySelector(".chart-sheets").getBoundingClientRect();
+    return sheet.bottom <= window.bottom + 1;
+  });
+  await expect.poll(bottomShowing).toBe(true);
+  // As a late font would: the panel grows, and the window above it shrinks.
+  await page.locator(".knitting-panel").evaluate(panel => { panel.style.paddingBottom = "80px"; });
+  await expect.poll(bottomShowing).toBe(true);
 });
 
 test("the chart page does not pan sideways, and zooming leaves the chart where it lands", async ({ page }) => {

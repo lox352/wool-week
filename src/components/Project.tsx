@@ -179,13 +179,20 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
    * knitting fills the screen, without the header and title above it. Hold
    * the chart where it is on screen rather than letting it jump.
    */
-  const chartHeld = useRef<number>();
+  const chartHeld = useRef<{ left: number; top: number }>();
   useLayoutEffect(() => {
     const was = chartHeld.current;
     chartHeld.current = undefined;
     const sheet = document.querySelector(".chart-sheets");
-    if (was === undefined || !sheet) return;
-    window.scrollBy({ top: sheet.getBoundingClientRect().top - was, behavior: "instant" });
+    const scroller = sheet?.closest<HTMLElement>(".chart-scroll");
+    if (!was || !sheet || !scroller) return;
+    // Up and down by the page where it can scroll, and by the chart's own
+    // window for what is left; sideways by the window, whose edges move
+    // in by the frame's padding when the knitting is closed.
+    window.scrollBy({ top: sheet.getBoundingClientRect().top - was.top, behavior: "instant" });
+    const now = sheet.getBoundingClientRect();
+    scroller.scrollTop += now.top - was.top;
+    scroller.scrollLeft += now.left - was.left;
   }, [knitting]);
 
   if (!project || !hat) {
@@ -212,7 +219,8 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
       project={project}
       knitting={knitting}
       setKnitting={(on) => {
-        chartHeld.current = document.querySelector(".chart-sheets")?.getBoundingClientRect().top;
+        const sheet = document.querySelector(".chart-sheets")?.getBoundingClientRect();
+        chartHeld.current = sheet && { left: sheet.left, top: sheet.top };
         const next = new URLSearchParams(params);
         if (on) next.set(knittingParam, "1");
         else next.delete(knittingParam);
