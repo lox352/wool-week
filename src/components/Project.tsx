@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
@@ -7,7 +7,9 @@ import { paletteOf, yarnFor } from "../knitting/palette";
 import { totals, positionOf } from "../knitting/progress";
 import {
   Project as SavedProject,
+  chartPath,
   knittingParam,
+  overviewPath,
   readProject,
   projectsChanged,
   writeProject,
@@ -20,6 +22,7 @@ import Chart from "../knitting/Chart";
 import KnittingPanel from "./KnittingPanel";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
+import NextStep from "./ui/NextStep";
 import "./Project.css";
 
 /**
@@ -34,7 +37,7 @@ import "./Project.css";
 /** How many changes Undo can step back through. */
 const undoLimit = 100;
 
-const Project: React.FC = () => {
+const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
   const { projectId } = useParams();
   const [params, setParams] = useSearchParams();
   const [project, setProject] = useState<SavedProject | undefined>(() =>
@@ -131,8 +134,15 @@ const Project: React.FC = () => {
     );
   }
 
+  // Knitting happens on the chart page; an old link that asked for it on the
+  // overview is sent there.
+  if (view === "overview" && knitting) {
+    return <Navigate to={chartPath(project.id, true)} replace />;
+  }
+
   return (
     <ProjectView
+      view={view}
       hatId={hat.id}
       project={project}
       knitting={knitting}
@@ -153,6 +163,7 @@ const Project: React.FC = () => {
 };
 
 const ProjectView: React.FC<{
+  view: "overview" | "chart";
   hatId: string;
   project: SavedProject;
   knitting: boolean;
@@ -164,6 +175,7 @@ const ProjectView: React.FC<{
   setShade: (slots: SlotId[], chosen: Chosen | undefined) => void;
   restoreShades: () => void;
 }> = ({
+  view,
   hatId,
   project,
   knitting,
@@ -190,149 +202,211 @@ const ProjectView: React.FC<{
   const counts = totals(index, project.progress);
   const position = positionOf(stitches, project.progress, index);
 
+  const title = project.name ?? hat.name;
+  const eyebrow = `Shetland Wool Week ${hat.year} · ${size.label} · ${colourway.name}`;
+  const knitLabel = counts.worked > 0 ? "Keep knitting" : "Start knitting";
+
+  if (view === "chart") {
+    return (
+      <PageLayout title={title} eyebrow={eyebrow} showTitle={!knitting}>
+        <section className="section chart-page">
+          <Chart
+            stitches={stitches}
+            rounds={rounds}
+            palette={palette}
+            progress={project.progress}
+            follow={knitting}
+            onJump={knitting ? setProgress : undefined}
+            labels={roundLabels}
+            turns={turns}
+            stitchNotes={hat.stitchNotes}
+          />
+          <ul className="chart-key">
+            {hat.slots.map((slot) => (
+              <li key={slot}>
+                <span
+                  className="swatch"
+                  style={{ background: yarnFor(palette, slot).hex }}
+                />
+                {slot} · {yarnFor(palette, slot).name}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {knitting ? (
+          <KnittingPanel
+            stitches={stitches}
+            index={index}
+            palette={palette}
+            progress={project.progress}
+            setProgress={setProgress}
+            onStop={() => setKnitting(false)}
+            canUndo={canUndo}
+            onUndo={undo}
+          />
+        ) : (
+          /*
+           * Where the knitting panel sits while you knit, so that closing it
+           * leaves the way back to it under the same thumb.
+           */
+          <nav className="knitting-panel chart-page-bar" aria-label="Project">
+            <p className="chart-page-status quiet">
+              {position.finished
+                ? "Finished."
+                : `Round ${position.round} of ${position.totalRounds} · ` +
+                  `${counts.worked.toLocaleString()} of ` +
+                  `${counts.total.toLocaleString()} stitches knitted`}
+            </p>
+            <div className="chart-page-actions">
+              <Link to="/" className="btn btn-quiet">
+                Home
+              </Link>
+              <Link to={overviewPath(project.id)} className="btn btn-secondary">
+                Overview &amp; colours
+              </Link>
+              <Button
+                variant="primary"
+                size="lg"
+                className="chart-page-resume"
+                onClick={() => setKnitting(true)}
+              >
+                {position.finished
+                  ? "See the last stitch"
+                  : counts.worked > 0
+                    ? "Resume knitting"
+                    : "Start knitting"}
+              </Button>
+            </div>
+          </nav>
+        )}
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout
-      title={project.name ?? hat.name}
-      eyebrow={`Shetland Wool Week ${hat.year} · ${size.label} · ${colourway.name}`}
-      showTitle={!knitting}
+      title={title}
+      eyebrow={eyebrow}
       aside={
-        !knitting && (
-          <Button variant="primary" onClick={() => setKnitting(true)}>
-            {counts.worked > 0 ? "Keep knitting" : "Start knitting"}
-          </Button>
-        )
+        <Link to={chartPath(project.id, !position.finished)} className="btn btn-primary">
+          {position.finished ? "Open the chart" : knitLabel}
+        </Link>
       }
     >
-      {!knitting && (
-        <>
-          <div className="project-layout">
-            <div className="project-stage">
-              <HatModel
-                hatId={hat.id}
-                sizeId={size.id}
-                stitches={stitches}
-                rounds={rounds}
-                roundHeight={roundHeight}
-                palette={palette}
-                progress={project.progress}
-                target={{
-                  acrossCm: size.circumferenceCm / Math.PI,
-                  tallCm: size.lengthCm,
-                }}
-              />
-              <p className="quiet hat-stage-note">
-                The wool fills in as you knit. Drag to turn it.
-              </p>
+      <div className="project-layout">
+        <div className="project-stage">
+          <HatModel
+            hatId={hat.id}
+            sizeId={size.id}
+            stitches={stitches}
+            rounds={rounds}
+            roundHeight={roundHeight}
+            palette={palette}
+            progress={project.progress}
+            target={{
+              acrossCm: size.circumferenceCm / Math.PI,
+              tallCm: size.lengthCm,
+            }}
+          />
+          <p className="quiet hat-stage-note">
+            The wool fills in as you knit. Drag to turn it.
+          </p>
+        </div>
+        <div className="project-figures">
+          <ProgressRing percent={counts.percent} />
+          <dl className="measurements">
+            <div>
+              <dt>Knitted</dt>
+              <dd>
+                {counts.worked.toLocaleString()} of{" "}
+                {counts.total.toLocaleString()} stitches
+              </dd>
             </div>
-            <div className="project-figures">
-              <ProgressRing percent={counts.percent} />
-              <dl className="measurements">
-                <div>
-                  <dt>Knitted</dt>
-                  <dd>
-                    {counts.worked.toLocaleString()} of{" "}
-                    {counts.total.toLocaleString()} stitches
-                  </dd>
-                </div>
-                <div>
-                  <dt>Round</dt>
-                  <dd>
-                    {position.finished
-                      ? "Finished"
-                      : `${position.round} of ${position.totalRounds}`}
-                  </dd>
-                </div>
-                <div>
-                  <dt>Left to go</dt>
-                  <dd>{counts.remaining.toLocaleString()} stitches</dd>
-                </div>
-              </dl>
+            <div>
+              <dt>Round</dt>
+              <dd>
+                {position.finished
+                  ? "Finished"
+                  : `${position.round} of ${position.totalRounds}`}
+              </dd>
             </div>
-          </div>
+            <div>
+              <dt>Left to go</dt>
+              <dd>{counts.remaining.toLocaleString()} stitches</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
 
-          <div className="peerie-rule" aria-hidden="true" />
-
-          <section className="section">
-            <h2>Your wool</h2>
-            {/*
-              The pattern's own colourways first, because they are where most
-              people start, then the wool itself. Choosing one sets every yarn
-              at once; a row below changes any of them afterwards.
-            */}
-            <div className="chooser">
-              {colourways.map((option) => {
-                const optionPalette = paletteOf(option, {}, hat.charts);
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    className={`colourway-option${option.id === colourway.id ? " is-chosen" : ""}`}
-                    aria-pressed={option.id === colourway.id}
-                    onClick={() => setColourway(option.id)}
-                  >
-                    <span className="colourway-swatches" aria-hidden="true">
-                      {option.shades.map((shade) => (
-                        <span
-                          key={shade.slot}
-                          style={{ background: yarnFor(optionPalette, shade.slot).hex }}
-                        />
-                      ))}
-                    </span>
-                    <strong>{option.name}</strong>
-                    <span className="quiet">{option.brand}</span>
-                  </button>
-                );
-              })}
-            </div>
-            <WoolList
-              colourway={colourway}
-              sizeId={project.sizeId}
-              overrides={project.shades ?? {}}
-              onChange={setShade}
-              onRestoreAll={restoreShades}
-            />
-          </section>
-        </>
-      )}
+      <div className="peerie-rule" aria-hidden="true" />
 
       <section className="section">
-        {!knitting && <h2>The chart</h2>}
-        <Chart
-          stitches={stitches}
-          rounds={rounds}
-          palette={palette}
-          progress={project.progress}
-          follow={knitting}
-          onJump={knitting ? setProgress : undefined}
-          labels={roundLabels}
-          turns={turns}
-          stitchNotes={hat.stitchNotes}
+        <h2>Your wool</h2>
+        {/*
+          The pattern's own colourways first, because they are where most
+          people start, then the wool itself. Choosing one sets every yarn
+          at once; a row below changes any of them afterwards.
+        */}
+        <div className="chooser">
+          {colourways.map((option) => {
+            const optionPalette = paletteOf(option, {}, hat.charts);
+            return (
+              <button
+                key={option.id}
+                type="button"
+                className={`colourway-option${option.id === colourway.id ? " is-chosen" : ""}`}
+                aria-pressed={option.id === colourway.id}
+                onClick={() => setColourway(option.id)}
+              >
+                <span className="colourway-swatches" aria-hidden="true">
+                  {option.shades.map((shade) => (
+                    <span
+                      key={shade.slot}
+                      style={{ background: yarnFor(optionPalette, shade.slot).hex }}
+                    />
+                  ))}
+                </span>
+                <strong>{option.name}</strong>
+                <span className="quiet">{option.brand}</span>
+              </button>
+            );
+          })}
+        </div>
+        <WoolList
+          colourway={colourway}
+          sizeId={project.sizeId}
+          overrides={project.shades ?? {}}
+          onChange={setShade}
+          onRestoreAll={restoreShades}
         />
-        <ul className="chart-key">
-          {hat.slots.map((slot) => (
-            <li key={slot}>
-              <span
-                className="swatch"
-                style={{ background: yarnFor(palette, slot).hex }}
-              />
-              {slot} · {yarnFor(palette, slot).name}
-            </li>
-          ))}
-        </ul>
       </section>
 
-      {knitting && (
-        <KnittingPanel
-          stitches={stitches}
-          index={index}
-          palette={palette}
-          progress={project.progress}
-          setProgress={setProgress}
-          onStop={() => setKnitting(false)}
-          canUndo={canUndo}
-          onUndo={undo}
-        />
-      )}
+      <NextStep
+        title={position.finished ? "All knitted" : counts.worked > 0 ? "Carry on" : "Ready to cast on?"}
+        detail={
+          position.finished
+            ? "Every stitch is done. The chart is still there to look back over."
+            : counts.worked > 0
+              ? `You are on round ${position.round} of ${position.totalRounds}. The chart opens where you left off.`
+              : `${counts.total.toLocaleString()} stitches over ${position.totalRounds} rounds. The chart follows you round by round.`
+        }
+      >
+        {position.finished ? (
+          <Link to={chartPath(project.id)} className="btn btn-primary btn-lg">
+            Open the chart
+          </Link>
+        ) : (
+          <>
+            <Link to={chartPath(project.id)} className="btn btn-secondary">
+              View the chart
+            </Link>
+            <Link to={chartPath(project.id, true)} className="btn btn-primary btn-lg">
+              {knitLabel}
+            </Link>
+          </>
+        )}
+      </NextStep>
     </PageLayout>
   );
 };

@@ -39,6 +39,9 @@ test("DK selection, accessible chart controls and text instructions", async ({ p
   await page.goto(pattern);
   await page.getByRole("button", { name: "Yarn weight 1 · DK", exact: true }).click();
   await expect(page.getByRole("button", { name: "Yarn weight 1 · DK", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
+  // Out of knitting, so the chart stops following and any round can be read.
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
   const sheetWidth = () => page.locator(".chart-sheets").evaluate(node => node.offsetWidth);
   const unzoomed = await sheetWidth();
   await page.getByRole("region", { name: /Scrollable knitting chart/ }).press("+");
@@ -53,6 +56,34 @@ test("DK selection, accessible chart controls and text instructions", async ({ p
   await page.getByLabel("Read round").selectOption("2");
   await expect(page.getByText("Round 2:", { exact: false })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+});
+
+test("the chart is its own page, and closing the knitting keeps you on it", async ({ page }) => {
+  await page.goto(pattern);
+  // The hat page shows the hat and its wool, and ends with the way to start.
+  await expect(page.locator(".chart-sheets")).toHaveCount(0);
+  await page.getByRole("button", { name: "Start knitting", exact: true }).click();
+  await expect(page).toHaveURL(/\/project\/[^/]+\/chart\?knitting=1$/);
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
+
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
+  await expect(page).toHaveURL(/\/project\/[^/]+\/chart$/);
+  await expect(page.locator(".chart-sheets")).toBeVisible();
+  const bar = page.getByRole("navigation", { name: "Project" });
+  await bar.getByRole("button", { name: "Resume knitting", exact: true }).click();
+  await expect(position(page)).toContainText("Round 2, stitch 1.");
+
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
+  await bar.getByRole("link", { name: "Overview & colours", exact: true }).click();
+  await expect(page).toHaveURL(/\/project\/[^/?]+$/);
+  await expect(page.locator(".chart-sheets")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Your wool" })).toBeVisible();
+  await page.locator(".next-step").getByRole("link", { name: "Keep knitting", exact: true }).click();
+  await expect(position(page)).toContainText("Round 2, stitch 1.");
+
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
+  await bar.getByRole("link", { name: "Home", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Wool Week Toories", level: 1, exact: true })).toBeVisible();
 });
 
 test("progress survives reload and undo; a second tab stays in sync", async ({ page, context }) => {
