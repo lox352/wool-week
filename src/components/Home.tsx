@@ -77,9 +77,8 @@ const ProjectCard: React.FC<{
   const { stitches, rounds } = hatStitches(hat, project.sizeId);
 
   /*
-   * The hat's body in this project's own wool, filling in as it is knitted:
-   * what is done in colour, what is still to come faded, and a line along
-   * its foot for how far through the whole hat that is.
+   * The hat's body in this project's own wool, with a line along its foot
+   * for how far through the whole hat the knitting is.
    */
   return (
     <li className="project-card">
@@ -89,7 +88,6 @@ const ProjectCard: React.FC<{
             stitches={stitches}
             rounds={rounds}
             palette={palette}
-            progress={project.progress}
             className="hat-card-body"
           />
           <span className="project-card-bar" aria-hidden="true">

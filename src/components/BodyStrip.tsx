@@ -18,10 +18,8 @@ const BodyStrip: React.FC<{
   palette: Palette;
   /** Fade every stitch but these yarns', to show where they are knitted. */
   highlight?: SlotId[];
-  /** Fade every stitch not yet knitted: the id of the last one worked. */
-  progress?: number;
   className?: string;
-}> = ({ stitches, rounds, palette, highlight, progress, className }) => {
+}> = ({ stitches, rounds, palette, highlight, className }) => {
   /** The rounds at the hat's full width, from the first to the last. */
   const body = useMemo(() => {
     const widest = Math.max(...rounds.map((round) => round.length));
@@ -32,7 +30,7 @@ const BodyStrip: React.FC<{
   }, [rounds]);
 
   /*
-   * Painted once per change of wool or progress, a pixel a stitch, and used
+   * Painted once per change of wool, a pixel a stitch, and used
    * as the strip's background: scaled up square to the strip's height and
    * repeated sideways to fill it. A round goes all the way round the hat, so
    * the next repeat along is simply more of the hat - which is what lets a
@@ -57,18 +55,13 @@ const BodyStrip: React.FC<{
       const y = body.length - 1 - index;
       round.forEach((id, position) => {
         const yarn = yarnFor(palette, stitches[id]?.slot ?? "");
-        ctx.globalAlpha =
-          (lit && !lit.has(yarn)) || (progress !== undefined && id > progress)
-            ? progress !== undefined
-              ? 0.3
-              : 0.14
-            : 1;
+        ctx.globalAlpha = lit && !lit.has(yarn) ? 0.14 : 1;
         ctx.fillStyle = yarn.hex;
         ctx.fillRect(width - 1 - position, y, 1, 1);
       });
     });
     return element.toDataURL();
-  }, [body, stitches, palette, highlight, progress]);
+  }, [body, stitches, palette, highlight]);
 
   return (
     <div
