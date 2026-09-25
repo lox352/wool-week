@@ -202,19 +202,10 @@
   }
 }
 
-.next-step .chart-foot-actions {
-  flex: 1 1 100%;
-}
-
 .chart-foot {
   background: var(--paper-raised);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
-  overflow: hidden;
-}
-
-/* B: the figure, the bar, the numbers. */
-.chart-foot-b {
   display: grid;
   gap: 0.75rem;
   padding: 1.2rem 1.3rem 1.3rem;
@@ -246,32 +237,6 @@
   border-radius: 4px;
 }
 
-.chart-foot-b p {
+.chart-foot p {
   margin: 0;
-}
-
-/* C: the project card again. */
-.chart-foot-c .chart-foot-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  padding: 0.9rem 1rem 0.6rem;
-}
-
-.chart-foot-c .chart-foot-text strong {
-  font-size: 1.1rem;
-}
-
-.chart-foot-c .chart-foot-text .quiet {
-  font-size: 0.87rem;
-}
-
-.chart-foot-c .chart-foot-actions {
-  padding: 0.4rem 1rem 1rem;
-}
-
-/* D: no card at all. */
-.chart-foot-d .chart-foot-stats {
-  margin: 1.2rem 0 0.9rem;
-  font-size: 1.05rem;
 }
