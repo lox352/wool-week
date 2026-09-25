@@ -178,12 +178,23 @@ const sww14: HatPattern = {
     "designed by Hazel Tindall for Shetland Wool Week 2014.",
   patternUrl: "https://www.hazeltindall.com",
   credit: "Shwook hat © Hazel Tindall, 2014",
+  // The stitches as this pattern's own abbreviations define them.
   stitchNotes: {
     kfb: {
+      how:
+        "Increase by knitting into the front and back of the stitch: one " +
+        "stitch becomes two, the new one to its left.",
       note:
         "The leaflet's written rounds call these increases \u201cm1\u201d, " +
         "but it defines every increase as knitting into the front and back " +
         "of the stitch.",
+    },
+    k2tog: { how: "Knit two together." },
+    s2kp: {
+      how:
+        "Put the right needle into the next two stitches from left to right, " +
+        "as if to knit them together, and slip them together. Knit 1, then " +
+        "pass the 2 slipped stitches over it. The centre stitch ends on top.",
     },
   },
   slots: ["A", "B", "C", "D", "E"],
