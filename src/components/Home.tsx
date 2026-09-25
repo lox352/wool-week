@@ -19,7 +19,7 @@ import Button from "./ui/Button";
 import Dialog from "./ui/Dialog";
 import NameDialog from "./ui/NameDialog";
 import ProgressRing from "./ProgressRing";
-import ChartMotif from "./ChartMotif";
+import BodyStrip from "./BodyStrip";
 import "./Home.css";
 
 const formatDate = (iso: string) =>
@@ -151,10 +151,16 @@ const Home: React.FC = () => {
         <ul className="hat-list">
           {hats.map((hat) => {
             const palette = paletteOf(hat.colourways[0], {}, hat.charts);
+            const { stitches, rounds } = hatStitches(hat);
             return (
               <li key={hat.id}>
                 <Link to={`/hat/${hat.id}`} className="hat-card">
-                  <ChartMotif hat={hat} palette={palette} />
+                  <BodyStrip
+                    stitches={stitches}
+                    rounds={rounds}
+                    palette={palette}
+                    className="hat-card-body"
+                  />
                   <span className="hat-card-text">
                     <span className="eyebrow">{hat.year}</span>
                     <strong>{hat.name}</strong>

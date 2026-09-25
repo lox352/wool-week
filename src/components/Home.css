@@ -91,9 +91,8 @@
   box-shadow: 0 6px 18px rgb(0 0 0 / 0.1);
 }
 
-.chart-motif {
-  display: block;
-  width: 100%;
+/* The hat's body, in its first colourway, as the card's picture. */
+.hat-card-body {
   height: 160px;
   border-bottom: 1px solid var(--rule);
 }

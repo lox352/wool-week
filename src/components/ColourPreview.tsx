@@ -1,27 +1,14 @@
 import React, { RefObject, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { SlotId } from "../data/hats/types";
 import { Palette } from "../knitting/palette";
 import BodyStrip from "./BodyStrip";
 import { Stitch } from "../types/Stitch";
+
+/** The knitting a preview is drawn from. */
+export interface Body {
+  stitches: Stitch[];
+  rounds: number[][];
+}
 import "./ColourPreview.css";
-
-/**
- * The ways of seeing a colour choice while making it, for comparing side by
- * side: "?preview=banner", "sticky", "picker" or "swatches".
- */
-export type PreviewVariant = "none" | "banner" | "sticky" | "picker" | "swatches";
-
-export const usePreviewVariant = (): PreviewVariant => {
-  const [params] = useSearchParams();
-  const asked = params.get("preview");
-  return asked === "banner" ||
-    asked === "sticky" ||
-    asked === "picker" ||
-    asked === "swatches"
-    ? asked
-    : "none";
-};
 
 /** Whether an element is on screen at all. */
 const useOnScreen = (ref: RefObject<Element>) => {
@@ -59,41 +46,3 @@ export const PreviewBanner: React.FC<{
     </div>
   );
 };
-
-/** The knitting a preview is drawn from. */
-export interface Body {
-  stitches: Stitch[];
-  rounds: number[][];
-}
-
-/**
- * What the wool list shows while choosing, for the variants that show
- * anything there: the hat's body in the picker (C), or each ball's part in
- * it beside the ball (D).
- */
-export const colourPreviews = (
-  variant: PreviewVariant,
-  body: Body,
-  palette: Palette,
-): {
-  rowPreview?: (slots: SlotId[]) => React.ReactNode;
-  pickerPreview?: (slots: SlotId[]) => React.ReactNode;
-} =>
-  variant === "picker"
-    ? {
-        pickerPreview: () => (
-          <BodyStrip {...body} palette={palette} className="picker-preview" />
-        ),
-      }
-    : variant === "swatches"
-      ? {
-          rowPreview: (slots) => (
-            <BodyStrip
-              {...body}
-              palette={palette}
-              highlight={slots}
-              className="wool-row-motif"
-            />
-          ),
-        }
-      : {};

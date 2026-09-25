@@ -8,7 +8,7 @@ import {
 import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
-import { ballsOf, paletteOf, yarnFor, type Overrides } from "../knitting/palette";
+import { ballsOf, paletteOf, type Overrides } from "../knitting/palette";
 import { totals } from "../knitting/progress";
 import { chartPath, startProject } from "../helpers/projects";
 import PageLayout from "./ui/PageLayout";
@@ -18,7 +18,7 @@ import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
 import BodyStrip from "./BodyStrip";
-import { PreviewBanner, colourPreviews, usePreviewVariant } from "./ColourPreview";
+import { PreviewBanner } from "./ColourPreview";
 import "./Hat.css";
 
 /**
@@ -140,8 +140,7 @@ const HatPage: React.FC<{
     navigate(chartPath(project.id, true));
   };
 
-  const variant = usePreviewVariant();
-  const woolPreviews = colourPreviews(variant, { stitches, rounds }, palette);
+  const body = useMemo(() => ({ stitches, rounds }), [stitches, rounds]);
   const stageEl = (
         <div className="hat-stage" ref={stageRef}>
           <HatModel
@@ -189,24 +188,7 @@ const HatPage: React.FC<{
                 aria-pressed={option.id === colourway.id}
                 onClick={() => setColourwayId(option.id)}
               >
-                {variant === "swatches" ? (
-                  <BodyStrip stitches={stitches} rounds={rounds} palette={optionPalette} className="colourway-motif" />
-                ) : (
-                <span className="colourway-swatches" aria-hidden="true">
-                  {/*
-                    The colourway's own wool, not the pattern's full set of
-                    yarns: a hat drawn in parts can be offered in a colourway
-                    that uses fewer than the pattern names, and 2026's last two
-                    do. Asking for a yarn it has not got draws a grey blank.
-                  */}
-                  {option.shades.map((shade) => (
-                    <span
-                      key={shade.slot}
-                      style={{ background: yarnFor(optionPalette, shade.slot).hex }}
-                    />
-                  ))}
-                </span>
-                )}
+                                <BodyStrip {...body} palette={optionPalette} className="colourway-motif" />
                 <strong>{option.name}</strong>
                 <span className="quiet">{option.brand}</span>
               </button>
@@ -221,7 +203,8 @@ const HatPage: React.FC<{
           overrides={own}
           onChange={choose}
           onRestoreAll={() => setOwn({})}
-          {...woolPreviews}
+          body={body}
+          palette={palette}
         />
 
         <p className="quiet">
@@ -311,18 +294,6 @@ const HatPage: React.FC<{
         </Button>
       }
     >
-      {variant === "sticky" ? (
-        <div className="preview-sticky">
-          {stageEl}
-          <div>
-            {aboutEl}
-            <div className="peerie-rule" aria-hidden="true" />
-            {colourEl}
-            {sizeEl}
-          </div>
-        </div>
-      ) : (
-        <>
           <div className="hat-layout">
             {stageEl}
             {aboutEl}
@@ -330,11 +301,7 @@ const HatPage: React.FC<{
           <div className="peerie-rule" aria-hidden="true" />
           {colourEl}
           {sizeEl}
-        </>
-      )}
-      {variant === "banner" && (
-        <PreviewBanner body={{ stitches, rounds }} palette={palette} stage={stageRef} choices={choicesRef} />
-      )}
+      <PreviewBanner body={body} palette={palette} stage={stageRef} choices={choicesRef} />
 
       <NextStep
         title="Ready to cast on?"
