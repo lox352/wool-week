@@ -173,3 +173,70 @@
     flex: 1 1 auto;
   }
 }
+
+/* The end of the chart page when you are not knitting. */
+.chart-foot-actions {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    "home . overview"
+    "knit knit knit";
+  gap: 0.6rem 0.75rem;
+  align-items: center;
+  width: 100%;
+}
+
+.chart-foot-actions > :nth-child(1) { grid-area: home; }
+.chart-foot-actions > :nth-child(2) { grid-area: overview; }
+.chart-foot-knit { grid-area: knit; }
+
+@media (min-width: 621px) {
+  .chart-foot-actions {
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas: "home overview knit";
+    gap: 0.75rem 1.25rem;
+  }
+  .chart-foot-knit {
+    justify-self: end;
+    min-width: 16rem;
+  }
+}
+
+.chart-foot {
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.2rem 1.3rem 1.3rem;
+  border-top: 2px solid var(--crimson);
+}
+
+.chart-foot-figure {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.chart-foot-figure em {
+  font-family: var(--display);
+  font-style: normal;
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.chart-foot-track {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.chart-foot-track .project-card-bar {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.chart-foot p {
+  margin: 0;
+}

@@ -82,7 +82,10 @@ test("the chart is its own page, and closing the knitting keeps you on it", asyn
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
   await expect(page).toHaveURL(/\/project\/[^/]+\/chart$/);
   await expect(page.locator(".chart-sheets")).toBeVisible();
-  const bar = page.getByRole("navigation", { name: "Project" });
+  // Not knitting, the page ends with your progress and the ways on.
+  const bar = page.getByRole("region", { name: "Your progress" });
+  await expect(bar).toContainText("knitted");
+  await expect(bar).toContainText("Round 2 of");
   await bar.getByRole("button", { name: "Resume knitting", exact: true }).click();
   await expect(position(page)).toContainText("Round 2, stitch 1.");
 

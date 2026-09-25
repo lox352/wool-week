@@ -27,6 +27,53 @@ import BodyStrip from "./BodyStrip";
 import { PreviewBanner } from "./ColourPreview";
 import "./Project.css";
 
+/** "Under 1%", "3%": how far through, never rounded up to done. */
+const percentKnitted = (worked: number, percent: number) =>
+  `${worked > 0 && percent < 1 ? "Under 1" : Math.floor(percent)}%`;
+
+/**
+ * The end of the chart page while you are not knitting: how far you have
+ * got, and the ways on from here.
+ */
+const ChartPageFoot: React.FC<{
+  percent: number;
+  worked: number;
+  total: number;
+  round: number;
+  rounds: number;
+  finished: boolean;
+  overview: string;
+  onKnit: () => void;
+}> = ({ percent, worked, total, round, rounds, finished, overview, onKnit }) => (
+  <section className="section chart-foot" aria-label="Your progress">
+    <div className="chart-foot-figure">
+      <em>{finished ? "100%" : percentKnitted(worked, percent)}</em>
+      <span className="quiet">knitted</span>
+    </div>
+    <div className="chart-foot-track">
+      <span className="project-card-bar" aria-hidden="true">
+        <span style={{ width: `${percent}%` }} />
+      </span>
+    </div>
+    <p className="quiet">
+      {finished
+        ? `Finished · ${total.toLocaleString()} stitches`
+        : `Round ${round} of ${rounds} · ${worked.toLocaleString()} of ${total.toLocaleString()} stitches`}
+    </p>
+    <div className="chart-foot-actions">
+      <Link to="/" className="btn btn-quiet">
+        Home
+      </Link>
+      <Link to={overview} className="btn btn-secondary">
+        Overview &amp; colours
+      </Link>
+      <Button variant="primary" size="lg" className="chart-foot-knit" onClick={onKnit}>
+        {finished ? "See the last stitch" : worked > 0 ? "Resume knitting" : "Start knitting"}
+      </Button>
+    </div>
+  </section>
+);
+
 /**
  * A project: one hat, one knitter, one row counter.
  *
@@ -252,39 +299,16 @@ const ProjectView: React.FC<{
             onUndo={undo}
           />
         ) : (
-          /*
-           * Where the knitting panel sits while you knit, so that closing it
-           * leaves the way back to it under the same thumb.
-           */
-          <nav className="knitting-panel chart-page-bar" aria-label="Project">
-            <p className="chart-page-status quiet">
-              {position.finished
-                ? "Finished."
-                : `Round ${position.round} of ${position.totalRounds} · ` +
-                  `${counts.worked.toLocaleString()} of ` +
-                  `${counts.total.toLocaleString()} stitches knitted`}
-            </p>
-            <div className="chart-page-actions">
-              <Link to="/" className="btn btn-quiet">
-                Home
-              </Link>
-              <Link to={overviewPath(project.id)} className="btn btn-secondary">
-                Overview &amp; colours
-              </Link>
-              <Button
-                variant="primary"
-                size="lg"
-                className="chart-page-resume"
-                onClick={() => setKnitting(true)}
-              >
-                {position.finished
-                  ? "See the last stitch"
-                  : counts.worked > 0
-                    ? "Resume knitting"
-                    : "Start knitting"}
-              </Button>
-            </div>
-          </nav>
+          <ChartPageFoot
+            percent={counts.percent}
+            worked={counts.worked}
+            total={counts.total}
+            round={position.round}
+            rounds={position.totalRounds}
+            finished={position.finished}
+            overview={overviewPath(project.id)}
+            onKnit={() => setKnitting(true)}
+          />
         )}
       </PageLayout>
     );
