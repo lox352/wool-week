@@ -3,7 +3,7 @@ import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
-import { paletteOf, yarnFor } from "../knitting/palette";
+import { paletteOf, yarnFor, type Palette } from "../knitting/palette";
 import { totals, positionOf } from "../knitting/progress";
 import {
   Project as SavedProject,
@@ -24,6 +24,7 @@ import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
 import BodyStrip from "./BodyStrip";
+import { Stitch } from "../types/Stitch";
 import { PreviewBanner } from "./ColourPreview";
 import "./Project.css";
 
@@ -36,6 +37,105 @@ import "./Project.css";
  * memory: it is for a run tapped twice or a jump to the wrong stitch, not a
  * record of the project.
  */
+/** "Under 1%", "3%": how far through, never rounded up to done. */
+const percentKnitted = (worked: number, percent: number) =>
+  `${worked > 0 && percent < 1 ? "Under 1" : Math.floor(percent)}%`;
+
+/**
+ * The end of the chart page while you are not knitting: how far you have
+ * got, and the ways on from here. Four layouts on trial, "?foot=a" to "d".
+ */
+const ChartPageFoot: React.FC<{
+  title: string;
+  detail: string;
+  body: { stitches: Stitch[]; rounds: number[][] };
+  palette: Palette;
+  percent: number;
+  worked: number;
+  total: number;
+  round: number;
+  rounds: number;
+  finished: boolean;
+  overview: string;
+  onKnit: () => void;
+}> = ({ title, detail, body, palette, percent, worked, total, round, rounds, finished, overview, onKnit }) => {
+  const [params] = useSearchParams();
+  const asked = params.get("foot");
+  const look = asked === "b" || asked === "c" || asked === "d" ? asked : "a";
+  const knit = finished ? "See the last stitch" : worked > 0 ? "Resume knitting" : "Start knitting";
+  const stats = finished
+    ? `Finished · ${total.toLocaleString()} stitches`
+    : `${percentKnitted(worked, percent)} knitted · round ${round} of ${rounds} · ` +
+      `${worked.toLocaleString()} of ${total.toLocaleString()} stitches`;
+  const actions = (
+    <div className="chart-foot-actions">
+      <Link to="/" className="btn btn-quiet">
+        Home
+      </Link>
+      <Link to={overview} className="btn btn-secondary">
+        Overview &amp; colours
+      </Link>
+      <Button variant="primary" size="lg" className="chart-foot-knit" onClick={onKnit}>
+        {knit}
+      </Button>
+    </div>
+  );
+  const bar = (
+    <span className="project-card-bar" aria-hidden="true">
+      <span style={{ width: `${percent}%` }} />
+    </span>
+  );
+
+  if (look === "a") {
+    return (
+      <NextStep
+        title={finished ? "All knitted" : worked > 0 ? "Carry on" : "Ready to cast on?"}
+        detail={stats}
+      >
+        {actions}
+      </NextStep>
+    );
+  }
+  if (look === "b") {
+    return (
+      <section className="section chart-foot chart-foot-b" aria-label="Your progress">
+        <div className="chart-foot-figure">
+          <em>{finished ? "100%" : percentKnitted(worked, percent)}</em>
+          <span className="quiet">knitted</span>
+        </div>
+        <div className="chart-foot-track">{bar}</div>
+        <p className="quiet">
+          Round {round} of {rounds} · {worked.toLocaleString()} of {total.toLocaleString()} stitches
+        </p>
+        {actions}
+      </section>
+    );
+  }
+  if (look === "c") {
+    return (
+      <section className="section chart-foot chart-foot-c" aria-label="Your progress">
+        <span className="project-card-picture">
+          <BodyStrip {...body} palette={palette} className="hat-card-body" />
+          {bar}
+        </span>
+        <div className="chart-foot-text">
+          <strong>{title}</strong>
+          <span className="quiet">{detail}</span>
+          <span className="quiet">{stats}</span>
+        </div>
+        {actions}
+      </section>
+    );
+  }
+  return (
+    <section className="section chart-foot-d" aria-label="Your progress">
+      <div className="peerie-rule" aria-hidden="true" />
+      <p className="chart-foot-stats">{stats}</p>
+      {actions}
+    </section>
+  );
+};
+
 /** How many changes Undo can step back through. */
 const undoLimit = 100;
 
@@ -252,39 +352,20 @@ const ProjectView: React.FC<{
             onUndo={undo}
           />
         ) : (
-          /*
-           * Where the knitting panel sits while you knit, so that closing it
-           * leaves the way back to it under the same thumb.
-           */
-          <nav className="knitting-panel chart-page-bar" aria-label="Project">
-            <p className="chart-page-status quiet">
-              {position.finished
-                ? "Finished."
-                : `Round ${position.round} of ${position.totalRounds} · ` +
-                  `${counts.worked.toLocaleString()} of ` +
-                  `${counts.total.toLocaleString()} stitches knitted`}
-            </p>
-            <div className="chart-page-actions">
-              <Link to="/" className="btn btn-quiet">
-                Home
-              </Link>
-              <Link to={overviewPath(project.id)} className="btn btn-secondary">
-                Overview &amp; colours
-              </Link>
-              <Button
-                variant="primary"
-                size="lg"
-                className="chart-page-resume"
-                onClick={() => setKnitting(true)}
-              >
-                {position.finished
-                  ? "See the last stitch"
-                  : counts.worked > 0
-                    ? "Resume knitting"
-                    : "Start knitting"}
-              </Button>
-            </div>
-          </nav>
+          <ChartPageFoot
+            title={title}
+            detail={`${hat.year} · ${size.label} · ${colourway.name}`}
+            body={body}
+            palette={palette}
+            percent={counts.percent}
+            worked={counts.worked}
+            total={counts.total}
+            round={position.round}
+            rounds={position.totalRounds}
+            finished={position.finished}
+            overview={overviewPath(project.id)}
+            onKnit={() => setKnitting(true)}
+          />
         )}
       </PageLayout>
     );
