@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Stitch } from "../types/Stitch";
 import {
   Run,
@@ -14,7 +14,7 @@ import {
 import { Palette, inkOn, yarnFor } from "../knitting/palette";
 import Button from "./ui/Button";
 import { KeyEntry, keyEntryAt, stitchKey } from "../knitting/stitch-key";
-import { KeyList, Swatch as StitchSwatch } from "../knitting/ChartHelp";
+import { Swatch as StitchSwatch } from "../knitting/ChartHelp";
 import type { StitchKeyId, StitchNote } from "../data/hats/types";
 import "./KnittingPanel.css";
 
@@ -29,12 +29,7 @@ interface KnittingPanelProps {
   onUndo: () => void;
   /** What the pattern says about its stitches. */
   notes?: Partial<Record<StitchKeyId, StitchNote>>;
-  /**
-   * Trial, "?key=": "a" explains this round's stitches and opens the key in
-   * a sheet, "b" leaves both to a rail over the chart, "c" explains them and
-   * swaps the controls for the key on a tab.
-   */
-  keyStyle?: "a" | "b" | "c";
+  /** Opens the whole key: the colours and every stitch. */
   onOpenKey?: () => void;
 }
 
@@ -76,35 +71,6 @@ const StitchHint: React.FC<{ entries: KeyEntry[]; current?: string }> = ({ entri
     ))}
   </ul>
 );
-
-/** The colours and every stitch in this hat: the whole key. */
-export const FullKey: React.FC<{
-  stitches: Stitch[];
-  palette: Palette;
-  notes?: Partial<Record<StitchKeyId, StitchNote>>;
-  current?: string;
-}> = ({ stitches, palette, notes, current }) => {
-  // The stitch in hand first, where it is seen without scrolling.
-  const entries = useMemo(() => {
-    const all = stitchKey(stitches, notes);
-    return [...all.filter((e) => e.id === current), ...all.filter((e) => e.id !== current)];
-  }, [stitches, notes, current]);
-  const yarns = Object.entries(palette).filter(
-    ([, yarn], i, all) => all.findIndex(([, other]) => other.name === yarn.name && other.hex === yarn.hex) === i,
-  );
-  return (
-    <div className="full-key">
-      <ul className="full-key-yarns">
-        {yarns.map(([slot, yarn]) => (
-          <li key={slot}>
-            <span className="swatch" style={{ background: yarn.hex }} /> {slot} · {yarn.name}
-          </li>
-        ))}
-      </ul>
-      <KeyList entries={entries} current={current} />
-    </div>
-  );
-};
 
 const Swatch: React.FC<{ run: Run; palette: Palette; small?: boolean }> = ({
   run,
@@ -197,20 +163,16 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
   canUndo,
   onUndo,
   notes,
-  keyStyle,
   onOpenKey,
 }) => {
   const position = positionOf(stitches, progress, index);
   const run = currentRun(stitches, progress, index);
   const roundIds = index.rounds[position.round - 1];
   const inRound = useMemo(
-    () => (keyStyle && keyStyle !== "b" && roundIds ? roundEntries(stitches, roundIds, notes) : []),
-    [keyStyle, stitches, roundIds, notes],
+    () => (roundIds ? roundEntries(stitches, roundIds, notes) : []),
+    [stitches, roundIds, notes],
   );
   const current = run ? keyEntryAt(stitches, run.startId, notes)?.id : undefined;
-  const [tab, setTab] = useState<"knit" | "key">("knit");
-  const panelRef = useRef<HTMLDivElement>(null);
-  const [tabHeight, setTabHeight] = useState<number>();
   const ahead = upcomingRuns(stitches, run?.endId ?? progress, index, 2);
   const counts = totals(index, progress);
 
@@ -290,6 +252,9 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
   if (position.finished) {
     return (
       <div className="knitting-panel knitting-panel-done">
+        <div className="knitting-bar" aria-hidden="true">
+          <span style={{ width: "100%" }} />
+        </div>
         <div className="knitting-done">
           <strong>That is the last stitch.</strong>
           <span className="quiet">
@@ -307,44 +272,12 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
     );
   }
 
-  const keyButton = (keyStyle === "a" || keyStyle === "c") && (
-    <button
-      type="button"
-      className="knitting-key-button"
-      onClick={() => {
-        if (keyStyle === "a") {
-          onOpenKey?.();
-          return;
-        }
-        // The key takes the controls' place at their height, so the chart
-        // above does not move.
-        if (panelRef.current) setTabHeight(panelRef.current.offsetHeight);
-        setTab("key");
-      }}
-    >
-      Key
-    </button>
-  );
-
-  if (keyStyle === "c" && tab === "key") {
-    return (
-      <div className="knitting-panel knitting-panel-key" ref={panelRef} style={{ height: tabHeight }}>
-        <div className="knitting-key-head">
-          <strong>Key</strong>
-          <Button variant="secondary" onClick={() => setTab("knit")}>
-            Back to knitting
-          </Button>
-        </div>
-        <div className="knitting-key-scroll">
-          <FullKey stitches={stitches} palette={palette} notes={notes} current={current} />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="knitting-panel" ref={panelRef}>
-      {keyButton}
+    <div className="knitting-panel">
+      {/* How far through the hat, as the panel's top edge. */}
+      <div className="knitting-bar" aria-hidden="true">
+        <span style={{ width: `${counts.percent}%` }} />
+      </div>
       <button
         type="button"
         className="knitting-close"
@@ -399,18 +332,15 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
         <Turn opening={position.stitchInRound === 1} />
       )}
 
-      {position.label && (
-        <p className="knitting-where quiet">{position.label}</p>
-      )}
-
       {inRound.length > 0 && <StitchHint entries={inRound} current={current} />}
-
-      <div className="knitting-bar" aria-hidden="true">
-        <span style={{ width: `${counts.percent}%` }} />
-      </div>
 
       <div className="knitting-actions">
         <UndoButton onUndo={onUndo} canUndo={canUndo} />
+        {onOpenKey && (
+          <Button variant="secondary" className="knitting-key" onClick={onOpenKey}>
+            Key
+          </Button>
+        )}
         <Button variant="secondary" className="knitting-round" onClick={finishRound}>
           End of round
         </Button>

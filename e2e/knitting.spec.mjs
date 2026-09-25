@@ -102,6 +102,42 @@ test("the chart is its own page, and closing the knitting keeps you on it", asyn
   await expect(page.getByRole("heading", { name: "Wool Week Toories", level: 1, exact: true })).toBeVisible();
 });
 
+test("knitting fills the screen, says how to work the round's stitches, and closing it leaves the chart still", async ({ page }) => {
+  await page.goto("#/hat/sww19-roadside-beanie");
+  await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
+  // The crown's first decrease round.
+  for (let i = 0; i < 54; i++) await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await expect(position(page)).toContainText("Round 55, stitch 1.");
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 1)).toBe(true);
+
+  const hint = page.getByRole("list", { name: "Stitches in this round" });
+  await expect(hint).toContainText("Knit two together");
+
+  await page.getByRole("button", { name: "Key", exact: true }).click();
+  const key = page.getByRole("dialog", { name: "Key" });
+  await expect(key).toContainText("Light Grey Green Mix");
+  await key.getByRole("button", { name: "Close the key" }).click();
+  await expect(key).toBeHidden();
+
+  // Round 55, the second stitch from the right-hand edge: a k2tog.
+  await page.locator(".chart-sheets").evaluate(sheet => {
+    const cell = 16;
+    const box = sheet.getBoundingClientRect();
+    const columns = Math.round((box.width - Math.round(cell * 2.2)) / cell);
+    sheet.dispatchEvent(new MouseEvent("click", { bubbles: true,
+      clientX: box.left + (columns - 1.5) * cell, clientY: box.bottom - 54.5 * cell }));
+  });
+  const picker = page.getByRole("dialog", { name: /^Round 55, stitch/ });
+  await expect(picker).toContainText("Knit two together");
+  await picker.getByRole("button", { name: "Close" }).click();
+
+  const before = await page.locator(".chart-sheets").evaluate(sheet => sheet.getBoundingClientRect().top);
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Your progress" })).toBeVisible();
+  const after = await page.locator(".chart-sheets").evaluate(sheet => sheet.getBoundingClientRect().top);
+  expect(Math.abs(after - before)).toBeLessThan(2);
+});
+
 test("the chart page does not pan sideways, and zooming leaves the chart where it lands", async ({ page }) => {
   await start(page);
   const fits = () => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
@@ -176,6 +212,8 @@ test("tapping a stitch on the chart carries on from it, and can be undone", asyn
 
 test("backup restores copies and rename/delete require their dialogs", async ({ page }) => {
   await start(page);
+  // Knitting fills the screen; Settings is in the header, once you stop.
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
   const downloadPromise = page.waitForEvent("download");
   await (await openSettings(page)).getByRole("button", { name: "Save", exact: true }).click();
   const download = await downloadPromise;
@@ -213,9 +251,11 @@ test("quota failures preserve progress and offer a recovery export", async ({ pa
 
 test("a prepared project reloads and saves progress offline", async ({ page, context }) => {
   await start(page);
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
   await expect(page.getByText(/Ready for offline knitting/)).toBeVisible({ timeout: 45_000 });
   await context.setOffline(true);
   await page.reload();
+  await page.getByRole("button", { name: "Start knitting", exact: true }).click();
   await page.getByRole("button", { name: "End of round", exact: true }).click();
   const progress = await position(page).textContent();
   await page.reload();

@@ -1,67 +1,48 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Stitch } from "../types/Stitch";
 import { Palette } from "../knitting/palette";
 import { stitchKey } from "../knitting/stitch-key";
-import { Swatch } from "../knitting/ChartHelp";
-import { FullKey } from "./KnittingPanel";
+import { KeyList } from "../knitting/ChartHelp";
 import type { StitchKeyId, StitchNote } from "../data/hats/types";
 
 type Notes = Partial<Record<StitchKeyId, StitchNote>>;
 
-/**
- * Trial B: the key as a rail across the top of the chart while you knit.
- *
- * Every symbol this hat uses, and its yarns, small enough to stay up the whole
- * time. The stitch you are working lights up and says how it is done; any
- * other can be tapped to read it, and tapped again to go back.
- */
-export const KeyRail: React.FC<{
+/** The colours and every stitch in this hat: the whole key. */
+const FullKey: React.FC<{
   stitches: Stitch[];
   palette: Palette;
   notes?: Notes;
   current?: string;
 }> = ({ stitches, palette, notes, current }) => {
-  const entries = useMemo(() => stitchKey(stitches, notes), [stitches, notes]);
-  const [chosen, setChosen] = useState<string>();
-  const shown = chosen ?? (current !== "k1" ? current : undefined);
-  const entry = entries.find((e) => e.id === shown);
+  // The stitch in hand first, where it is seen without scrolling.
+  const entries = useMemo(() => {
+    const all = stitchKey(stitches, notes);
+    return [...all.filter((e) => e.id === current), ...all.filter((e) => e.id !== current)];
+  }, [stitches, notes, current]);
   const yarns = Object.entries(palette).filter(
     ([, yarn], i, all) => all.findIndex(([, other]) => other.name === yarn.name && other.hex === yarn.hex) === i,
   );
   return (
-    <div className="key-rail">
-      <ul className="key-rail-chips">
-        {entries.map((e) => (
-          <li key={e.id}>
-            <button
-              type="button"
-              className={`key-chip${e.id === shown ? " key-chip-on" : ""}${e.id === current ? " key-chip-now" : ""}`}
-              aria-pressed={e.id === shown}
-              onClick={() => setChosen(chosen === e.id ? undefined : e.id)}
-            >
-              <Swatch entry={e} />
-              {e.abbreviation ?? e.label}
-            </button>
-          </li>
-        ))}
+    <div className="full-key">
+      <ul className="full-key-yarns">
         {yarns.map(([slot, yarn]) => (
-          <li key={slot} className="key-rail-yarn" title={yarn.name}>
-            <span className="swatch" style={{ background: yarn.hex }} />
-            {slot}
+          <li key={slot}>
+            <span className="swatch" style={{ background: yarn.hex }} /> {slot} · {yarn.name}
           </li>
         ))}
       </ul>
-      {entry && (
-        <p className="key-rail-how">
-          <strong>{entry.label}.</strong> {entry.how}
-          {entry.note && <span className="stitch-note"> {entry.note}</span>}
-        </p>
-      )}
+      <KeyList entries={entries} current={current} />
     </div>
   );
 };
 
-/** Trial A: the whole key in a sheet over the lower part of the screen. */
+/**
+ * The whole key while knitting, in a sheet over the lower part of the screen.
+ *
+ * Full-screen knitting has no room for the key below the chart, and the panel
+ * already explains the stitches in the round in hand. This is for everything
+ * else: which yarn is which, or a stitch further on.
+ */
 export const KeySheet: React.FC<{
   stitches: Stitch[];
   palette: Palette;

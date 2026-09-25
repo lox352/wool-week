@@ -33,7 +33,9 @@ const StitchPicker: React.FC<{
   /** What the stitch is and how to work it, and the yarn it is worked in. */
   entry?: KeyEntry;
   yarn?: { name: string; hex: string };
-}> = ({ id, stitches, rounds, layout, cell, progress, onJump, onClose, entry, yarn }) => {
+  /** What the pattern calls each round: "Chart F, row 1", "Crown". */
+  labels?: string[];
+}> = ({ id, stitches, rounds, layout, cell, progress, onJump, onClose, entry, yarn, labels }) => {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -79,6 +81,9 @@ const StitchPicker: React.FC<{
         <div className="stitch-picker-head">
           <span>
             Round {at.round}, stitch {at.index}
+            {labels?.[at.round - 1] && (
+              <span className="stitch-picker-where">{labels[at.round - 1]}</span>
+            )}
           </span>
           <button
             type="button"

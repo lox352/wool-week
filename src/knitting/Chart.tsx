@@ -97,8 +97,6 @@ interface ChartProps {
    * the window, never the height of the page.
    */
   contained?: boolean;
-  /** Trial: keep the page, but never let a zoom out shorten it. */
-  holdHeight?: boolean;
 }
 
 /**
@@ -127,7 +125,6 @@ const Chart: React.FC<ChartProps> = ({
   stitchNotes,
   onJump,
   contained = false,
-  holdHeight = false,
 }) => {
   const [picked, setPicked] = useState<number>();
   const makeOneLean = stitchNotes?.m1?.lean;
@@ -147,7 +144,7 @@ const Chart: React.FC<ChartProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const zoomTo = useCallback((cell: number) => setZoom(Math.round(cell)), []);
-  const zoomAt = usePinchZoom(scrollRef, sheetRef, cellSize, zoomTo, contained, holdHeight);
+  const zoomAt = usePinchZoom(scrollRef, sheetRef, cellSize, zoomTo, contained);
   /*
    * The cell size the follow below reads, kept out of its dependencies: a
    * zoom leaves the chart where it lands, and only knitting moves it.
@@ -267,18 +264,27 @@ const Chart: React.FC<ChartProps> = ({
 
   const at = nextId === undefined ? undefined : layout.cells.get(nextId);
 
-  // Sideways: keep the stitch being worked in the middle, so the chart follows
-  // the knitter rather than having to be hunted for.
+  /*
+   * Keep the stitch being worked in the middle, sideways, so the chart follows
+   * the knitter rather than having to be hunted for. In a window of its own,
+   * up and down too, in the same call: its round a few rows up from the
+   * bottom edge. A smooth scroll of a box cancels any other still under way
+   * in it, so the two directions cannot be sent separately. The round only
+   * changes once a round, so within one this moves only sideways.
+   */
   useEffect(() => {
     const scroller = scrollRef.current;
     if (!scroller || !at) return;
     const cell = cellNow.current;
-    const { x } = cellAt(layout, at.round, at.column, cell);
+    const { x, y } = cellAt(layout, at.round, at.column, cell);
     scroller.scrollTo({
       left: Math.max(x - scroller.clientWidth / 2 + cell / 2, 0),
+      top: contained
+        ? Math.max(y + cell - (scroller.clientHeight - clearance * cell), 0)
+        : undefined,
       behavior: reducedMotion() ? "auto" : "smooth",
     });
-  }, [at, layout]);
+  }, [at, layout, contained]);
 
   /*
    * And down the page, but only when the round changes. Within a round the
@@ -287,33 +293,12 @@ const Chart: React.FC<ChartProps> = ({
    */
   const focusRound = at?.round;
   useEffect(() => {
-    const scroller = scrollRef.current;
-    const sheets = scroller?.querySelector(".chart-sheets");
-    if (!scroller || !sheets || focusRound === undefined) return;
+    // A window of its own is followed both ways above.
+    if (contained) return;
+    const sheets = scrollRef.current?.querySelector(".chart-sheets");
+    if (!sheets || focusRound === undefined) return;
     const cellSize = cellNow.current;
     const { y } = cellAt(layout, focusRound, 1, cellSize);
-    if (contained) {
-      /*
-       * Bring the window itself fully into view above the panel, then move
-       * the chart inside it: the round a few rows up from its bottom edge.
-       * Sideways too, in the same call, since two smooth scrolls of the one
-       * box cancel each other.
-       */
-      const panel = document.querySelector<HTMLElement>(".knitting-panel");
-      const floor = window.innerHeight - (panel?.offsetHeight ?? 0);
-      const box = scroller.getBoundingClientRect();
-      const below = box.bottom - floor;
-      const above = box.top;
-      const page = below > 1 ? below : above < 0 ? above : 0;
-      if (page) window.scrollBy({ top: page, behavior: "instant" });
-      const x = at ? cellAt(layout, at.round, at.column, cellSize).x : scroller.scrollLeft;
-      scroller.scrollTo({
-        left: Math.max(x - scroller.clientWidth / 2 + cellSize / 2, 0),
-        top: Math.max(y + cellSize - (scroller.clientHeight - clearance * cellSize), 0),
-        behavior: reducedMotion() ? "auto" : "smooth",
-      });
-      return;
-    }
     /*
      * The panel is stuck to the bottom of the screen while you work, so the
      * part of the page you can see ends at its top edge. Its height, not
@@ -409,6 +394,7 @@ const Chart: React.FC<ChartProps> = ({
           {picked !== undefined && (
             <StitchPicker
               entry={keyEntryAt(stitches, picked, stitchNotes)}
+              labels={labels}
               yarn={stitches[picked] && yarnFor(palette, stitches[picked].slot)}
               id={picked}
               stitches={stitches}

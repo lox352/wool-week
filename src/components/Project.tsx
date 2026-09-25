@@ -21,7 +21,7 @@ import ProgressRing from "./ProgressRing";
 import HatModel from "./HatModel";
 import Chart from "../knitting/Chart";
 import KnittingPanel from "./KnittingPanel";
-import { KeyRail, KeySheet } from "./KnitKey";
+import { KeySheet } from "./KnitKey";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
@@ -175,9 +175,9 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
   }, [change]);
 
   /*
-   * Opening or closing the knitting hides or shows the page title above the
-   * chart. Hold the chart where it is on screen rather than letting it jump
-   * by the title's height.
+   * Opening or closing the knitting rearranges everything around the chart:
+   * knitting fills the screen, without the header and title above it. Hold
+   * the chart where it is on screen rather than letting it jump.
    */
   const chartHeld = useRef<number>();
   useLayoutEffect(() => {
@@ -272,14 +272,7 @@ const ProjectView: React.FC<{
   const choicesRef = useRef<HTMLElement>(null);
   const body = useMemo(() => ({ stitches, rounds }), [stitches, rounds]);
 
-  // Trial: three ways to stop the chart page jumping, "?scroll=a" to "c".
-  const [trialParams] = useSearchParams();
-  const askedScroll = trialParams.get("scroll");
-  const scrollTrial =
-    askedScroll === "a" || askedScroll === "b" || askedScroll === "c" ? askedScroll : "now";
-  // Trial: three ways to keep the key to hand while knitting, "?key=a" to "c".
-  const askedKey = trialParams.get("key");
-  const keyTrial = askedKey === "b" || askedKey === "c" ? askedKey : "a";
+  // The full key, over the lower part of the screen while knitting.
   const [keyOpen, setKeyOpen] = useState(false);
   const closeKey = useCallback(() => setKeyOpen(false), []);
   useEffect(() => {
@@ -287,32 +280,6 @@ const ProjectView: React.FC<{
   }, [knitting]);
   const run = currentRun(stitches, project.progress, index);
   const currentStitch = run ? keyEntryAt(stitches, run.startId, hat.stitchNotes)?.id : undefined;
-  // The next stitch in this round that is not a plain knit, for the rail to
-  // explain before you reach it.
-  const comingStitch = useMemo(() => {
-    const round = index.roundOf.get(project.progress + 1);
-    const ids = round === undefined ? [] : index.rounds[round - 1];
-    for (const id of ids) {
-      if (id <= project.progress) continue;
-      const entry = keyEntryAt(stitches, id, hat.stitchNotes);
-      if (entry && entry.id !== "k1") return entry.id;
-    }
-    return undefined;
-  }, [index, project.progress, stitches, hat.stitchNotes]);
-  // The panel's height, for a chart window that has to fit above it.
-  useLayoutEffect(() => {
-    const panel = document.querySelector<HTMLElement>(".knitting-panel");
-    const root = document.documentElement;
-    if (!knitting || !panel || typeof ResizeObserver === "undefined") return;
-    const measure = () => root.style.setProperty("--panel-h", `${panel.offsetHeight}px`);
-    measure();
-    const watch = new ResizeObserver(measure);
-    watch.observe(panel);
-    return () => {
-      watch.disconnect();
-      root.style.removeProperty("--panel-h");
-    };
-  }, [knitting, view]);
 
   const title = project.name ?? hat.name;
   const eyebrow = `Shetland Wool Week ${hat.year} · ${size.label} · ${colourway.name}`;
@@ -324,20 +291,11 @@ const ProjectView: React.FC<{
         title={title}
         eyebrow={eyebrow}
         showTitle={!knitting}
-        className={scrollTrial === "b" && knitting ? "knit-screen" : undefined}
+        className={knitting ? "knit-screen" : undefined}
       >
-        <section className={`section chart-page chart-page-${scrollTrial}`}>
-          {knitting && keyTrial === "b" && (
-            <KeyRail
-              stitches={stitches}
-              palette={palette}
-              notes={hat.stitchNotes}
-              current={comingStitch}
-            />
-          )}
+        <section className="section chart-page">
           <Chart
-            contained={scrollTrial === "a" || scrollTrial === "b"}
-            holdHeight={scrollTrial === "c"}
+            contained
             stitches={stitches}
             rounds={rounds}
             palette={palette}
@@ -372,7 +330,6 @@ const ProjectView: React.FC<{
             canUndo={canUndo}
             onUndo={undo}
             notes={hat.stitchNotes}
-            keyStyle={keyTrial}
             onOpenKey={() => setKeyOpen(true)}
           />
         ) : (
