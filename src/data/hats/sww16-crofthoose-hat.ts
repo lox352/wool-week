@@ -35,6 +35,21 @@ const sww16: HatPattern = {
   patternUrl: "https://www.ravelry.com/patterns/library/crofthoose-hat",
   credit: "© 2016 Ella Gordon Designs",
   hashtag: "#crofthoosehat",
+  // The stitches as this pattern's own abbreviations define them.
+  stitchNotes: {
+    m1: {
+      note:
+        "The pattern gives m1 only as \u201cincrease\u201d, without saying " +
+        "how: any make-one will do, and the usual one is described here.",
+    },
+    k2tog: { how: "Knit two together." },
+    s2kp: {
+      abbreviation: "cdd",
+      how:
+        "Slip 2 stitches as if to k2tog, knit 1 in the shade shown, then pass " +
+        "the 2 slipped stitches over.",
+    },
+  },
   slots: ["A", "B", "C", "D", "E"],
 
   sizes: [

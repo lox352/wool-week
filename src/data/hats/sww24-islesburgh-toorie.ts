@@ -32,6 +32,19 @@ const sww24: HatPattern = {
   patternUrl: "https://www.ravelry.com/patterns/library/islesburgh-toorie",
   credit: "© The Doull Family",
   hashtag: "#IslesburghToorie",
+  // The stitches as this pattern's own abbreviations define them.
+  stitchNotes: {
+    m1: {
+      lean: "left",
+      how:
+        "Pick up the bar between stitches with the left needle from front " +
+        "to back, and knit it through the back of the loop.",
+    },
+    k2tog: { how: "Knit 2 stitches together as if they were one." },
+    s2kp: {
+      how: "Slip 2 stitches as if to knit, knit 1, then pass the slipped stitches over.",
+    },
+  },
   slots: ["A", "B", "C", "D", "E"],
 
   sizes: [

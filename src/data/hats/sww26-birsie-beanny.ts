@@ -218,6 +218,22 @@ const sww26: HatPattern = {
   patternUrl: "https://payhip.com/b/Zozyp",
   credit: "© Helen Robertson",
   hashtag: "#BirsieBeanny",
+  // The stitches as this pattern's own abbreviations define them.
+  stitchNotes: {
+    k1tbl: { abbreviation: "k tbl", how: "Knit the stitch through the back loop." },
+    m1: {
+      lean: "left",
+      how:
+        "Pick up the bar between stitches with the left needle from front " +
+        "to back, and knit it through the back of the loop.",
+    },
+    k2tog: { how: "Knit 2 stitches together as if they are one stitch." },
+    s2kp: {
+      how:
+        "Slip 2 stitches together as if to knit, knit 1 in the shade shown, " +
+        "then pass both slipped stitches over.",
+    },
+  },
   slots: ["A", "B", "C", "D", "E", "F"],
 
   sizes: [

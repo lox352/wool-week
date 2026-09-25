@@ -79,6 +79,18 @@ const sww18: HatPattern = {
   patternUrl: "https://www.ravelry.com/patterns/library/merrie-dancers-toorie-2",
   credit: "© Elizabeth Johnston (Shetland Handspun)",
   hashtag: "#merriedancerstoorie",
+  // The stitches as this pattern's own abbreviations define them.
+  stitchNotes: {
+    kfb: {
+      how:
+        "Knit into the front then the back of the stitch: one stitch " +
+        "becomes two, the new one to its left.",
+    },
+    k2tog: { how: "Knit 2 stitches together as if they were one." },
+    s2kp: {
+      how: "Slip 2 stitches together knitwise, knit 1, then pass the slipped stitches over.",
+    },
+  },
   slots: ["A", "B", "C", "D", "E"],
 
   sizes: [

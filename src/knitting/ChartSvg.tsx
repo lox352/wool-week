@@ -23,6 +23,8 @@ interface ChartSvgProps {
   cell: number;
   /** Rounds after which the work is turned inside out. */
   turns?: number[];
+  /** Which way this pattern's make-ones lean, if it says. */
+  makeOneLean?: "left" | "right";
 }
 
 type Grid = ReturnType<typeof gridPaths>;
@@ -47,14 +49,15 @@ const Knitting: React.FC<{
   palette: Palette;
   cell: number;
   grid: Grid;
-}> = React.memo(({ stitches, layout, palette, cell, grid }) => {
+  makeOneLean?: "left" | "right";
+}> = React.memo(({ stitches, layout, palette, cell, grid, makeOneLean }) => {
   const fills = useMemo(
     () => fillPaths(stitches, layout, cell),
     [stitches, layout, cell],
   );
   const marks = useMemo(
-    () => markPaths(stitches, layout, palette, cell),
-    [stitches, layout, palette, cell],
+    () => markPaths(stitches, layout, palette, cell, makeOneLean),
+    [stitches, layout, palette, cell, makeOneLean],
   );
 
   return (
@@ -94,6 +97,7 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
   nextStitchId,
   cell,
   turns,
+  makeOneLean,
 }) => {
   const { width, height } = chartSize(layout, cell);
   /*
@@ -130,6 +134,7 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
         palette={palette}
         cell={cell}
         grid={grid}
+        makeOneLean={makeOneLean}
       />
       {yarnLabels && <YarnLabels stitches={stitches} layout={layout} cell={cell} labels={yarnLabels} />}
       {veil && <path d={veil} className="chart-done" />}

@@ -119,6 +119,7 @@ const Chart: React.FC<ChartProps> = ({
   onJump,
 }) => {
   const [picked, setPicked] = useState<number>();
+  const makeOneLean = stitchNotes?.m1?.lean;
   const closePicker = useCallback(() => setPicked(undefined), []);
   const [zoom, setZoom] = useState(16);
   const { highContrast: contrast, writtenRounds } = useSettings();
@@ -200,10 +201,11 @@ const Chart: React.FC<ChartProps> = ({
       cellSize,
       token("--ink-faint", "#a29a91"),
       marked,
+      makeOneLean,
     );
     // Size is derived from the same values this already depends on.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [drawn, layout, palette, width, height, ratio, drawWith]);
+  }, [drawn, layout, palette, width, height, ratio, drawWith, makeOneLean]);
 
   /*
    * And the two things that change as you knit, on a sheet of their own over
@@ -350,6 +352,7 @@ const Chart: React.FC<ChartProps> = ({
               nextStitchId={nextId}
               cell={cellSize}
               turns={marked}
+              makeOneLean={makeOneLean}
             />
           ) : (
             <>

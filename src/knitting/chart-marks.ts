@@ -1,6 +1,6 @@
 import { Stitch } from "../types/Stitch";
 import { ChartLayout, isSecondLoop } from "./layout";
-import { Mark, forkMark, markFor } from "../helpers/stitch-marks";
+import { Mark, forkMark, makeOneMark, markFor } from "../helpers/stitch-marks";
 
 /**
  * The mark a stitch carries on the chart, which can depend on its neighbours.
@@ -14,8 +14,11 @@ export const markAt = (
   stitch: Stitch,
   byId: Map<number, Stitch>,
   layout: ChartLayout,
+  /** Which way this pattern's make-ones lean, if it says. */
+  makeOneLean?: "left" | "right",
 ): Mark | undefined => {
   if (isSecondLoop(stitch, byId)) return undefined;
+  if (stitch.type === "m1") return makeOneMark(makeOneLean);
   if (stitch.type !== "kfb") return markFor(stitch.type);
 
   const at = layout.cells.get(stitch.id);

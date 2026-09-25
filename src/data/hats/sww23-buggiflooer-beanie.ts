@@ -36,7 +36,22 @@ const sww23: HatPattern = {
   patternUrl: "https://www.ravelry.com/patterns/library/buggiflooer-beanie",
   credit: "Design and pattern © Alison Rendall 2023",
   hashtag: "#alisonrendall",
+  // The stitches as this pattern's own abbreviations define them.
   stitchNotes: {
+    kfb: {
+      how:
+        "Knit into the front and then the back of the stitch: one stitch " +
+        "becomes two, the new one to its left.",
+    },
+    k2tog: { abbreviation: "K2tog", how: "Knit 2 stitches together." },
+    s2kp: {
+      abbreviation: "CDD",
+      label: "Centre double decrease",
+      how:
+        "Slip 2 stitches together as if to knit, knit the next stitch in the " +
+        "colour shown on the tower, then pass the slipped stitches over it, " +
+        "so the centre stitch lands on top.",
+    },
     k2togtbl: {
       note:
         "Used only in the last round. First move the first stitch of the " +

@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Stitch } from "../types/Stitch";
 import { StitchType } from "../types/StitchType";
-import { Mark, forkMark, markFor } from "../helpers/stitch-marks";
+import { Mark, forkMark, makeOneMark, markFor } from "../helpers/stitch-marks";
 import { Palette, yarnFor } from "./palette";
 import { indexRounds, runInstruction, upcomingRuns } from "./progress";
 import { KeyEntry, stitchKey } from "./stitch-key";
@@ -35,6 +35,8 @@ const Swatch: React.FC<{ entry: KeyEntry }> = ({ entry }) => {
           <Cell x={0} />
           <Cell x={1} mark={forkMark(0.5, [0.5, -0.5])} />
         </>
+      ) : entry.id === "m1" ? (
+        <Cell x={0} mark={makeOneMark(entry.lean)} />
       ) : (
         <Cell type={entry.type} x={0} />
       )}

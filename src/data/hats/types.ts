@@ -190,10 +190,19 @@ export type StitchKeyId =
 /**
  * What a pattern says about one of its stitches, for the symbol key.
  *
- * `label` and `how` replace the key's own wording where the pattern puts it
- * differently; `note` is added underneath, for anything peculiar to this hat.
+ * `abbreviation`, `label` and `how` replace the key's own wording where the
+ * pattern puts it differently - its abbreviations list is the place to take
+ * them from; `note` is added underneath, for anything peculiar to this hat.
  */
 export interface StitchNote {
+  abbreviation?: string;
+  /**
+   * Which way a make-one leans, where the pattern's definition settles it:
+   * lifted front to back and knitted through the back loop it leans left;
+   * back to front and knitted through the front, right. The chart tilts the
+   * make-one's mark to match.
+   */
+  lean?: "left" | "right";
   label?: string;
   how?: string;
   note?: string;

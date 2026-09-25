@@ -54,7 +54,7 @@ describe("Buggiflooer Beanie reconciles with the 2023 pattern", () => {
     );
     expect(decreases).toEqual([8, 10, 12, 14, 16, 18, 20, 22, 24, 26]);
 
-    const cContrast = [..."CCCCCCDDDEEEFEEEDDDDCCCCC"];
+    const cContrast = [..."CCCCCDDDDEEEFEEEDDDDCCCCC"];
     chart("C").rows.forEach((row, i) => {
       expect(new Set(row.map((cell) => cell.slot))).toEqual(
         new Set(["A", cContrast[i]]),

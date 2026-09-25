@@ -44,6 +44,16 @@ const sww15: HatPattern = {
     "in Shetland, but it knits just as well on a circular.",
   patternUrl: "https://www.ravelry.com/patterns/library/baa-ble-hat",
   credit: "© Donna Smith",
+  // The stitches as this pattern's own abbreviations define them. Its
+  // make-one does not say which way the loop is picked up, so it is not leant.
+  stitchNotes: {
+    m1: {
+      how:
+        "Pick up a loop between two stitches and knit into the back of the " +
+        "new stitch.",
+    },
+    k2tog: { how: "Knit 2 together." },
+  },
   slots: ["A", "B", "C", "D"],
 
   sizes: [

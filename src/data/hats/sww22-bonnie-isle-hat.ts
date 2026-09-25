@@ -45,8 +45,18 @@ const sww22: HatPattern = {
   patternUrl: "https://www.ravelry.com/patterns/library/bonnie-isle-hat",
   credit: "© Linda Shearer",
   hashtag: "#BonnieIsleHat",
+  // The stitches as this pattern's own abbreviations define them.
   stitchNotes: {
+    kfb: {
+      how:
+        "Knit into the front and back of the stitch: one stitch becomes two, " +
+        "the new one to its left.",
+    },
+    k2tog: { how: "Knit 2 stitches together as if they were one." },
     sk2p: {
+      how:
+        "Slip 1 stitch as if to knit, knit 2 together, then pass the slipped " +
+        "stitch over.",
       note:
         "Not the centred s2kp most years use: this hat's crown decreases " +
         "lean rather than standing straight.",

@@ -110,6 +110,26 @@ const marks: Partial<Record<StitchType, Mark>> = {
 export const markFor = (type: StitchType): Mark | undefined => marks[type];
 
 /**
+ * A make-one whose pattern says which way it leans: the same strand along the
+ * foot of the cell, with the new stitch lifted out of it leaning that way.
+ */
+export const makeOneMark = (lean?: "left" | "right"): Mark | undefined =>
+  lean === undefined
+    ? marks.m1
+    : {
+        strokes: [
+          [
+            [near, far],
+            [far, far],
+          ],
+          [
+            [mid, far],
+            [lean === "left" ? near : far, near],
+          ],
+        ],
+      };
+
+/**
  * One stitch becoming two, drawn across both: a V opening from over the
  * stitch below to the middle of each stitch it becomes - the double
  * decrease's chevron, the other way up.

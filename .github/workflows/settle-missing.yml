@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - claude/shetland-wool-week-tracker-u20lz7
     paths:
       - "src/data/hats/**"
       - "src/knitting/**"
