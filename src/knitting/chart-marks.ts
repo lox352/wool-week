@@ -30,3 +30,13 @@ export const markAt = (
   const parentAt = layout.cells.get(stitch.links[0]);
   return forkMark(centre(parentAt?.column ?? at.column), [0.5, centre(madeAt.column)]);
 };
+
+/**
+ * The turns that actually fall inside the chart, in order. One at the very
+ * top or bottom would divide nothing, and there would be no fabric either
+ * side of it to draw the rule across.
+ */
+export const turnsInside = (turns: number[] | undefined, roundCount: number): number[] =>
+  [...new Set(turns ?? [])]
+    .filter((round) => round > 0 && round < roundCount)
+    .sort((a, b) => a - b);

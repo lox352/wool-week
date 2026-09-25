@@ -4,7 +4,8 @@ import { layOut } from "./layout";
 import { Palette, yarnFor } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
-import { StitchLegend, TextRound } from "./ChartHelp";
+import { StitchLegend, TextRound, TurnText } from "./ChartHelp";
+import { turnsInside } from "./chart-marks";
 import StitchPicker from "./StitchPicker";
 import { keyEntryAt } from "./stitch-key";
 import { stitchAtPoint } from "./jump";
@@ -158,18 +159,7 @@ const Chart: React.FC<ChartProps> = ({
   const drawWith = contrast ? "svg" : preferredRenderer;
 
   const layout = useMemo(() => layOut(stitches, rounds), [stitches, rounds]);
-  /*
-   * The turns that actually fall inside the chart, in order. One at the very
-   * top or bottom would divide nothing, and there would be no fabric either
-   * side of it to draw the rule across.
-   */
-  const marked = useMemo(
-    () =>
-      [...new Set(turns ?? [])]
-        .filter((round) => round > 0 && round < layout.rounds)
-        .sort((a, b) => a - b),
-    [turns, layout.rounds],
-  );
+  const marked = useMemo(() => turnsInside(turns, layout.rounds), [turns, layout.rounds]);
   const { width, height } = chartSize(layout, cellSize);
 
   const ratio = useMemo(() => {
@@ -438,7 +428,7 @@ const Chart: React.FC<ChartProps> = ({
           )}
         </div>
       </div>
-      <StitchLegend stitches={stitches} notes={stitchNotes} />
+      <StitchLegend stitches={stitches} notes={stitchNotes} turns={marked} />
       {writtenRounds && <details className="chart-help" onToggle={e => setShowText(e.currentTarget.open)}>
         <summary>Text round instructions</summary>
         <label>Read round <select value={follow && focusRound ? focusRound : textRound} disabled={follow && !!focusRound} onChange={e => setTextRound(Number(e.target.value))}>
@@ -456,13 +446,7 @@ const Chart: React.FC<ChartProps> = ({
         <p className="chart-caption chart-turn-note">
           <span className="chart-key-turn" aria-hidden="true" />
           <span>
-            The work is turned inside out after{" "}
-            {marked.length === 1 ? "round" : "rounds"} {marked.join(", ")}.
-            Each rule divides two regions worked on opposite faces of the hat:
-            the rounds below it go on the other way about, so they read back to
-            front against the rounds above. Which, with the fold, is why a brim
-            charted this way comes out the right way round once it is turned
-            up.
+            <TurnText turns={marked} />
           </span>
         </p>
       )}

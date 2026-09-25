@@ -44,27 +44,55 @@ export const Swatch: React.FC<{ entry: KeyEntry }> = ({ entry }) => {
   );
 };
 
+/** What the crimson rule across the chart means, and why it is there. */
+export function TurnText({ turns }: { turns: number[] }) {
+  return (
+    <>
+      The work is turned inside out after {turns.length === 1 ? "round" : "rounds"}{" "}
+      {turns.join(", ")}. Each rule divides two regions worked on opposite faces
+      of the hat: the rounds below it go on the other way about, so they read
+      back to front against the rounds above. Which, with the fold, is why a
+      brim charted this way comes out the right way round once it is turned up.
+    </>
+  );
+}
+
+/** The rule as the key draws it: across a cell, between two rounds. */
+const TurnSwatch: React.FC = () => (
+  <svg className="key-swatch" width="24" height="24" viewBox="-0.04 -0.04 1.08 1.08" aria-hidden="true">
+    <rect width="1" height="1" className="key-cell" />
+    <line x1="-0.04" y1="0.5" x2="1.04" y2="0.5" className="key-turn" />
+  </svg>
+);
+
 /**
  * What the marks on this hat's chart mean, and how to work each one.
  *
  * Only the stitches this hat uses, in the words its pattern uses; see
  * stitch-key.ts.
  */
-export function StitchLegend({ stitches, notes }: {
+export function StitchLegend({ stitches, notes, turns }: {
   stitches: Stitch[];
   notes?: Partial<Record<StitchKeyId, StitchNote>>;
+  /** Rounds after which the work is turned; see turnsInside. */
+  turns?: number[];
 }) {
   const entries = useMemo(() => stitchKey(stitches, notes), [stitches, notes]);
   return (
     <details className="chart-help">
       <summary>Stitch-symbol key</summary>
-      <KeyList entries={entries} />
+      <KeyList entries={entries} turns={turns} />
     </details>
   );
 }
 
 /** The key's entries, each with its mark and how to work it. */
-export function KeyList({ entries, current }: { entries: KeyEntry[]; current?: string }) {
+export function KeyList({ entries, current, turns }: {
+  entries: KeyEntry[];
+  current?: string;
+  /** Rounds after which the work is turned, which the key explains last. */
+  turns?: number[];
+}) {
   return (
     <ul className="stitch-key">
       {entries.map((entry) => (
@@ -79,6 +107,17 @@ export function KeyList({ entries, current }: { entries: KeyEntry[]; current?: s
           </div>
         </li>
       ))}
+      {turns && turns.length > 0 && (
+        <li className="stitch-key-turn">
+          <TurnSwatch />
+          <div>
+            <strong>Turn the work inside out</strong>
+            <p>
+              <TurnText turns={turns} />
+            </p>
+          </div>
+        </li>
+      )}
     </ul>
   );
 }
