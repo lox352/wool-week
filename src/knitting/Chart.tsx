@@ -272,19 +272,49 @@ const Chart: React.FC<ChartProps> = ({
    * in it, so the two directions cannot be sent separately. The round only
    * changes once a round, so within one this moves only sideways.
    */
+  const aim = useCallback(
+    (behavior: ScrollBehavior) => {
+      const scroller = scrollRef.current;
+      if (!scroller || !at) return;
+      const cell = cellNow.current;
+      const { x, y } = cellAt(layout, at.round, at.column, cell);
+      scroller.scrollTo({
+        left: Math.max(x - scroller.clientWidth / 2 + cell / 2, 0),
+        top: contained
+          ? Math.max(y + cell - (scroller.clientHeight - clearance * cell), 0)
+          : undefined,
+        behavior,
+      });
+    },
+    [at, layout, contained],
+  );
+  useEffect(() => {
+    aim(reducedMotion() ? "auto" : "smooth");
+  }, [aim]);
+
+  /*
+   * And again whenever the window changes size while you knit. It is sized to
+   * fit above the panel, and the panel can grow after the aim above: when its
+   * fonts arrive on a fresh load, when a round brings a hint or a turn, when
+   * the phone is turned. Aimed for the old size, the stitch can end up below
+   * the new bottom edge, which on the first round is where it always is.
+   */
+  const aimRef = useRef(aim);
+  aimRef.current = aim;
+  const following = contained && at !== undefined;
   useEffect(() => {
     const scroller = scrollRef.current;
-    if (!scroller || !at) return;
-    const cell = cellNow.current;
-    const { x, y } = cellAt(layout, at.round, at.column, cell);
-    scroller.scrollTo({
-      left: Math.max(x - scroller.clientWidth / 2 + cell / 2, 0),
-      top: contained
-        ? Math.max(y + cell - (scroller.clientHeight - clearance * cell), 0)
-        : undefined,
-      behavior: reducedMotion() ? "auto" : "smooth",
+    if (!following || !scroller || typeof ResizeObserver === "undefined") return;
+    let size = `${scroller.clientWidth}x${scroller.clientHeight}`;
+    const watch = new ResizeObserver(() => {
+      const now = `${scroller.clientWidth}x${scroller.clientHeight}`;
+      if (now === size) return;
+      size = now;
+      aimRef.current("auto");
     });
-  }, [at, layout, contained]);
+    watch.observe(scroller);
+    return () => watch.disconnect();
+  }, [following]);
 
   /*
    * And down the page, but only when the round changes. Within a round the
