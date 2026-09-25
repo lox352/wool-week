@@ -4,7 +4,7 @@ import { layOut } from "./layout";
 import { Palette, yarnFor } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
-import { StitchLegend, TextRound, TurnText } from "./ChartHelp";
+import { StitchLegend, TextRound } from "./ChartHelp";
 import { turnsInside } from "./chart-marks";
 import StitchPicker from "./StitchPicker";
 import { keyEntryAt } from "./stitch-key";
@@ -442,14 +442,6 @@ const Chart: React.FC<ChartProps> = ({
         whole round, and pinch to zoom.{onJump && " Tap a stitch to carry on from there."} Where a round is shorter than the one below it, stitches
         have been decreased away.
       </p>
-      {marked.length > 0 && (
-        <p className="chart-caption chart-turn-note">
-          <span className="chart-key-turn" aria-hidden="true" />
-          <span>
-            <TurnText turns={marked} />
-          </span>
-        </p>
-      )}
     </div>
   );
 };

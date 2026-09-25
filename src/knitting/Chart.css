@@ -230,22 +230,6 @@
   flex: none;
 }
 
-/* The one line under the chart that says what the crimson rule is. */
-.chart-turn-note {
-  display: flex;
-  align-items: baseline;
-  gap: 0.55rem;
-  margin-top: 0.5rem;
-}
-
-.chart-turn-note .chart-key-turn {
-  flex: none;
-  width: 1.6rem;
-  height: 0;
-  margin-top: 0.55rem;
-  border-top: 2.5px solid var(--crimson);
-}
-
 .stitch-picker-what {
   display: grid;
   grid-template-columns: auto 1fr;
