@@ -4,6 +4,13 @@
  * "join" is not a stitch a knitter works; it is the seam where the cast-on
  * row closes into a round, and it exists so the tube is a single chain.
  *
+ * "turn" is not a stitch either, but it is a step: turning the work inside
+ * out, between one round and the next. It takes nothing from the round below
+ * and leaves nothing behind - where an m1 is nothing to one and a k2tog two
+ * to one, a turn is nothing to nothing - but it has its place in the order
+ * things are done, so that a knitter works it, and can undo it, like any
+ * other step. It belongs to no round.
+ *
  * s2kp and sk2p both take three stitches down to one and are not the same
  * stitch. A centred double decrease slips two together, knits one and passes
  * the two over, so the middle stitch finishes on top and the decrease stands
@@ -21,7 +28,8 @@ export type StitchType =
   | "k2togtbl"
   | "s2kp"
   | "sk2p"
-  | "join";
+  | "join"
+  | "turn";
 
 /** How many stitches of the round below this one consumes. */
 export const consumption: Record<StitchType, number> = {
@@ -35,4 +43,5 @@ export const consumption: Record<StitchType, number> = {
   s2kp: 3,
   sk2p: 3,
   join: 0,
+  turn: 0,
 };

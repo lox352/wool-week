@@ -296,7 +296,10 @@ export const buildHat = (
         // about from here. The boundary is kept so the chart can draw it and
         // the knitting panel can say so; a turn before the cast-on divides
         // nothing, so it is only a flip.
-        if (knitter.rounds.length > 0) turns.push(knitter.rounds.length);
+        if (knitter.rounds.length > 0) {
+          turns.push(knitter.rounds.length);
+          knitter.turn();
+        }
         backwards = !backwards;
         return;
       }

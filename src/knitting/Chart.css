@@ -266,3 +266,17 @@
   stroke: var(--crimson);
   stroke-width: 0.12;
 }
+
+/*
+ * Rounds worked with the other face of the hat towards you: a light hatch,
+ * so they read as the other side of the fabric without hiding it.
+ */
+.chart-hatch {
+  pointer-events: none;
+}
+
+.chart-hatch-line {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  opacity: 0.2;
+}

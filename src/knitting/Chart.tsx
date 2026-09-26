@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Stitch } from "../types/Stitch";
-import { layOut } from "./layout";
+import { Stitch, isFabric } from "../types/Stitch";
+import { layOut, mirrorLayout } from "./layout";
 import { Palette, yarnFor } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
@@ -158,8 +158,37 @@ const Chart: React.FC<ChartProps> = ({
   const preferredRenderer = useMemo(() => renderer(), []);
   const drawWith = contrast ? "svg" : preferredRenderer;
 
-  const layout = useMemo(() => layOut(stitches, rounds), [stitches, rounds]);
+  const laid = useMemo(() => layOut(stitches, rounds, turns), [stitches, rounds, turns]);
+  /*
+   * A chart shows the knitting from the face you are working on. Past a turn
+   * that is the other face of everything, so the chart turns over with you:
+   * laid out, it reads right to left for the last stretch of the hat, and it
+   * is mirrored for as long as an odd number of turns are still to come.
+   * Working a turn turns it over; undoing one turns it back.
+   */
+  const turnIds = useMemo(
+    () => stitches.filter((stitch) => stitch.type === "turn").map((stitch) => stitch.id),
+    [stitches],
+  );
+  const turned = turnIds.filter((id) => id <= progress).length;
+  const flipped = (turnIds.length - turned) % 2 === 1;
+  const layout = useMemo(() => (flipped ? mirrorLayout(laid) : laid), [laid, flipped]);
   const marked = useMemo(() => turnsInside(turns, layout.rounds), [turns, layout.rounds]);
+  /*
+   * The rounds worked with the other face towards you from the one you are
+   * on now, hatched: a knit there is a purl from here, and the chart shows
+   * them the way round they were knitted, not the way you see them.
+   */
+  const hatch = useMemo(() => {
+    const bands: [number, number][] = [];
+    for (let round = 1; round <= layout.rounds; round++) {
+      if ((regionsBelow(marked, round) - turned) % 2 === 0) continue;
+      const band = bands[bands.length - 1];
+      if (band && band[1] === round - 1) band[1] = round;
+      else bands.push([round, round]);
+    }
+    return bands;
+  }, [layout.rounds, marked, turned]);
   const { width, height } = chartSize(layout, cellSize);
 
   const ratio = useMemo(() => {
@@ -169,7 +198,7 @@ const Chart: React.FC<ChartProps> = ({
   }, [width, height]);
 
   const drawn = useMemo(
-    () => stitches.filter((stitch) => stitch.id !== 0),
+    () => stitches.filter(isFabric),
     [stitches],
   );
 
@@ -460,6 +489,7 @@ const Chart: React.FC<ChartProps> = ({
               nextStitchId={nextId}
               cell={cellSize}
               turns={marked}
+              hatch={hatch}
               makeOneLean={makeOneLean}
             />
           ) : (

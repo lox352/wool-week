@@ -1,4 +1,4 @@
-import { Stitch } from "../types/Stitch";
+import { Stitch, isFabric } from "../types/Stitch";
 import { consumption } from "../types/StitchType";
 
 export interface Cell {
@@ -183,13 +183,19 @@ const place = (
   on: number,
   lean: Lean,
   column: Map<number, number>,
+  /** 1 for a round worked right to left on the chart, -1 left to right. */
+  way = 1,
 ) => {
   const anchor =
     lean === "right" ? 0 : lean === "left" ? ids.length - 1 : (ids.length - 1) / 2;
   ids.forEach((id, index) => {
-    column.set(id, on + index - anchor);
+    column.set(id, on + way * (index - anchor));
   });
 };
+
+/** A lean as it looks from the other face of the fabric. */
+const mirrored = (lean: Lean): Lean =>
+  lean === "right" ? "left" : lean === "left" ? "right" : "middle";
 
 const columnsOf = (ids: number[], column: Map<number, number>): number[] =>
   ids.map((id) => column.get(id)).filter((at): at is number => at !== undefined);
@@ -223,22 +229,49 @@ const columnsOf = (ids: number[], column: Map<number, number>): number[] =>
  * and made the crown's decreases slide sideways rather than closing in evenly,
  * because the gap a decrease leaves always opened on the same side of it.
  */
-export const layOut = (stitches: Stitch[], rounds: number[][]): ChartLayout => {
+export const layOut = (
+  stitches: Stitch[],
+  rounds: number[][],
+  /**
+   * Rounds after which the work is turned inside out. A turn sends the
+   * rounds after it the other way round the hat, and so the other way
+   * across the chart.
+   */
+  turns: number[] = [],
+): ChartLayout => {
   const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
   const widest = rounds.reduce((most, round) => Math.max(most, round.length), 0);
   const anchor = rounds.findIndex((round) => round.length === widest);
   const column = new Map<number, number>();
 
+  /*
+   * Which way across the chart each round is worked. The last stretch of the
+   * hat reads right to left, as a chart does; each turn before it reverses
+   * the stretch below. Every stitch still stands over the stitch it was
+   * worked into - a turn changes direction, not what joins what - so the
+   * columns line up straight through it, and a stretch worked left to right
+   * is the mirror image of how it looks from its own face, with its leans
+   * mirrored to match. The chart as a whole is turned over for whichever
+   * stretch is being knitted: see mirrorLayout.
+   */
+  const cuts = [...new Set(turns)].filter((turn) => turn > 0 && turn < rounds.length);
+  const way = (index: number) =>
+    cuts.filter((turn) => turn > index).length % 2 === 0 ? 1 : -1;
+  const leanIn = (family: Family, index: number) =>
+    way(index) === 1 ? leanOf(family, byId) : mirrored(leanOf(family, byId));
+
   if (anchor >= 0) {
-    rounds[anchor].forEach((id, index) => column.set(id, index + 1));
+    rounds[anchor].forEach((id, index) =>
+      column.set(id, way(anchor) === 1 ? index + 1 : widest - index),
+    );
   }
 
   // Upwards from the anchor: over what it was worked into.
   for (let index = anchor + 1; index < rounds.length; index++) {
     for (const family of familiesOf(rounds[index], byId)) {
       const below = columnsOf(family.below, column);
-      const lean = leanOf(family, byId);
-      if (below.length > 0) place(family.above, pick(below, widest, lean), lean, column);
+      const lean = leanIn(family, index);
+      if (below.length > 0) place(family.above, pick(below, widest, lean), lean, column, way(index));
     }
   }
 
@@ -246,8 +279,8 @@ export const layOut = (stitches: Stitch[], rounds: number[][]): ChartLayout => {
   for (let index = anchor - 1; index >= 0; index--) {
     for (const family of familiesOf(rounds[index + 1], byId, true)) {
       const above = columnsOf(family.above, column);
-      const lean = leanOf(family, byId);
-      if (above.length > 0) place(family.below, pick(above, widest, lean), lean, column);
+      const lean = leanIn(family, index + 1);
+      if (above.length > 0) place(family.below, pick(above, widest, lean), lean, column, way(index));
     }
   }
 
@@ -265,6 +298,18 @@ export const layOut = (stitches: Stitch[], rounds: number[][]): ChartLayout => {
   return { cells, rounds: rounds.length, columns: widest };
 };
 
-/** The stitches to draw. Stitch 0 is the phantom start of the helix. */
+/** The stitches to draw: not the phantom start of the helix, nor a turn. */
 export const chartedStitches = (stitches: Stitch[]): Stitch[] =>
-  stitches.filter((stitch) => stitch.id !== 0);
+  stitches.filter(isFabric);
+
+/**
+ * The chart turned over, left for right: how it looks from the other face.
+ * Every stitch keeps its round and its stitch number; only which side of the
+ * chart the columns count from changes.
+ */
+export const mirrorLayout = (layout: ChartLayout): ChartLayout => ({
+  ...layout,
+  cells: new Map(
+    [...layout.cells].map(([id, cell]) => [id, { ...cell, column: layout.columns + 1 - cell.column }]),
+  ),
+});

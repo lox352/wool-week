@@ -669,19 +669,31 @@ describe("where the work is turned inside out", () => {
       .forEach((hat) => expect(buildHat(hat).turns).toEqual([]));
   });
 
-  it("no stitch is added: a turn costs nothing in the count", () => {
+  it("a turn is a step, nothing to nothing, in its place between two rounds", () => {
     /*
-     * The whole reason the turn is a boundary rather than an invisible
-     * "instruction stitch". A stitch would take an id, and every id after it
-     * would shift - which is the settled models, the chart's layout and every
-     * saved knitter's progress, all moved by one, for something nobody works.
+     * Where an m1 makes one stitch out of nothing and a k2tog one out of two,
+     * a turn makes nothing out of nothing - but it is done, and done at one
+     * point in the work, so it has a place in the order: an id of its own,
+     * between the last stitch before it and the first after, which is what
+     * lets a knitter work it and undo it like any other step.
      */
-    const { stitches, rounds } = buildHat(hatById("sww26-birsie-beanny")!);
-    const worked = rounds.flat();
-    // Every stitch is in a round, bar the phantom the hat hangs from.
-    expect(stitches).toHaveLength(worked.length + 1);
-    // And ids run 1..n in order, so nothing has been shifted by a marker.
-    expect(worked).toEqual(worked.map((_, at) => at + 1));
+    const { stitches, rounds, turns } = buildHat(hatById("sww26-birsie-beanny")!);
+    const steps = stitches.filter((stitch) => stitch.type === "turn");
+    expect(steps).toHaveLength(1);
+    const [step] = steps;
+    // In no round: it is not fabric.
+    expect(rounds.flat()).not.toContain(step.id);
+    // Between the last stitch of the round before and the first after.
+    const [before, after] = [rounds[turns[0] - 1], rounds[turns[0]]];
+    expect(step.id).toBe(before[before.length - 1] + 1);
+    expect(after[0]).toBe(step.id + 1);
+    // Worked into nothing, and nothing worked into it: the first stitch after
+    // it carries on from the last one before.
+    expect(step.links).toEqual([]);
+    expect(stitches.some((stitch) => stitch.links.includes(step.id))).toBe(false);
+    expect(stitches[after[0]].links).toContain(before[before.length - 1]);
+    // Every other stitch is in a round, bar the phantom the hat hangs from.
+    expect(stitches).toHaveLength(rounds.flat().length + 2);
   });
 
   it("turns alternate, so n of them leave n + 1 regions", () => {

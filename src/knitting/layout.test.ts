@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { layOut } from "./layout";
+import { layOut, mirrorLayout } from "./layout";
 import { buildHat } from "./engine";
 import { hatById } from "../data/hats";
 import { consumption } from "../types/StitchType";
@@ -234,5 +234,52 @@ describe("the chart hangs every stitch over what it was worked into", () => {
         }
       }
     }
+  });
+});
+
+describe("a hat turned inside out partway", () => {
+  it("lines its columns up through the turn, and works the stretch before it the other way across", () => {
+    /*
+     * A turn changes which way the work goes, not what joins what: every
+     * stitch still stands over the one it was worked into, so the columns run
+     * straight through the turn and an increase still leaves its whole column
+     * empty below it. The Birsie Beanny's brim is worked before the turn, and
+     * so, laid out for the body above it, left to right: the mirror of how
+     * the pattern charts it, which is how it looks from the body's face.
+     */
+    const hat = hatById("sww26-birsie-beanny")!;
+    const { stitches, rounds, roundLabels, turns } = buildHat(hat);
+    const { cells } = layOut(stitches, rounds, turns);
+    const columns = (round: number[]) => round.map((id) => cells.get(id)!.column);
+
+    rounds.forEach((round, index) =>
+      expect(new Set(columns(round)).size, roundLabels[index]).toBe(round.length),
+    );
+    // Each lettering row left to right in the order it is worked: stitch 1
+    // at the chart's left, every step towards its right.
+    for (let row = 1; row <= 18; row++) {
+      const across = columns(rounds[roundLabels.indexOf(`Chart Brim, row ${row}`)]);
+      across.slice(1).forEach((at, i) => expect(at).toBeLessThan(across[i]));
+    }
+    // The rib under the body's increases spans the whole chart.
+    const rib = columns(rounds[1]);
+    expect(Math.max(...rib) - Math.min(...rib)).toBeGreaterThan(rounds[1].length);
+    // And the body is laid out exactly as it would be with no turn at all.
+    const straight = layOut(stitches, rounds).cells;
+    rounds.slice(turns[0]).flat().forEach((id) =>
+      expect(cells.get(id)!.column).toBe(straight.get(id)!.column),
+    );
+  });
+
+  it("turns over whole, left for right, and back", () => {
+    const hat = hatById("sww26-birsie-beanny")!;
+    const { stitches, rounds, turns } = buildHat(hat);
+    const laid = layOut(stitches, rounds, turns);
+    const over = mirrorLayout(laid);
+    laid.cells.forEach((cell, id) => {
+      expect(over.cells.get(id)!.column).toBe(laid.columns + 1 - cell.column);
+      expect(over.cells.get(id)!.round).toBe(cell.round);
+    });
+    expect(mirrorLayout(over).cells).toEqual(laid.cells);
   });
 });

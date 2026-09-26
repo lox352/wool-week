@@ -49,10 +49,12 @@ function TurnText({ turns }: { turns: number[] }) {
   return (
     <>
       The work is turned inside out after {turns.length === 1 ? "round" : "rounds"}{" "}
-      {turns.join(", ")}. Each rule divides two regions worked on opposite faces
-      of the hat: the rounds below it go on the other way about, so they read
-      back to front against the rounds above. Which, with the fold, is why a
-      brim charted this way comes out the right way round once it is turned up.
+      {turns.join(", ")}. Each rule divides two stretches worked with opposite
+      faces of the hat towards you. The chart shows the face you are working
+      on: working the turn turns the chart over, and the stretch on the other
+      side of the rule is hatched, because you see it from its other face.
+      Which, with the fold, is why a brim charted this way comes out the right
+      way round once it is turned up.
     </>
   );
 }

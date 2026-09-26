@@ -1,4 +1,4 @@
-import { Stitch } from "../types/Stitch";
+import { Stitch, isFabric } from "../types/Stitch";
 import { Point } from "../types/Point";
 
 /**
@@ -36,7 +36,7 @@ export const hatShape = (
 
   for (const stitch of stitches) {
     // Stitch 0 is the phantom start of the helix and is never drawn.
-    if (stitch.id === 0) continue;
+    if (!isFabric(stitch)) continue;
     const at = settled?.[stitch.id] ?? stitch.position;
     if (!at) continue;
     radius = Math.max(radius, Math.hypot(at.x, at.z));

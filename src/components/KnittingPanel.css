@@ -313,3 +313,7 @@
   font-size: 0.85rem;
   color: var(--crimson);
 }
+
+.knitting-turn .knitting-go {
+  margin-top: 0.6rem;
+}

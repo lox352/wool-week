@@ -153,9 +153,16 @@ describe("the regions a turn divides a hat into", () => {
     expect(positionOf(stitches, before[before.length - 2], index)).toMatchObject(
       { round: turn, region: 0 },
     );
-    // ... and the first of the round above it opens region 1.
-    expect(positionOf(stitches, before[before.length - 1], index)).toMatchObject(
-      { round: turn + 1, region: 1, regionRound: 1, stitchInRound: 1 },
+    // With the round finished, the next thing to do is the turn: a step of
+    // its own, with nothing to knit, still in region 0.
+    const last = before[before.length - 1];
+    expect(positionOf(stitches, last, index)).toMatchObject(
+      { round: turn, region: 0, turnNext: true, stitchInRound: before.length },
+    );
+    expect(stitches[last + 1].type).toBe("turn");
+    // Once it is worked, the first stitch of the round above opens region 1.
+    expect(positionOf(stitches, last + 1, index)).toMatchObject(
+      { round: turn + 1, region: 1, regionRound: 1, stitchInRound: 1, turnNext: false },
     );
     // The reminder comes down at the end of that round, not before it.
     const after = index.rounds[turn];
