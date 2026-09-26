@@ -215,10 +215,33 @@ test("the key explains the turn, on a hat that is turned inside out", async ({ p
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
   await page.getByRole("button", { name: "Key", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "Key" })).toContainText("Turn the work inside out");
+  await expect(page.getByRole("dialog", { name: "Key" })).toContainText("Hatched");
   await page.getByRole("button", { name: "Close the key" }).click();
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
   await page.getByText("Stitch-symbol key", { exact: true }).click();
   await expect(page.locator(".stitch-key")).toContainText("turned inside out after round 51");
+});
+
+test("a hatched stitch says so when tapped", async ({ page }) => {
+  await page.goto("#/hat/sww26-birsie-beanny");
+  await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
+  const tap = (round) => page.locator(".chart-sheets").evaluate((sheet, round) => {
+    const cell = 16;
+    const box = sheet.getBoundingClientRect();
+    const columns = Math.round((box.width - Math.round(cell * 2.2)) / cell);
+    sheet.dispatchEvent(new MouseEvent("click", { bubbles: true,
+      clientX: box.left + (columns - 3.5) * cell, clientY: box.bottom - (round - 0.5) * cell }));
+  }, round);
+  // In the brim, on this side of the turn: not hatched.
+  await tap(20);
+  const brim = page.getByRole("dialog", { name: /^Round 20, stitch/ });
+  await expect(brim).toBeVisible();
+  await expect(brim).not.toContainText("Hatched.");
+  await brim.getByRole("button", { name: "Close" }).click();
+  // In the body, past the turn: hatched while the brim is worked.
+  await tap(60);
+  const body = page.getByRole("dialog", { name: /^Round 60, stitch/ });
+  await expect(body).toContainText("Hatched.");
 });
 
 test("starting to knit brings the stitch into view, and keeps it there when the panel grows", async ({ page }) => {

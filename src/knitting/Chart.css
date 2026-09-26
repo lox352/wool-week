@@ -280,3 +280,15 @@
   stroke-width: 1.5;
   opacity: 0.2;
 }
+
+.key-hatch-ground {
+  fill: var(--paper);
+  stroke: var(--ink-faint);
+  stroke-width: 1;
+}
+
+.stitch-picker-face p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.35;
+}
