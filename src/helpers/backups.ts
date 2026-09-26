@@ -1,5 +1,6 @@
 import { hatById } from "../data/hats";
 import { buildHat } from "../knitting/engine";
+import { fitLettering } from "../knitting/lettering/fit";
 import { currentVersion, listProjects, type Project, writeProject } from "./projects";
 
 export const backupText = () => JSON.stringify({ format: "wool-week-projects", version: 1,
@@ -20,6 +21,12 @@ export function parseBackup(text: string): Project[] {
       typeof p.startedAt !== "string" || !Number.isFinite(Date.parse(p.startedAt))) {
       throw new Error("A project contains an unknown pattern, size, colourway or invalid progress.");
     }
+    if (p.brimText !== undefined) {
+      const band = hat.lettering;
+      const chart = band && hat.charts.find(c => c.id === band.chart);
+      if (typeof p.brimText !== "string" || p.brimText.length > 60 || !chart ||
+        !fitLettering(p.brimText, chart.rows[band.row - 1].length).ok) throw new Error("Invalid brim lettering.");
+    }
     if (p.shades !== undefined) {
       if (!p.shades || typeof p.shades !== "object" || Array.isArray(p.shades)) throw new Error("Invalid yarn choices.");
       for (const [slot, shade] of Object.entries(p.shades)) {
@@ -31,7 +38,7 @@ export function parseBackup(text: string): Project[] {
     }
     return { version: currentVersion, id: `project-${crypto.randomUUID()}`, name: p.name,
       hatId: p.hatId, sizeId: p.sizeId, colourwayId: p.colourwayId, progress: p.progress,
-      shades: p.shades, startedAt: p.startedAt, updatedAt: new Date().toISOString() };
+      shades: p.shades, brimText: p.brimText, startedAt: p.startedAt, updatedAt: new Date().toISOString() };
   });
 }
 

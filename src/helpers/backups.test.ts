@@ -23,3 +23,16 @@ it("rejects a colourway incompatible with the selected yarn-weight variant", () 
   expect(() => parseBackup(backupText())).toThrow("colourway");
   expect(listProjects()).toEqual([wrong]);
 });
+
+it("keeps a brim's own words, and refuses words the brim cannot knit", () => {
+  const hat = hats.find(h => h.lettering)!;
+  startProject(hat.id, hat.sizes[0].id, hat.colourways[0].id, {}, "HAPPY BIRTHDAY MUM");
+  expect(parseBackup(backupText())[0].brimText).toBe("HAPPY BIRTHDAY MUM");
+  localStorage.clear();
+  startProject(hat.id, hat.sizes[0].id, hat.colourways[0].id, {}, "CAFÉ");
+  expect(() => parseBackup(backupText())).toThrow("lettering");
+  localStorage.clear();
+  const plain = hats.find(h => !h.lettering)!;
+  startProject(plain.id, plain.sizes[0].id, plain.colourways[0].id, {}, "HELLO");
+  expect(() => parseBackup(backupText())).toThrow("lettering");
+});

@@ -12,6 +12,7 @@ import {
   renameProject,
 } from "../helpers/projects";
 import { hatStitches } from "../knitting/useHat";
+import { withLettering } from "../knitting/lettering/apply";
 import { indexRounds, totals } from "../knitting/progress";
 import { paletteOf } from "../knitting/palette";
 import PageLayout from "./ui/PageLayout";
@@ -32,7 +33,7 @@ const formatDate = (iso: string) =>
 const describe = (project: Project) => {
   const hat = hatById(project.hatId);
   if (!hat) return undefined;
-  const { rounds, roundLabels } = hatStitches(hat, project.sizeId);
+  const { rounds, roundLabels } = hatStitches(withLettering(hat, project.brimText), project.sizeId);
   const index = indexRounds(rounds, roundLabels);
   const counts = totals(index, project.progress);
   const colourway =
@@ -74,7 +75,7 @@ const ProjectCard: React.FC<{
     ? `Finished · ${counts.total.toLocaleString()} stitches`
     : `${counts.worked.toLocaleString()} of ${counts.total.toLocaleString()} stitches · started ${formatDate(project.startedAt)}`;
 
-  const { stitches, rounds } = hatStitches(hat, project.sizeId);
+  const { stitches, rounds } = hatStitches(withLettering(hat, project.brimText), project.sizeId);
 
   /*
    * The hat's body in this project's own wool, with a line along its foot

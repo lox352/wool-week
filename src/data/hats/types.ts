@@ -354,6 +354,8 @@ export interface HatPattern {
     chart: string;
     /** The chart row the letters' top row is on. */
     row: number;
+    /** What the band says as printed. */
+    printed: string;
     /** The words, once a knitter has chosen some. Set by withLettering. */
     text?: string;
   };

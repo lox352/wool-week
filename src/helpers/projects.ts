@@ -21,6 +21,8 @@ export interface Project {
   sizeId: string;
   colourwayId: string;
   shades?: Overrides;
+  /** Words of the knitter's own for a hat's lettering band, if it has one. */
+  brimText?: string;
   /** Id of the last stitch worked. 0 means nothing knitted yet. */
   progress: number;
   startedAt: string;
@@ -85,6 +87,7 @@ const isProject = (value: unknown): value is Project => {
     (typeof date === "string" && Number.isFinite(Date.parse(date)));
   if (!validDate(candidate.startedAt) || !validDate(candidate.updatedAt) ||
     (candidate.name !== undefined && typeof candidate.name !== "string") ||
+    (candidate.brimText !== undefined && typeof candidate.brimText !== "string") ||
     (candidate.version !== undefined && candidate.version !== currentVersion)) return false;
   if (candidate.shades !== undefined) {
     if (!candidate.shades || typeof candidate.shades !== "object" || Array.isArray(candidate.shades)) return false;
@@ -174,6 +177,8 @@ export const startProject = (
   colourwayId: string,
   /** Any wool chosen before starting, on the hat's own page. */
   shades: Overrides = {},
+  /** And any words of their own for the brim. */
+  brimText?: string,
 ): Project =>
   writeProject({
     version: currentVersion,
@@ -182,6 +187,7 @@ export const startProject = (
     sizeId,
     colourwayId,
     shades: Object.keys(shades).length > 0 ? shades : undefined,
+    brimText,
     progress: 0,
     startedAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

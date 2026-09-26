@@ -20,6 +20,8 @@ import NextStep from "./ui/NextStep";
 import BodyStrip from "./BodyStrip";
 import { PreviewBanner } from "./ColourPreview";
 import "./Hat.css";
+import { withLettering } from "../knitting/lettering/apply";
+import BrimLettering from "./BrimLettering";
 
 /**
  * One hat: what it is, what it is made of, and a way to start knitting it.
@@ -95,7 +97,15 @@ const HatPage: React.FC<{
   setOwn,
   navigate,
 }) => {
-  const hat = hatById(hatId)!;
+  const printed = hatById(hatId)!;
+  // Words of the knitter's own for the brim, which the project will keep.
+  const [brimText, setBrimText] = useState<string>();
+  // As typed, before the page has caught up with it, for starting straight away.
+  const brimDraft = useRef<{ words?: string }>();
+  const draftBrim = useCallback((words: string | undefined) => {
+    brimDraft.current = { words };
+  }, []);
+  const hat = withLettering(printed, brimText);
   const size = hat.sizes.find((s) => s.id === sizeId) ?? hat.sizes[0];
   const stageRef = useRef<HTMLDivElement>(null);
   const choicesRef = useRef<HTMLElement>(null);
@@ -136,7 +146,7 @@ const HatPage: React.FC<{
 
   // A project is made only now, so browsing hats never leaves one behind.
   const start = () => {
-    const project = startProject(hat.id, size.id, colourway.id, own);
+    const project = startProject(hat.id, size.id, colourway.id, own, brimDraft.current ? brimDraft.current.words : brimText);
     navigate(chartPath(project.id, true));
   };
 
@@ -300,6 +310,15 @@ const HatPage: React.FC<{
           </div>
           <div className="peerie-rule" aria-hidden="true" />
           {colourEl}
+          {printed.lettering && (
+            <BrimLettering
+              hat={printed}
+              text={brimText}
+              onChange={setBrimText}
+              onDraft={draftBrim}
+              palette={palette}
+            />
+          )}
           {sizeEl}
       <PreviewBanner body={body} palette={palette} stage={stageRef} choices={choicesRef} />
 
