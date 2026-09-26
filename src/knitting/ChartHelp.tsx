@@ -50,11 +50,9 @@ function TurnText({ turns }: { turns: number[] }) {
     <>
       The work is turned inside out after {turns.length === 1 ? "round" : "rounds"}{" "}
       {turns.join(", ")}. Each rule divides two regions worked on opposite faces
-      of the hat: the rounds below it go the other way round the hat, so their
-      stitches do not line up with the ones above. Both sides are drawn as they
-      are knitted, right to left, just as the pattern charts them. Which, with
-      the fold, is why a brim charted this way comes out the right way round
-      once it is turned up.
+      of the hat: the rounds below it go on the other way about, so they read
+      back to front against the rounds above. Which, with the fold, is why a
+      brim charted this way comes out the right way round once it is turned up.
     </>
   );
 }

@@ -158,7 +158,7 @@ const Chart: React.FC<ChartProps> = ({
   const preferredRenderer = useMemo(() => renderer(), []);
   const drawWith = contrast ? "svg" : preferredRenderer;
 
-  const layout = useMemo(() => layOut(stitches, rounds, turns), [stitches, rounds, turns]);
+  const layout = useMemo(() => layOut(stitches, rounds), [stitches, rounds]);
   const marked = useMemo(() => turnsInside(turns, layout.rounds), [turns, layout.rounds]);
   const { width, height } = chartSize(layout, cellSize);
 
