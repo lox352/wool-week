@@ -344,6 +344,21 @@ export interface HatPattern {
   tensions?: Record<string, { stitch?: number; round?: number }>;
   /** Anything the pattern says about its stitches. See StitchNote. */
   stitchNotes?: Partial<Record<StitchKeyId, StitchNote>>;
+  /**
+   * A band of lettering a knitter may put their own words in, instead of the
+   * pattern's: nine rows of one chart, from the row given, as the brim is worn
+   * (see knitting/lettering). Only which yarn each stitch is changes, never a
+   * stitch, so the hat is the same shape whatever it says.
+   */
+  lettering?: {
+    chart: string;
+    /** The chart row the letters' top row is on. */
+    row: number;
+    /** What the band says as printed. */
+    printed: string;
+    /** The words, once a knitter has chosen some. Set by withLettering. */
+    text?: string;
+  };
 }
 
 /** Stitches a cell consumes from the round below. */

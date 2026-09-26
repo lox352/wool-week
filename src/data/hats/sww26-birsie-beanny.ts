@@ -372,6 +372,8 @@ const sww26: HatPattern = {
   ],
 
   charts: chartsOf(),
+  // The name round the brim, which a knitter may swap for their own words.
+  lettering: { chart: "Brim", row: 4, printed: "SHETLAND WOOL WEEK 2026" },
 
   /*
    * Two fabrics, and the pattern prints half of each: its stitch tension is

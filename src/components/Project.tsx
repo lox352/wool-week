@@ -23,6 +23,8 @@ import HatModel from "./HatModel";
 import Chart from "../knitting/Chart";
 import KnittingPanel from "./KnittingPanel";
 import { KeySheet } from "./KnitKey";
+import BrimLettering from "./BrimLettering";
+import { withLettering } from "../knitting/lettering/apply";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
@@ -175,6 +177,10 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
     change(current => ({ ...current, shades: undefined }));
   }, [change]);
 
+  const setBrimText = useCallback((brimText: string | undefined) => {
+    change(current => ({ ...current, brimText }));
+  }, [change]);
+
   /*
    * Opening or closing the knitting rearranges everything around the chart:
    * knitting fills the screen, without the header and title above it. Hold
@@ -233,6 +239,7 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
       setColourway={setColourway}
       setShade={setShade}
       restoreShades={restoreShades}
+      setBrimText={setBrimText}
     />
   );
 };
@@ -249,6 +256,7 @@ const ProjectView: React.FC<{
   setColourway: (id: string) => void;
   setShade: (slots: SlotId[], chosen: Chosen | undefined) => void;
   restoreShades: () => void;
+  setBrimText: (text: string | undefined) => void;
 }> = ({
   view,
   hatId,
@@ -261,8 +269,11 @@ const ProjectView: React.FC<{
   setColourway,
   setShade,
   restoreShades,
+  setBrimText,
 }) => {
-  const hat = hatById(hatId)!;
+  const printed = hatById(hatId)!;
+  // The pattern with the knitter's own words round its brim, if they chose any.
+  const hat = withLettering(printed, project.brimText);
   const size = hat.sizes.find((s) => s.id === project.sizeId) ?? hat.sizes[0];
   const { stitches, rounds, roundHeight, roundLabels, turns, index } =
     useHat(hat, size.id);
@@ -289,6 +300,13 @@ const ProjectView: React.FC<{
   }, [knitting]);
   const run = currentRun(stitches, project.progress, index);
   const currentStitch = run ? keyEntryAt(stitches, run.startId, hat.stitchNotes)?.id : undefined;
+
+  // The first stitch of the lettering: once it is worked, the words are set.
+  const letteringStarts = useMemo(() => {
+    const band = printed.lettering;
+    const at = band ? roundLabels.indexOf(`Chart ${band.chart}, row ${band.row}`) : -1;
+    return at < 0 ? Infinity : Math.min(...rounds[at]);
+  }, [printed, roundLabels, rounds]);
 
   const title = project.name ?? hat.name;
   const eyebrow = `Shetland Wool Week ${hat.year} · ${size.label} · ${colourway.name}`;
@@ -467,6 +485,15 @@ const ProjectView: React.FC<{
           </div>
           <div className="peerie-rule" aria-hidden="true" />
           {woolEl}
+          {printed.lettering && (
+            <BrimLettering
+              hat={printed}
+              text={project.brimText}
+              onChange={setBrimText}
+              palette={palette}
+              knitted={project.progress >= letteringStarts}
+            />
+          )}
       <PreviewBanner body={body} palette={palette} stage={stageRef} choices={choicesRef} />
 
       <NextStep

@@ -13,7 +13,8 @@ import { indexRounds } from "./progress";
 const cache = new Map<string, ReturnType<typeof buildHat>>();
 
 export const hatStitches = (pattern: HatPattern, sizeId?: string) => {
-  const key = `${pattern.id}::${sizeId ?? ""}`;
+  // Words of the knitter's own change the hat's yarns, and so its stitches.
+  const key = `${pattern.id}::${sizeId ?? ""}::${pattern.lettering?.text ?? ""}`;
   const cached = cache.get(key);
   if (cached) return cached;
   const built = buildHat(pattern, sizeId);

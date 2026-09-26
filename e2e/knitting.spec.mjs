@@ -160,6 +160,29 @@ test("the chart keeps its bottom right corner when its window is resized for a m
   await expect.poll(gaps).toEqual({ right: 0, bottom: 0 });
 });
 
+test("the Birsie Beanny's brim takes your own words, until they are knitted", async ({ page }) => {
+  await page.goto("#/hat/sww26-birsie-beanny");
+  const words = page.getByLabel("Your words");
+  await words.fill("Café");
+  await expect(page.locator(".brim-lettering-status")).toContainText("There is no É");
+  // Typed and started at once, before the page has caught up: still kept.
+  await words.fill("Happy birthday Mum");
+  await expect(page.locator(".brim-lettering-status")).toContainText("hearts between the words");
+  await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
+  await page.getByRole("link", { name: "Overview & colours", exact: true }).click();
+  await expect(page.getByLabel("Your words")).toHaveValue("HAPPY BIRTHDAY MUM");
+  await expect(page.getByRole("img", { name: "The brim, lettered HAPPY BIRTHDAY MUM" })).toBeVisible();
+
+  // Knitted into the lettering, the words are set.
+  await page.getByRole("link", { name: /^(Start|Keep) knitting$/ }).first().click();
+  for (let i = 0; i < 12; i++) await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
+  await page.getByRole("link", { name: "Overview & colours", exact: true }).click();
+  await expect(page.getByLabel("Your words")).toHaveCount(0);
+  await expect(page.locator(".brim-lettering")).toContainText("The lettering is knitted: HAPPY BIRTHDAY MUM");
+});
+
 test("the key explains the turn, on a hat that is turned inside out", async ({ page }) => {
   await page.goto("#/hat/sww26-birsie-beanny");
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
