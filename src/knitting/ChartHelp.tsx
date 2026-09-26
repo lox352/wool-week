@@ -69,6 +69,22 @@ const TurnSwatch: React.FC = () => (
   </svg>
 );
 
+/** The hatch as the chart draws it over the other face's rounds. */
+export const HatchSwatch: React.FC = () => (
+  <svg className="key-swatch" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <rect width="24" height="24" className="key-hatch-ground" />
+    {[-12, -6, 0, 6, 12, 18].map((at) => (
+      <line key={at} x1={at} y1={24} x2={at + 24} y2={0} className="chart-hatch-line" />
+    ))}
+  </svg>
+);
+
+/** What the hatch on the chart means. */
+export const hatchSaying =
+  "Knitted with the other face of the hat towards you, on the far side of " +
+  "a turn from where you are now. The chart shows it from the face you are " +
+  "working on, so it is mirrored, and a knit there is a purl from here.";
+
 /**
  * What the marks on this hat's chart mean, and how to work each one.
  *
@@ -119,6 +135,15 @@ export function KeyList({ entries, current, turns }: {
             <p>
               <TurnText turns={turns} />
             </p>
+          </div>
+        </li>
+      )}
+      {turns && turns.length > 0 && (
+        <li className="stitch-key-hatch">
+          <HatchSwatch />
+          <div>
+            <strong>Hatched</strong>
+            <p>{hatchSaying}</p>
           </div>
         </li>
       )}

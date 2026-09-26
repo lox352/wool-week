@@ -5,7 +5,7 @@ import { cellAt, chartSize } from "./draw-chart";
 import { progressBefore } from "./jump";
 import Button from "../components/ui/Button";
 import { KeyEntry } from "./stitch-key";
-import { Swatch } from "./ChartHelp";
+import { HatchSwatch, Swatch, hatchSaying } from "./ChartHelp";
 
 /** How wide the bubble is, so it can be kept on the chart. */
 const bubbleWidth = 208;
@@ -35,7 +35,9 @@ const StitchPicker: React.FC<{
   yarn?: { name: string; hex: string };
   /** What the pattern calls each round: "Chart F, row 1", "Crown". */
   labels?: string[];
-}> = ({ id, stitches, rounds, layout, cell, progress, onJump, onClose, entry, yarn, labels }) => {
+  /** Whether the stitch is hatched: on the far side of a turn from you. */
+  otherFace?: boolean;
+}> = ({ id, stitches, rounds, layout, cell, progress, onJump, onClose, entry, yarn, labels, otherFace }) => {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -50,7 +52,7 @@ const StitchPicker: React.FC<{
   const { x, y } = cellAt(layout, at.round, at.column, cell);
   const { width } = chartSize(layout, cell);
   const explains = entry !== undefined && entry.id !== "k1";
-  const bubble = explains ? explainingWidth : bubbleWidth;
+  const bubble = explains || otherFace ? explainingWidth : bubbleWidth;
   const left = Math.min(
     Math.max(x + cell / 2 - bubble / 2, 4),
     Math.max(width - bubble - 4, 4),
@@ -110,6 +112,14 @@ const StitchPicker: React.FC<{
               {explains && <p>{entry.how}</p>}
               {explains && entry.note && <p className="stitch-note">{entry.note}</p>}
             </div>
+          </div>
+        )}
+        {otherFace && (
+          <div className="stitch-picker-what stitch-picker-face">
+            <HatchSwatch />
+            <p>
+              <strong>Hatched.</strong> {hatchSaying}
+            </p>
           </div>
         )}
         {!onJump ? null : here ? (

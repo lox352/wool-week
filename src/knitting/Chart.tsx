@@ -503,6 +503,10 @@ const Chart: React.FC<ChartProps> = ({
               entry={keyEntryAt(stitches, picked, stitchNotes)}
               labels={labels}
               yarn={stitches[picked] && yarnFor(palette, stitches[picked].slot)}
+              otherFace={(() => {
+                const round = layout.cells.get(picked)?.round;
+                return round !== undefined && hatch.some(([from, to]) => round >= from && round <= to);
+              })()}
               id={picked}
               stitches={stitches}
               rounds={rounds}
