@@ -164,11 +164,30 @@ export function usePinchZoom(
      * where the point has got to, and move it back.
      */
     const box = sheet.getBoundingClientRect();
-    scroller.scrollLeft += box.left + done.originX * done.ratio - done.screenX;
+    const left = scroller.scrollLeft + box.left + done.originX * done.ratio - done.screenX;
     if (contained) {
-      scroller.scrollTop += box.top + done.originY * done.ratio - done.screenY;
+      const top = scroller.scrollTop + box.top + done.originY * done.ratio - done.screenY;
+      const place = () => {
+        scroller.scrollLeft = Math.min(Math.max(left, 0), scroller.scrollWidth - scroller.clientWidth);
+        scroller.scrollTop = Math.min(Math.max(top, 0), scroller.scrollHeight - scroller.clientHeight);
+      };
+      /*
+       * An iPhone scrolls a box itself, apart from the page, and while it
+       * thinks a finger is still on it - as it does for a while after a long
+       * pinch - it ignores a scroll set from here and keeps its own. Zoomed
+       * out, that is past the chart's new edge: blank, until the next touch
+       * springs it back. Stopping the box scrolling for a frame makes it let
+       * go of its own, and the scroll set here then stands.
+       */
+      scroller.style.overflow = "hidden";
+      place();
+      requestAnimationFrame(() => {
+        scroller.style.overflow = "";
+        place();
+      });
       return;
     }
+    scroller.scrollLeft = left;
     window.scrollBy({
       top: box.top + done.originY * done.ratio - done.screenY,
       behavior: "instant",
