@@ -141,14 +141,23 @@ describe("a Birsie Beanny with its own words", () => {
 
   it("reads the right way round once the brim is turned up", () => {
     // As engine.test.ts reads the printed brim: rows down from the cast-on
-    // edge, each round read back, since its first stitch is on the right.
+    // edge, and each read left to right as worn, from where its stitches
+    // are - against the way the body's rounds go round the hat.
     const own = withLettering(birsie, "Happy birthday Mum");
     const { stitches, rounds, roundLabels } = buildHat(own, "medium");
     const fit = fitLettering("Happy birthday Mum", round);
     if (!fit.ok) throw new Error("did not fit");
+    const angle = (id: number) => Math.atan2(stitches[id].position.z, stitches[id].position.x);
+    const body = rounds[roundLabels.indexOf("Chart Body, row 1")];
+    const [a, b] = [stitches[body[0]].position, stitches[body[1]].position];
+    const rightToLeft = Math.sign(a.x * b.z - a.z * b.x);
     for (let y = 0; y < glyphHeight; y++) {
-      const worn = [...rounds[roundLabels.indexOf(`Chart Brim, row ${4 + y}`)]]
-        .reverse()
+      const row = rounds[roundLabels.indexOf(`Chart Brim, row ${4 + y}`)];
+      const from = angle(row[0]);
+      const along = (id: number) =>
+        (((-rightToLeft * (angle(id) - from)) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      const worn = [...row]
+        .sort((p, q) => along(p) - along(q))
         .map((id) => stitches[id].slot.endsWith(":motif"));
       expect(worn).toEqual(fit.columns.map((col) => col[y]));
     }

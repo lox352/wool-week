@@ -402,29 +402,49 @@ describe("the counts the patterns print", () => {
 
   it("Birsie Beanny: turned up, the brim spells it the right way round", () => {
     /*
-     * The brim charts are drawn upside down and back to front, because the
+     * The brim chart is drawn upside down and back to front - through half a
+     * turn, not in a mirror: its 6 is a 9, not a backwards 6 - because the
      * pattern turns the work inside out before the body ("Turn work inside
-     * out so the wrong side of the brim is facing you") and then the brim is
-     * worn turned up. Both halves of that have to be modelled or the
-     * festival's name comes out in mirror writing: the fold gives the one
-     * turn and the turn the other, and either alone is a mirror.
+     * out so the wrong side of the brim is facing you") and the brim is worn
+     * turned up. The fold hangs the chart's first row highest; the turn sends
+     * the brim's rounds the other way round the hat from the body's, which
+     * puts its first stitch on the left. Either alone is a mirror; the two
+     * together are the half turn, and the name reads.
      *
-     * So the brim, as it is worn, is its chart through half a turn - which
-     * is to say chart row 1 hangs highest and its first stitch is on the
-     * left, where a chart's first stitch is on the right.
+     * Read here from where the stitches are, not from the order they are
+     * knitted in, which is the chart's own, right to left, turn or no turn.
      */
     const hat = hatById("sww26-birsie-beanny")!;
     const { stitches, rounds, roundLabels } = buildHat(hat);
     const chart = hat.charts.find((c) => c.id === "Brim")!;
     const motif = (slot: string) => slot.endsWith(":motif");
+    const angle = (id: number) => Math.atan2(stitches[id].position.z, stitches[id].position.x);
+    const sweep = (round: number[]) => {
+      const [a, b] = [stitches[round[0]].position, stitches[round[1]].position];
+      return Math.sign(a.x * b.z - a.z * b.x);
+    };
+    // A chart reads right to left the way the body's rounds go, seen from
+    // outside; so left to right is against them.
+    const rightToLeft = sweep(rounds[roundLabels.indexOf("Chart Body, row 1")]);
+    const leftToRight = (round: number[]) => {
+      const from = angle(round[0]);
+      const along = (id: number) =>
+        (((-rightToLeft * (angle(id) - from)) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      return [...round].sort((p, q) => along(p) - along(q));
+    };
 
-    // Rows down the brim from its cast-on edge, stitches left to right. A
-    // round is worked anticlockwise seen from above, which puts its first
-    // stitch on the right, so reading it left to right is reading it back.
-    const worn = chart.rows.map((_, index) => {
+    // Every round is knitted in the chart's own order...
+    chart.rows.forEach((row, index) => {
       const round = rounds[roundLabels.indexOf(`Chart Brim, row ${index + 1}`)];
-      return [...round].reverse().map((id) => motif(stitches[id].slot));
+      round.forEach((id, at) => expect(motif(stitches[id].slot)).toBe(row[at].slot === "motif"));
     });
+    // ...and, worn, reads left to right from its first stitch: the chart
+    // through half a turn.
+    const worn = chart.rows.map((_, index) =>
+      leftToRight(rounds[roundLabels.indexOf(`Chart Brim, row ${index + 1}`)]).map((id) =>
+        motif(stitches[id].slot),
+      ),
+    );
     expect(worn).toHaveLength(18);
     worn.forEach((row, index) =>
       row.forEach((on, at) =>
@@ -697,26 +717,30 @@ describe("where the work is turned inside out", () => {
       ],
     });
 
-    // What each round opens on: a knit the way it is written, a purl backwards.
-    const opening = (turnAt: number[]) => {
+    /*
+     * A turn never changes the order a round is worked in - every one opens
+     * on its knit, as written - only which way round the hat it goes: the
+     * sign of the turn from its first stitch to its second, seen from above.
+     */
+    const rounds = (turnAt: number[]) => {
       const { stitches, rounds } = buildHat(plain(turnAt));
-      return rounds.slice(1).map((round) => stitches[round[0]].type);
+      return rounds.slice(1).map((round) => {
+        const [a, b] = [stitches[round[0]].position, stitches[round[1]].position];
+        return { opens: stitches[round[0]].type, way: Math.sign(a.x * b.z - a.z * b.x) };
+      });
     };
+    const ways = (turnAt: number[]) => rounds(turnAt).map((round) => round.way);
 
-    const straight = opening([]);
-    const once = opening([2]);
-    const twice = opening([1, 3]);
-
-    // No turn: every round goes on the same way.
-    expect(new Set(straight).size).toBe(1);
-    // One turn: the rounds before it are the other way about, the ones after
-    // it read as an unturned hat's do.
-    expect(once.slice(2)).toEqual(straight.slice(2));
-    expect(once[0]).not.toBe(straight[0]);
+    for (const turnAt of [[], [2], [1, 3]]) {
+      expect(rounds(turnAt).every((round) => round.opens === "k1")).toBe(true);
+    }
+    const [forwards, backwards] = [ways([])[0], -ways([])[0]];
+    // No turn: every round goes the same way.
+    expect(ways([])).toEqual([forwards, forwards, forwards, forwards]);
+    // One turn: the rounds before it go the other way; the last region is the
+    // one a chart is drawn for.
+    expect(ways([2])).toEqual([backwards, backwards, forwards, forwards]);
     // Two turns: the middle region is turned, the outer two are not.
-    expect(twice[0]).toBe(straight[0]);
-    expect(twice[1]).not.toBe(straight[1]);
-    expect(twice[2]).not.toBe(straight[2]);
-    expect(twice[3]).toBe(straight[3]);
+    expect(ways([1, 3])).toEqual([forwards, backwards, backwards, forwards]);
   });
 });
