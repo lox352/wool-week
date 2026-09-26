@@ -42,6 +42,15 @@ export default class Knitter {
   /** The round being worked into, and how far along it the next stitch is. */
   private under: number[] = [];
   private cursor = 0;
+  /**
+   * Which way round the hat a round goes: 1, or -1 for a round knitted
+   * before the work was turned inside out. One per round, and the one in
+   * progress.
+   */
+  private readonly directions: number[] = [];
+  private direction = 1;
+  /** Whether the round in progress goes the other way to the one below. */
+  private turned = false;
   private expected = 0;
   private slot: string = "A";
   /**
@@ -113,7 +122,7 @@ export default class Knitter {
   }
 
   private place(index: number, count: number) {
-    const angle = (index / Math.max(count, 1)) * Math.PI * 2;
+    const angle = this.direction * (index / Math.max(count, 1)) * Math.PI * 2;
     return {
       x: this.radius * Math.cos(angle),
       y: this.height,
@@ -121,7 +130,9 @@ export default class Knitter {
     };
   }
 
-  castOn(count: number, slot: string, width = adjacentStitchDistance): this {
+  castOn(count: number, slot: string, width = adjacentStitchDistance, direction = 1): this {
+    this.direction = direction;
+    this.directions.push(direction);
     this.slot = slot;
     this.width = width;
     this.radius = Knitter.radiusFor(count, width);
@@ -169,7 +180,10 @@ export default class Knitter {
     width: number = this.width,
     rise: number = this.rise,
     borrow = 0,
+    direction = 1,
   ): this {
+    this.turned = direction !== (this.directions[this.directions.length - 1] ?? direction);
+    this.direction = direction;
     this.current = [];
     this.expected = count;
     this.slot = slot;
@@ -189,7 +203,14 @@ export default class Knitter {
     const round = this.under.length;
     for (let i = 0; i < eaten && round > 0; i++) {
       const at = this.cursor++;
-      links.push(this.under[((at % round) + round) % round]);
+      /*
+       * Across a turn the round below goes the other way round the hat, so
+       * the stitch beneath is found walking it backwards: the first stitch
+       * of the new round is worked over the last of the old, where the two
+       * rounds meet.
+       */
+      const under = this.turned ? -at - 1 : at;
+      links.push(this.under[((under % round) + round) % round]);
     }
     // KFB makes two new loops through one stitch below. The first is stored
     // as the KFB itself and the second as the immediately following increase;
@@ -223,6 +244,7 @@ export default class Knitter {
   endRound(): this {
     if (this.current.length > 0) {
       this.rounds.push(this.current);
+      this.directions.push(this.direction);
       this.current = [];
     }
     return this;

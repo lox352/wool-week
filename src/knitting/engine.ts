@@ -186,15 +186,17 @@ const runRound = (
   backwards = false,
   borrow?: number,
 ) => {
-  const order = backwards ? [...work].reverse() : work;
+  // Always in the order the chart reads: a turn changes which way round the
+  // hat the stitches go, never the order a knitter works them in.
   knitter.startRound(
     length,
     undefined,
     fabric.width,
     fabric.rise,
-    borrow ?? borrowFor(order[0]?.type),
+    borrow ?? borrowFor(work[0]?.type),
+    backwards ? -1 : 1,
   );
-  order.forEach(({ type, slot }) => knitter.knit(type, slot));
+  work.forEach(({ type, slot }) => knitter.knit(type, slot));
   knitter.endRound();
   labels.push(label);
 };
@@ -271,13 +273,14 @@ export const buildHat = (
   /** The rounds after which the work is turned inside out. */
   const turns: number[] = [];
   /*
-   * Which way about the hat the round being worked goes.
+   * Which way round the hat the round being worked goes.
    *
    * A pattern that turns its work inside out partway - see the "turn" round -
-   * knits the two halves the opposite way about, and only their relation to
-   * each other means anything. The last region is the one drawn the way a
-   * chart reads, so with an odd number of turns it is the first that goes on
-   * backwards, and with an even number none of them does.
+   * has its two halves go opposite ways round the hat, and only their
+   * relation to each other means anything. The last region is the one drawn
+   * the way a chart reads, so with an odd number of turns it is the first
+   * that goes round backwards, and with an even number none of them does.
+   * Which way round never changes the order a round is knitted in.
    */
   const turnCount = sections.reduce(
     (total, section) =>
@@ -307,6 +310,7 @@ export const buildHat = (
           round.count,
           round.slot,
           fabricOf(pattern, roundHeight, round.fabric).width,
+          backwards ? -1 : 1,
         );
         count = round.count;
         labels.push(`${section} · cast on`);

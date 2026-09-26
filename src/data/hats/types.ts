@@ -273,14 +273,16 @@ export type RoundSpec =
    * Also not a round. A brim meant to be worn turned up has to be knitted
    * with its right side facing in, so that turning it up brings it out, and
    * the pattern gets there by turning the whole work over partway. Everything
-   * before that point is therefore worked the other way about the hat from
-   * everything after it, and so goes on backwards: the brim's chart is laid
-   * over its round in the opposite direction from the body's.
+   * before that point therefore runs the other way round the hat from
+   * everything after it. Not in the order it is knitted - every chart row is
+   * still worked right to left, stitch 1 first, as the pattern says - only in
+   * which way round the hat its stitches go.
    *
-   * Which is why the brim charts are drawn upside down and back to front.
-   * Read them the usual way, turn the brim up, and the festival's name comes
-   * out the right way round - and a model that turned the brim without
-   * turning the work spells it in mirror writing.
+   * Which is why the brim charts are drawn upside down and back to front:
+   * through half a turn, not in a mirror. Read them the usual way, turn the
+   * brim up, and the festival's name comes out the right way round - and a
+   * model that turned the brim without turning the work spells it in mirror
+   * writing.
    */
   | { type: "turn" }
   | {
