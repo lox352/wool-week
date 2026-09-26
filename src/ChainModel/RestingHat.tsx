@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Stitch } from "../types/Stitch";
+import { Stitch, isFabric } from "../types/Stitch";
 import { Point } from "../types/Point";
 import { Palette, rgbOf, yarnFor } from "../knitting/palette";
 import StitchInstances from "./StitchInstances";
@@ -31,7 +31,7 @@ export default function RestingHat({
   settled,
   reducedMotion,
 }: RestingHatProps) {
-  const drawn = useMemo(() => stitches.filter((s) => s.id > 0), [stitches]);
+  const drawn = useMemo(() => stitches.filter(isFabric), [stitches]);
 
   const colours = useMemo(
     () =>

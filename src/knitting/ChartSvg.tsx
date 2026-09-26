@@ -25,6 +25,11 @@ interface ChartSvgProps {
   turns?: number[];
   /** Which way this pattern's make-ones lean, if it says. */
   makeOneLean?: "left" | "right";
+  /**
+   * Rounds, first and last, worked with the other face towards you from the
+   * one you are on: hatched over.
+   */
+  hatch?: [number, number][];
 }
 
 type Grid = ReturnType<typeof gridPaths>;
@@ -98,6 +103,7 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
   cell,
   turns,
   makeOneLean,
+  hatch = [],
 }) => {
   const { width, height } = chartSize(layout, cell);
   /*
@@ -138,6 +144,32 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
       />
       {yarnLabels && <YarnLabels stitches={stitches} layout={layout} cell={cell} labels={yarnLabels} />}
       {veil && <path d={veil} className="chart-done" />}
+      {hatch.length > 0 && (
+        <>
+          <defs>
+            <pattern
+              id="chart-hatch"
+              width={6}
+              height={6}
+              patternUnits="userSpaceOnUse"
+              patternTransform="rotate(45)"
+            >
+              <line x1={0} y1={0} x2={0} y2={6} className="chart-hatch-line" />
+            </pattern>
+          </defs>
+          {hatch.map(([from, to]) => (
+            <rect
+              key={from}
+              className="chart-hatch"
+              x={0}
+              y={cellAt(layout, to, 1, cell).y}
+              width={layout.columns * cell}
+              height={(to - from + 1) * cell}
+              fill="url(#chart-hatch)"
+            />
+          ))}
+        </>
+      )}
       {grid.turn && (
         <path d={grid.turn} className="chart-rule chart-rule-turn">
           <title>The work is turned inside out here.</title>

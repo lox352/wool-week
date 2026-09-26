@@ -62,6 +62,14 @@ export default class Knitter {
   private radius = 0;
   private height = 0;
 
+  /** The last stitch made that is fabric: a turn is skipped over. */
+  private get lastWorked(): Stitch {
+    for (let i = this.stitches.length - 1; i >= 0; i--) {
+      if (this.stitches[i].type !== "turn") return this.stitches[i];
+    }
+    return this.stitches[0];
+  }
+
   private get last(): Stitch {
     return this.stitches[this.stitches.length - 1];
   }
@@ -216,14 +224,15 @@ export default class Knitter {
     // as the KFB itself and the second as the immediately following increase;
     // give that second loop the same parent as the first rather than leaving
     // it attached only sideways to its neighbour.
+    const previous = this.lastWorked;
     if (
       type === "m1" &&
-      this.last.type === "kfb" &&
-      this.last.links.length > 1
+      previous.type === "kfb" &&
+      previous.links.length > 1
     ) {
-      links.push(this.last.links[0]);
+      links.push(previous.links[0]);
     }
-    links.push(this.last.id);
+    links.push(previous.id);
 
     const id = this.last.id + 1;
     this.stitches.push({
@@ -237,6 +246,29 @@ export default class Knitter {
       rise: this.rise,
     });
     this.current.push(id);
+    return this;
+  }
+
+  /**
+   * Turn the work inside out, between rounds: a step in the order of work,
+   * with an id of its own, that makes no fabric. So it belongs to no round,
+   * nothing is worked into it and it is worked into nothing, and the next
+   * stitch carries on from the last real one. It still needs somewhere to
+   * be, for the physics: pinned on the axis, level with the round before,
+   * where nothing of the hat can come near it.
+   */
+  turn(): this {
+    this.endRound();
+    this.stitches.push({
+      id: this.last.id + 1,
+      position: { x: 0, y: this.height, z: 0 },
+      links: [],
+      fixed: true,
+      type: "turn",
+      slot: this.slot,
+      width: this.width,
+      rise: this.rise,
+    });
     return this;
   }
 

@@ -1,6 +1,6 @@
 import { createRef, useMemo, useRef } from "react";
 import { RapierRigidBody } from "@react-three/rapier";
-import { Stitch } from "../types/Stitch";
+import { Stitch, isFabric } from "../types/Stitch";
 import { Palette, rgbOf, yarnFor } from "../knitting/palette";
 import { Tuning, ropeLength } from "./tuning";
 import { SettleMetrics } from "../helpers/settling";
@@ -54,8 +54,9 @@ export default function StitchPhysics({
     stitchRefs.current = stitches.map(() => createRef<RapierRigidBody>());
   }
 
-  // Stitch 0 is the phantom start of the helix and is never drawn.
-  const drawn = useMemo(() => stitches.filter((s) => s.id > 0), [stitches]);
+  // Stitch 0 is the phantom start of the helix, and a turn makes no stitch:
+  // neither is drawn.
+  const drawn = useMemo(() => stitches.filter(isFabric), [stitches]);
 
   const positionAt = useMemo(
     () => (id: number) =>

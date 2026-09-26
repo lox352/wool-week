@@ -1,4 +1,4 @@
-import { Stitch } from "../types/Stitch";
+import { Stitch, isFabric } from "../types/Stitch";
 import { StitchType } from "../types/StitchType";
 
 /**
@@ -117,6 +117,11 @@ export interface Position {
   /** Which round of that region this is, 1-based. */
   regionRound: number;
   nextStitchId?: number;
+  /**
+   * Whether the next thing to do is turn the work inside out, rather than
+   * work a stitch. The round is then the one just finished.
+   */
+  turnNext: boolean;
   finished: boolean;
 }
 
@@ -127,7 +132,8 @@ export const positionOf = (
 ): Position => {
   const lastId = stitches.length > 0 ? stitches[stitches.length - 1].id : 0;
   const nextStitchId = progress >= lastId ? undefined : progress + 1;
-  const reference = nextStitchId ?? progress;
+  const turnNext = nextStitchId !== undefined && stitches[nextStitchId]?.type === "turn";
+  const reference = turnNext ? progress : (nextStitchId ?? progress);
   const round = index.roundOf.get(reference) ?? index.totalRounds;
   const ids = index.rounds[round - 1] ?? [];
   const region =
@@ -138,11 +144,12 @@ export const positionOf = (
     round,
     totalRounds: index.totalRounds,
     label: index.labels[round - 1],
-    stitchInRound: Math.max(ids.indexOf(reference) + 1, 1),
+    stitchInRound: turnNext ? ids.length : Math.max(ids.indexOf(reference) + 1, 1),
     stitchesInRound: ids.length,
     region: region?.turns ?? 0,
     regionRound: region ? round - region.from + 1 : round,
     nextStitchId,
+    turnNext,
     finished: nextStitchId === undefined,
   };
 };
@@ -178,6 +185,8 @@ const words: Record<
   sk2p: { said: "sk2p", perStitch: false },
   // Never worked: the seam that closes the cast-on round. See below.
   join: { said: "knit", perStitch: true },
+  // A step, not a stitch: never part of a run. See currentRun.
+  turn: { said: "turn the work inside out", perStitch: false },
 };
 
 /** "knit", "purl", "knit tbl", "k2tog". */
@@ -230,7 +239,8 @@ export const currentRun = (
    */
   const startId = progress + 1;
   const first = stitches[startId];
-  if (!first) return undefined;
+  // A turn is worked on its own, not as part of a run: see positionOf.
+  if (!first || first.type === "turn") return undefined;
 
   const round = index.roundOf.get(startId);
   const type = typeOf(first);
@@ -285,9 +295,12 @@ export const upcomingRuns = (
   return runs;
 };
 
-/** Stitch ids that are worked, so the phantom and the seam are excluded. */
+/**
+ * Stitch ids that are worked, so the phantom, the seam and any turn - a step,
+ * but no stitch - are excluded.
+ */
 export const workable = (stitches: Stitch[]): Stitch[] =>
-  stitches.filter((stitch) => stitch.id !== 0 && stitch.type !== "join");
+  stitches.filter((stitch) => isFabric(stitch) && stitch.type !== "join");
 
 export const totals = (
   index: RoundIndex,

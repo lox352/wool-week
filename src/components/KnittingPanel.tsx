@@ -92,26 +92,25 @@ const Swatch: React.FC<{ run: Run; palette: Palette; small?: boolean }> = ({
 /**
  * The point where the work is turned inside out.
  *
- * Not a stitch, and so not something the stitch counter can carry: it is the
- * boundary between two regions of the hat worked on opposite faces, and it
- * applies to everything after it rather than to one stitch. So it is said at
- * the head of the round that opens the new region and left up for the whole
- * of that round - large for the first stitch, a reminder after that - which
- * is long enough that neither "End of round" nor a run can carry you past it
- * without having seen it.
+ * A step of its own, between the last stitch of one round and the first of
+ * the next: nothing is knitted, but it has to be done, and done in its place,
+ * so it is worked like a stitch - one tap, and Undo takes it back. Working it
+ * turns the chart over too: from here the other face of the hat is towards
+ * you, and the chart shows it that way.
  */
-const Turn: React.FC<{ opening: boolean }> = ({ opening }) => (
-  <div className={`knitting-turn${opening ? " knitting-turn-open" : ""}`}>
+const TurnStep: React.FC<{ onTurned: () => void }> = ({ onTurned }) => (
+  <div className="knitting-turn knitting-turn-open">
     <strong>
       <span aria-hidden="true">⟲</span> Turn your work inside out
     </strong>
-    {opening && (
-      <span className="quiet">
-        From here the other face of the hat is towards you, which is how the
-        brim's right side ends up outside once it is turned up. The crimson
-        rule on the chart marks it.
-      </span>
-    )}
+    <span className="quiet">
+      So the wrong side of the brim faces you, then carry on round. The other
+      face of the hat is towards you from here, and the chart turns over to
+      match: what you have knitted so far is shown hatched.
+    </span>
+    <Button variant="primary" size="lg" className="knitting-go" onClick={onTurned}>
+      Turned: carry on
+    </Button>
   </div>
 );
 
@@ -249,6 +248,34 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [step, finishRun, finishRound, onUndo]);
 
+  if (position.turnNext) {
+    return (
+      <div className="knitting-panel">
+        <div className="knitting-bar" aria-hidden="true">
+          <span style={{ width: `${counts.percent}%` }} />
+        </div>
+        <button
+          type="button"
+          className="knitting-close"
+          onClick={onStop}
+          aria-label="Stop knitting"
+          title="Stop knitting"
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+        <p className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+          Round {position.round} done. Turn your work inside out.
+        </p>
+        <TurnStep onTurned={() => setProgress(progress + 1)} />
+        <div className="knitting-actions">
+          <UndoButton onUndo={onUndo} canUndo={canUndo} />
+        </div>
+      </div>
+    );
+  }
+
   if (position.finished) {
     return (
       <div className="knitting-panel knitting-panel-done">
@@ -328,9 +355,6 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
         )}
       </div>
 
-      {position.region > 0 && position.regionRound === 1 && (
-        <Turn opening={position.stitchInRound === 1} />
-      )}
 
       {inRound.length > 0 && <StitchHint entries={inRound} current={current} />}
 

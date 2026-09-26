@@ -183,6 +183,33 @@ test("the Birsie Beanny's brim takes your own words, until they are knitted", as
   await expect(page.locator(".brim-lettering")).toContainText("The lettering is knitted: HAPPY BIRTHDAY MUM");
 });
 
+test("turning the work is a step of its own, and turns the chart over with it", async ({ page }) => {
+  await page.goto("#/hat/sww26-birsie-beanny");
+  await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
+  // Where the first stitch sits across the chart: at the right, as printed,
+  // while the brim is worked.
+  const firstStitchAtRight = () => page.locator(".chart-next").evaluate((mark) => {
+    const svg = mark.ownerSVGElement.getBoundingClientRect(), box = mark.getBoundingClientRect();
+    return box.left - svg.left > svg.width / 2;
+  });
+  await expect.poll(firstStitchAtRight).toBe(true);
+  await expect(page.locator(".chart-hatch").first()).toBeAttached();
+
+  for (let i = 0; i < 51; i++) await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await expect(page.locator(".knitting-panel")).toContainText("Turn your work inside out");
+  await expect(page.getByRole("button", { name: "End of round", exact: true })).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Turned: carry on" }).click();
+  await expect(position(page)).toContainText("Round 52, stitch 1.");
+  // Turned over: the body reads as its chart does, stitch 1 at the right,
+  // and the brim below, seen from its other face now, is what is hatched.
+  await expect.poll(firstStitchAtRight).toBe(true);
+
+  // Undo takes the turn back, and the chart with it.
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect(page.locator(".knitting-panel")).toContainText("Turn your work inside out");
+});
+
 test("the key explains the turn, on a hat that is turned inside out", async ({ page }) => {
   await page.goto("#/hat/sww26-birsie-beanny");
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Stitch } from "../types/Stitch";
+import { Stitch, isFabric } from "../types/Stitch";
 import { Point } from "../types/Point";
 import { createStitchGeometry } from "./stitch-geometry";
 
@@ -103,7 +103,7 @@ const StitchInstances: React.FC<StitchInstancesProps> = ({
   useEffect(() => () => geometry.dispose(), [geometry]);
 
   const drawn = useMemo(
-    () => stitches.filter((stitch) => stitch.id !== 0),
+    () => stitches.filter(isFabric),
     [stitches],
   );
 

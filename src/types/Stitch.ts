@@ -27,3 +27,10 @@ export interface Stitch {
   width?: number;
   rise?: number;
 }
+
+/**
+ * Whether a stitch is fabric: something drawn, on the chart or the hat. The
+ * phantom stitch 0 that starts the helix is not, and nor is a turn, which is
+ * a step in the knitting but makes no stitch.
+ */
+export const isFabric = (stitch: Stitch): boolean => stitch.id !== 0 && stitch.type !== "turn";
