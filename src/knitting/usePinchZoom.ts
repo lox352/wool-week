@@ -62,7 +62,12 @@ export function usePinchZoom(
         screenY: clientY,
       };
       sheet.style.transformOrigin = `${gesture.current.originX}px ${gesture.current.originY}px`;
-      sheet.style.willChange = "transform";
+      /*
+       * No will-change: it has the browser keep the whole chart as one layer
+       * for the transform, and a big hat's chart is more than a phone will
+       * hold. Held mid-pinch, Safari redraws that layer at the new scale,
+       * runs out, and leaves it blank after the fingers lift.
+       */
     };
 
     const scaleTo = (cellWanted: number) => {
@@ -79,7 +84,6 @@ export function usePinchZoom(
       const next = Math.round(g.cell);
       if (next === g.startCell) {
         sheet.style.transform = "";
-        sheet.style.willChange = "";
         return;
       }
       settle.current = {
@@ -152,7 +156,6 @@ export function usePinchZoom(
     settle.current = undefined;
     if (!sheet) return;
     sheet.style.transform = "";
-    sheet.style.willChange = "";
     if (!done || !scroller) return;
     /*
      * Measured rather than worked out: a browser may already have moved the

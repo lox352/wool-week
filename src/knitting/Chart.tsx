@@ -448,6 +448,9 @@ const Chart: React.FC<ChartProps> = ({
         >
           {drawWith === "svg" ? (
             <ChartSvg
+              // Drawn afresh at each size rather than redrawn in place, so a
+              // zoom never leaves the browser anything stale to repaint.
+              key={cellSize}
               stitches={drawn}
               rounds={rounds}
               layout={layout}
