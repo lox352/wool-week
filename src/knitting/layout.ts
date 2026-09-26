@@ -223,32 +223,63 @@ const columnsOf = (ids: number[], column: Map<number, number>): number[] =>
  * and made the crown's decreases slide sideways rather than closing in evenly,
  * because the gap a decrease leaves always opened on the same side of it.
  */
-export const layOut = (stitches: Stitch[], rounds: number[][]): ChartLayout => {
+export const layOut = (
+  stitches: Stitch[],
+  rounds: number[][],
+  /**
+   * Rounds after which the work is turned inside out. Each stretch between
+   * them is laid out on its own: see below.
+   */
+  turns: number[] = [],
+): ChartLayout => {
   const byId = new Map(stitches.map((stitch) => [stitch.id, stitch]));
   const widest = rounds.reduce((most, round) => Math.max(most, round.length), 0);
-  const anchor = rounds.findIndex((round) => round.length === widest);
   const column = new Map<number, number>();
 
-  if (anchor >= 0) {
-    rounds[anchor].forEach((id, index) => column.set(id, index + 1));
-  }
+  /*
+   * A turn sends the work the other way round the hat, so a stitch above the
+   * turn stands over the mirror image of where it would on a chart read
+   * straight through. A chart can have every row read right to left, as a
+   * knitter works them, or columns that line up across a turn - not both. So
+   * each stretch between turns is laid out by itself, right to left as it is
+   * knitted, from its own widest round, and centred on the chart: the brim
+   * of a hat that turns reads exactly as its pattern prints it, and the turn
+   * rule marks where the columns stop lining up.
+   */
+  const bounds = [
+    0,
+    ...[...new Set(turns)].filter((turn) => turn > 0 && turn < rounds.length).sort((a, b) => a - b),
+    rounds.length,
+  ];
+  for (let region = 0; region < bounds.length - 1; region++) {
+    const [from, to] = [bounds[region], bounds[region + 1]];
+    const local = new Map<number, number>();
+    const span = rounds
+      .slice(from, to)
+      .reduce((most, round) => Math.max(most, round.length), 0);
+    const anchor = from + rounds.slice(from, to).findIndex((round) => round.length === span);
+    rounds[anchor]?.forEach((id, index) => local.set(id, index + 1));
 
-  // Upwards from the anchor: over what it was worked into.
-  for (let index = anchor + 1; index < rounds.length; index++) {
-    for (const family of familiesOf(rounds[index], byId)) {
-      const below = columnsOf(family.below, column);
-      const lean = leanOf(family, byId);
-      if (below.length > 0) place(family.above, pick(below, widest, lean), lean, column);
+    // Upwards from the anchor: over what it was worked into.
+    for (let index = anchor + 1; index < to; index++) {
+      for (const family of familiesOf(rounds[index], byId)) {
+        const below = columnsOf(family.below, local);
+        const lean = leanOf(family, byId);
+        if (below.length > 0) place(family.above, pick(below, span, lean), lean, local);
+      }
     }
-  }
 
-  // And downwards: under whatever was worked into it.
-  for (let index = anchor - 1; index >= 0; index--) {
-    for (const family of familiesOf(rounds[index + 1], byId, true)) {
-      const above = columnsOf(family.above, column);
-      const lean = leanOf(family, byId);
-      if (above.length > 0) place(family.below, pick(above, widest, lean), lean, column);
+    // And downwards: under whatever was worked into it.
+    for (let index = anchor - 1; index >= from; index--) {
+      for (const family of familiesOf(rounds[index + 1], byId, true)) {
+        const above = columnsOf(family.above, local);
+        const lean = leanOf(family, byId);
+        if (above.length > 0) place(family.below, pick(above, span, lean), lean, local);
+      }
     }
+
+    const offset = Math.floor((widest - span) / 2);
+    local.forEach((at, id) => column.set(id, at + offset));
   }
 
   const cells = new Map<number, Cell>();

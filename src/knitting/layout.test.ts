@@ -6,8 +6,8 @@ import { consumption } from "../types/StitchType";
 
 const laid = (id: string) => {
   const hat = hatById(id)!;
-  const { stitches, rounds } = buildHat(hat);
-  const layout = layOut(stitches, rounds);
+  const { stitches, rounds, turns } = buildHat(hat);
+  const layout = layOut(stitches, rounds, turns);
   return { stitches, rounds, cells: layout.cells, columns: layout.columns };
 };
 
@@ -234,5 +234,38 @@ describe("the chart hangs every stitch over what it was worked into", () => {
         }
       }
     }
+  });
+});
+
+describe("a hat turned inside out partway", () => {
+  it("draws each side of the turn by itself, both read right to left", () => {
+    /*
+     * The Birsie Beanny's brim is knitted before the work is turned, and so
+     * goes the other way round the hat from the body above it. On one chart
+     * its rows can read right to left as they are knitted, or line up with
+     * the body's - not both - and a knitter needs the first. So below the
+     * turn the chart is the pattern's own brim chart: each row right to left
+     * in the order it is worked, one stitch to a column, never two stitches
+     * in one.
+     */
+    const hat = hatById("sww26-birsie-beanny")!;
+    const { stitches, rounds, roundLabels, turns } = buildHat(hat);
+    const { cells } = layOut(stitches, rounds, turns);
+    const columns = (round: number[]) => round.map((id) => cells.get(id)!.column);
+
+    rounds.forEach((round, index) =>
+      expect(new Set(columns(round)).size, roundLabels[index]).toBe(round.length),
+    );
+    const brim = hat.charts.find((chart) => chart.id === "Brim")!;
+    brim.rows.forEach((_, row) => {
+      const across = columns(rounds[roundLabels.indexOf(`Chart Brim, row ${row + 1}`)]);
+      across.slice(1).forEach((at, i) => expect(at - across[i]).toBe(1));
+    });
+
+    // Above the turn, the body is laid out just as it would be with no turn.
+    const straight = layOut(stitches, rounds).cells;
+    rounds.slice(turns[0]).flat().forEach((id) =>
+      expect(cells.get(id)!.column).toBe(straight.get(id)!.column),
+    );
   });
 });
