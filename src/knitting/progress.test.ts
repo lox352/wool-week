@@ -76,10 +76,11 @@ describe("what to work next", () => {
     // Then the join: a step of its own, between the cast-on and round 2.
     const last = castOn[castOn.length - 1];
     expect(stitches[last + 1].type).toBe("join");
-    expect(positionOf(stitches, last, index)).toMatchObject({ round: 1, joinNext: "join" });
+    expect(positionOf(stitches, last, index)).toMatchObject({ round: 1, joinNext: "castOn", joined: false });
     expect(currentRun(stitches, last, index)).toBeUndefined();
     expect(positionOf(stitches, last + 1, index)).toMatchObject({ round: 2, stitchInRound: 1 });
     expect(positionOf(stitches, last + 1, index).joinNext).toBeUndefined();
+    expect(positionOf(stitches, last + 1, index).joined).toBe(true);
   });
 
   it("counts the one-for-one stitches, and repeats the rest", () => {

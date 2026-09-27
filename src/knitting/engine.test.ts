@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildHat, rowConsumes } from "./engine";
+import { joinsCastOn } from "../types/Stitch";
 import { hats, hatById } from "../data/hats";
 import { HatPattern, RoundSpec, consumes } from "../data/hats/types";
 import { paletteOf } from "./palette";
@@ -825,7 +826,8 @@ describe("casting on and joining in the round", () => {
     // Straight after the last stitch cast on, which closes the round in place
     // of the phantom: the one stitch more that a join takes up.
     expect(join[0].id).toBe(castOn[castOn.length - 1] + 1);
-    expect(stitches[castOn[castOn.length - 1]].links).toContain(0);
+    expect(stitches[castOn[castOn.length - 1]].links).toEqual([0, castOn.length - 1]);
+    expect(joinsCastOn(stitches, join[0].id)).toBe(true);
     expect(rounds[1][0]).toBe(join[0].id + 1);
   });
 
@@ -836,9 +838,9 @@ describe("casting on and joining in the round", () => {
     expect(stitches[rounds[0].at(-1)! + 1].type).toBe("turn");
     // ... whose first stitch is worked into the last stitch cast on.
     expect(stitches[rounds[1][0]].links[0]).toBe(rounds[0].at(-1));
-    // Then joined across, after row 1: no lifted join, and nothing lost.
-    expect(stitches.some((stitch) => stitch.type === "join")).toBe(false);
-    const join = stitches.find((stitch) => stitch.type === "joinAcross")!;
+    // Then joined across, after row 1, and nothing lost.
+    const join = stitches.find((stitch) => stitch.type === "join")!;
+    expect(joinsCastOn(stitches, join.id)).toBe(false);
     const before = rounds.findIndex((ids) => ids.includes(join.id - 1));
     expect(roundLabels[before]).toBe("Chart A, row 1");
     expect(rounds[before + 1][0]).toBe(join.id + 1);

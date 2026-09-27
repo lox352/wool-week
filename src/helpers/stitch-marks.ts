@@ -119,41 +119,6 @@ marks.castOn = {
   ],
 };
 
-/*
- * Joining the round by lifting a stitch over: a ring, the cast-on closed into
- * one. Drawn on the stitch the join comes after, being a step with no cell of
- * its own, and open rather than filled, so it reads apart from a purl's dot
- * and can sit round one.
- */
-marks.join = {
-  strokes: [
-    Array.from({ length: 17 }, (_, i): [number, number] => {
-      const angle = (i / 16) * Math.PI * 2;
-      return [mid + 0.27 * Math.cos(angle), mid + 0.27 * Math.sin(angle)];
-    }),
-  ],
-};
-
-/*
- * Joining the round by working across the gap: an arrow carrying on round,
- * three quarters of a ring with its head, so it reads as the ring's cousin
- * and not as the same join.
- */
-marks.joinAcross = {
-  strokes: [
-    Array.from({ length: 13 }, (_, i): [number, number] => {
-      const angle = Math.PI * (0.75 + (i / 12) * 1.5);
-      return [mid + 0.27 * Math.cos(angle), mid + 0.27 * Math.sin(angle)];
-    }),
-    // The head, at the end of the arc, its barbs swept back along it.
-    [
-      [mid + 0.27 * Math.SQRT1_2 + 0.13, mid + 0.27 * Math.SQRT1_2 - 0.02],
-      [mid + 0.27 * Math.SQRT1_2, mid + 0.27 * Math.SQRT1_2],
-      [mid + 0.27 * Math.SQRT1_2 + 0.02, mid + 0.27 * Math.SQRT1_2 - 0.13],
-    ],
-  ],
-};
-
 export const markFor = (type: StitchType): Mark | undefined => marks[type];
 
 /**

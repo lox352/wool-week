@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Stitch, isFabric, isJoin } from "../types/Stitch";
+import { Stitch, isFabric } from "../types/Stitch";
 import { layOut, mirrorLayout } from "./layout";
 import { Palette, yarnFor } from "./palette";
-import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
+import { cellAt, chartSize, drawChart, drawProgress, leftMargin } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
 import { StitchLegend, TextRound } from "./ChartHelp";
-import { needleChangesIn, turnsInside } from "./chart-marks";
+import { joinIn, needleChangesIn, turnsInside } from "./chart-marks";
 import StitchPicker from "./StitchPicker";
 import { keyEntryAt } from "./stitch-key";
 import { stitchAtPoint } from "./jump";
@@ -176,6 +176,7 @@ const Chart: React.FC<ChartProps> = ({
   const marked = useMemo(() => turnsInside(turns, layout.rounds), [turns, layout.rounds]);
   const needles = useMemo(() => needleChangesIn(stitches, rounds), [stitches, rounds]);
   const needleRounds = useMemo(() => needles.map((change) => change.after), [needles]);
+  const join = useMemo(() => joinIn(stitches, rounds), [stitches, rounds]);
   /*
    * The rounds worked with the other face towards you from the one you are
    * on now, hatched: a knit there is a purl from here, and the chart shows
@@ -199,10 +200,8 @@ const Chart: React.FC<ChartProps> = ({
     return Math.max(1, Math.min(wanted, 2, maxCanvasSide / longest));
   }, [width, height]);
 
-  // The join in the round comes along, though it has no cell to draw: the
-  // stitch before it carries its ring. See markAt.
   const drawn = useMemo(
-    () => stitches.filter((stitch) => isFabric(stitch) || isJoin(stitch)),
+    () => stitches.filter(isFabric),
     [stitches],
   );
 
@@ -449,7 +448,7 @@ const Chart: React.FC<ChartProps> = ({
         <div
           ref={sheetRef}
           className="chart-sheets chart-pickable"
-          style={{ width, height }}
+          style={{ width, height, marginLeft: leftMargin(cellSize) }}
           onClick={
             ((event) => {
               const box = event.currentTarget.getBoundingClientRect();
@@ -495,6 +494,7 @@ const Chart: React.FC<ChartProps> = ({
               cell={cellSize}
               turns={marked}
               needleChanges={needleRounds}
+              join={join}
               hatch={hatch}
               makeOneLean={makeOneLean}
             />
@@ -525,7 +525,7 @@ const Chart: React.FC<ChartProps> = ({
           )}
         </div>
       </div>
-      <StitchLegend stitches={stitches} notes={stitchNotes} turns={marked} needles={needles} />
+      <StitchLegend stitches={stitches} notes={stitchNotes} turns={marked} needles={needles} join={join} />
       {writtenRounds && <details className="chart-help" onToggle={e => setShowText(e.currentTarget.open)}>
         <summary>Text round instructions</summary>
         <label>Read round <select value={follow && focusRound ? focusRound : textRound} disabled={follow && !!focusRound} onChange={e => setTextRound(Number(e.target.value))}>

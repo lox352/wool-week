@@ -40,13 +40,17 @@ export interface Stitch {
  * but makes no stitch.
  */
 export const isStep = (stitch: Stitch): boolean =>
-  stitch.type === "turn" ||
-  stitch.type === "needles" ||
-  stitch.type === "join" ||
-  stitch.type === "joinAcross";
+  stitch.type === "turn" || stitch.type === "needles" || stitch.type === "join";
 
-/** Whether a stitch joins the knitting into a round, by either way of doing it. */
-export const isJoin = (stitch: Stitch | undefined): boolean =>
-  stitch?.type === "join" || stitch?.type === "joinAcross";
+/**
+ * Whether the join in the round at `id` comes straight after the cast-on,
+ * and so is made by casting on one more and lifting one over, rather than by
+ * working across the gap after a row worked flat.
+ */
+export const joinsCastOn = (stitches: Stitch[], id: number): boolean => {
+  let at = id - 1;
+  while (at > 0 && isStep(stitches[at])) at--;
+  return stitches[at]?.type === "castOn";
+};
 
 export const isFabric = (stitch: Stitch): boolean => stitch.id !== 0 && !isStep(stitch);

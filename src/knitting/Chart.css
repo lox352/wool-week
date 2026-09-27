@@ -145,6 +145,17 @@
 
 .chart-svg {
   display: block;
+  /* The join's arrows reach just past the chart's edges. */
+  overflow: visible;
+}
+
+.chart-join {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  shape-rendering: geometricPrecision;
 }
 
 .chart-rule {
@@ -296,6 +307,14 @@
   stroke: var(--ink);
   stroke-width: 1.5;
   opacity: 0.2;
+}
+
+.key-join {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 0.08;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .key-needles {

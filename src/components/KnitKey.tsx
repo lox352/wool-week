@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import type { NeedleChange } from "../knitting/chart-marks";
+import type { Join, NeedleChange } from "../knitting/chart-marks";
 import { Stitch } from "../types/Stitch";
 import { Palette } from "../knitting/palette";
 import { stitchKey } from "../knitting/stitch-key";
@@ -16,7 +16,8 @@ const FullKey: React.FC<{
   current?: string;
   turns?: number[];
   needles?: NeedleChange[];
-}> = ({ stitches, palette, notes, current, turns, needles }) => {
+  join?: Join;
+}> = ({ stitches, palette, notes, current, turns, needles, join }) => {
   // The stitch in hand first, where it is seen without scrolling.
   const entries = useMemo(() => {
     const all = stitchKey(stitches, notes);
@@ -34,7 +35,7 @@ const FullKey: React.FC<{
           </li>
         ))}
       </ul>
-      <KeyList entries={entries} current={current} turns={turns} needles={needles} />
+      <KeyList entries={entries} current={current} turns={turns} needles={needles} join={join} />
     </div>
   );
 };
@@ -54,8 +55,9 @@ export const KeySheet: React.FC<{
   /** Rounds after which the work is turned inside out. */
   turns?: number[];
   needles?: NeedleChange[];
+  join?: Join;
   onClose: () => void;
-}> = ({ stitches, palette, notes, current, turns, needles, onClose }) => {
+}> = ({ stitches, palette, notes, current, turns, needles, join, onClose }) => {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -72,7 +74,7 @@ export const KeySheet: React.FC<{
         </button>
       </div>
       <div className="key-sheet-body">
-        <FullKey stitches={stitches} palette={palette} notes={notes} current={current} turns={turns} needles={needles} />
+        <FullKey stitches={stitches} palette={palette} notes={notes} current={current} turns={turns} needles={needles} join={join} />
       </div>
     </div>
   );

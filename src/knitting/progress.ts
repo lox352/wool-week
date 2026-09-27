@@ -1,4 +1,4 @@
-import { Stitch, isFabric, isStep } from "../types/Stitch";
+import { Stitch, isFabric, isStep, joinsCastOn } from "../types/Stitch";
 import { StitchType } from "../types/StitchType";
 
 /**
@@ -129,9 +129,15 @@ export interface Position {
   needlesNext?: number;
   /**
    * Whether the next thing to do is join the knitting into a round, and
-   * which way: by lifting a stitch over, or by working across the gap.
+   * which way: straight after the cast-on, by casting on one more and
+   * lifting one over; after a row worked flat, by working across the gap.
    */
-  joinNext?: "join" | "joinAcross";
+  joinNext?: "castOn" | "across";
+  /**
+   * Whether the knitting is joined in the round yet. A turn before it turns
+   * a flat row over; a turn after it turns a tube inside out.
+   */
+  joined: boolean;
   finished: boolean;
 }
 
@@ -145,7 +151,11 @@ export const positionOf = (
   const next = nextStitchId === undefined ? undefined : stitches[nextStitchId];
   const turnNext = next?.type === "turn";
   const needlesNext = next?.type === "needles" ? next.needles : undefined;
-  const joinNext = next?.type === "join" || next?.type === "joinAcross" ? next.type : undefined;
+  const joinNext =
+    next?.type === "join" ? (joinsCastOn(stitches, next.id) ? "castOn" : "across") : undefined;
+  // The join comes early, so looking for it stops early.
+  const join = stitches.findIndex((stitch) => stitch.type === "join");
+  const joined = join >= 0 && join <= progress;
   const stepNext = next !== undefined && isStep(next);
   // At a step, the round is the last one worked into: back past any steps.
   let reference = stepNext ? progress : (nextStitchId ?? progress);
@@ -168,6 +178,7 @@ export const positionOf = (
     turnNext,
     needlesNext,
     joinNext,
+    joined,
     finished: nextStitchId === undefined,
   };
 };
@@ -204,7 +215,6 @@ const words: Record<
   sk2p: { said: "sk2p", perStitch: false },
   // Steps, not stitches: never part of a run. See currentRun.
   join: { said: "join in the round", perStitch: false },
-  joinAcross: { said: "join in the round", perStitch: false },
   // A step, not a stitch: never part of a run. See currentRun.
   turn: { said: "turn the work", perStitch: false },
   needles: { said: "change needles", perStitch: false },
