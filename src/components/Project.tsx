@@ -6,7 +6,7 @@ import { useHat } from "../knitting/useHat";
 import { paletteOf, yarnFor } from "../knitting/palette";
 import { totals, positionOf, currentRun } from "../knitting/progress";
 import { keyEntryAt } from "../knitting/stitch-key";
-import { turnsInside } from "../knitting/chart-marks";
+import { needleChangesIn, turnsInside } from "../knitting/chart-marks";
 import {
   Project as SavedProject,
   chartPath,
@@ -378,6 +378,7 @@ const ProjectView: React.FC<{
             notes={hat.stitchNotes}
             current={currentStitch}
             turns={turnsInside(turns, rounds.length)}
+            needles={needleChangesIn(stitches, rounds)}
             onClose={closeKey}
           />
         )}

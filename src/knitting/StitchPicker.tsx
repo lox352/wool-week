@@ -52,6 +52,7 @@ const StitchPicker: React.FC<{
   const { x, y } = cellAt(layout, at.round, at.column, cell);
   const { width } = chartSize(layout, cell);
   const explains = entry !== undefined && entry.id !== "k1";
+  const needles = stitches[id]?.needles;
   const bubble = explains || otherFace ? explainingWidth : bubbleWidth;
   const left = Math.min(
     Math.max(x + cell / 2 - bubble / 2, 4),
@@ -108,6 +109,9 @@ const StitchPicker: React.FC<{
                 <span className="stitch-picker-yarn">
                   <span className="swatch" style={{ background: yarn.hex }} /> {yarn.name}
                 </span>
+              )}
+              {needles !== undefined && (
+                <span className="stitch-picker-needles">On {needles}mm needles</span>
               )}
               {explains && <p>{entry.how}</p>}
               {explains && entry.note && <p className="stitch-note">{entry.note}</p>}

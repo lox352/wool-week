@@ -285,6 +285,12 @@ export type RoundSpec =
    * writing.
    */
   | { type: "turn" }
+  /**
+   * "Change to larger needles." Not a round either: from here the knitting
+   * is on the size's main needles, having started on its rib needles, where
+   * it has any. See Size.needlesMm, and buildHat for how it is placed.
+   */
+  | { type: "needles"; to: "rib" | "main" }
   | {
       type: "chart";
       chart: string;
@@ -344,6 +350,14 @@ export interface HatPattern {
    * another.
    */
   tensions?: Record<string, { stitch?: number; round?: number }>;
+  /**
+   * Where the pattern chooses needles by the round rather than the section:
+   * 2026's "work every single-colour round using smaller needles, and all
+   * two-colour rounds using colourwork needles". Each round is then on the
+   * size's rib needles if it is knitted in one yarn and its main needles if
+   * in two, and any "needles" rounds are ignored.
+   */
+  needlesByColours?: boolean;
   /** Anything the pattern says about its stitches. See StitchNote. */
   stitchNotes?: Partial<Record<StitchKeyId, StitchNote>>;
   /**

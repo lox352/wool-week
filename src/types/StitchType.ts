@@ -11,6 +11,10 @@
  * things are done, so that a knitter works it, and can undo it, like any
  * other step. It belongs to no round.
  *
+ * "needles" is a step of the same kind: changing to needles of another size,
+ * as a pattern says to between its rib and its body. Nothing to nothing
+ * again, and in no round; the stitch carries the size changed to.
+ *
  * s2kp and sk2p both take three stitches down to one and are not the same
  * stitch. A centred double decrease slips two together, knits one and passes
  * the two over, so the middle stitch finishes on top and the decrease stands
@@ -29,7 +33,8 @@ export type StitchType =
   | "s2kp"
   | "sk2p"
   | "join"
-  | "turn";
+  | "turn"
+  | "needles";
 
 /** How many stitches of the round below this one consumes. */
 export const consumption: Record<StitchType, number> = {
@@ -44,4 +49,5 @@ export const consumption: Record<StitchType, number> = {
   sk2p: 3,
   join: 0,
   turn: 0,
+  needles: 0,
 };

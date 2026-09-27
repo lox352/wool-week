@@ -158,6 +158,8 @@ const sww16: HatPattern = {
       rounds: [
         { type: "castOn", count: 120, slot: "A" },
         { type: "chart", chart: "A", rows: [1, 8], repeats: 10 },
+        // "On row 9 change to 3.5mm and increase up to 168 stitches."
+        { type: "needles", to: "main" },
         {
           type: "shaping",
           slot: "A",

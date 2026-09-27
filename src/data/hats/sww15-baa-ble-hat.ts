@@ -153,7 +153,11 @@ const sww15: HatPattern = {
       // One chart for everything above the rib, worked twice a round: sixty
       // stitches to five over forty-five rows, with the first decrease on
       // row 26 and ten stitches left at the top.
-      rounds: [{ type: "chart", chart: "A", rows: [1, 45], repeats: 2 }],
+      rounds: [
+        // "Change to 4.5 mm needles."
+        { type: "needles", to: "main" },
+        { type: "chart", chart: "A", rows: [1, 45], repeats: 2 },
+      ],
     },
   ],
 };

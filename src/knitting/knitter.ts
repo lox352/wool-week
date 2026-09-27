@@ -1,4 +1,4 @@
-import { Stitch } from "../types/Stitch";
+import { Stitch, isStep } from "../types/Stitch";
 import { StitchType, consumption } from "../types/StitchType";
 import { adjacentStitchDistance, verticalStitchDistance } from "../constants";
 
@@ -62,10 +62,10 @@ export default class Knitter {
   private radius = 0;
   private height = 0;
 
-  /** The last stitch made that is fabric: a turn is skipped over. */
+  /** The last stitch made that is fabric: a step is skipped over. */
   private get lastWorked(): Stitch {
     for (let i = this.stitches.length - 1; i >= 0; i--) {
-      if (this.stitches[i].type !== "turn") return this.stitches[i];
+      if (!isStep(this.stitches[i])) return this.stitches[i];
     }
     return this.stitches[0];
   }
@@ -258,13 +258,27 @@ export default class Knitter {
    * where nothing of the hat can come near it.
    */
   turn(): this {
+    return this.step("turn");
+  }
+
+  /**
+   * Change to needles of another size, between one round and the next. A
+   * step like a turn, and placed like one; it carries the size.
+   */
+  changeNeedles(millimetres: number): this {
+    this.step("needles");
+    this.last.needles = millimetres;
+    return this;
+  }
+
+  private step(type: "turn" | "needles"): this {
     this.endRound();
     this.stitches.push({
       id: this.last.id + 1,
       position: { x: 0, y: this.height, z: 0 },
       links: [],
       fixed: true,
-      type: "turn",
+      type,
       slot: this.slot,
       width: this.width,
       rise: this.rise,

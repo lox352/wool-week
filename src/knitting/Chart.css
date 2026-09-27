@@ -167,6 +167,22 @@
   stroke-width: 2.5;
 }
 
+/*
+ * Where the needles are changed: a dashed rule in ink, beside the turn's, on
+ * a pale line of its own so that it shows on dark wool as well as light.
+ */
+.chart-rule-needles-ground {
+  stroke: #fff;
+  stroke-width: 4;
+}
+
+.chart-rule-needles {
+  stroke: #1d1a17;
+  stroke-width: 2;
+  stroke-dasharray: 5 3;
+  shape-rendering: geometricPrecision;
+}
+
 .chart-mark {
   fill: none;
   stroke-width: 1.2;
@@ -248,7 +264,8 @@
   line-height: 1.35;
 }
 
-.stitch-picker-yarn {
+.stitch-picker-yarn,
+.stitch-picker-needles {
   display: block;
   color: var(--ink-soft);
   font-size: 0.84rem;
@@ -279,6 +296,12 @@
   stroke: var(--ink);
   stroke-width: 1.5;
   opacity: 0.2;
+}
+
+.key-needles {
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
 }
 
 .key-hatch-ground {

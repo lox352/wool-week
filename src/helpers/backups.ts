@@ -1,7 +1,7 @@
 import { hatById } from "../data/hats";
 import { buildHat } from "../knitting/engine";
 import { fitLettering } from "../knitting/lettering/fit";
-import { currentVersion, listProjects, type Project, writeProject } from "./projects";
+import { currentVersion, listProjects, progressFromVersion1, type Project, writeProject } from "./projects";
 
 export const backupText = () => JSON.stringify({ format: "wool-week-projects", version: 1,
   exportedAt: new Date().toISOString(), projects: listProjects() }, null, 2);
@@ -11,7 +11,11 @@ export function parseBackup(text: string): Project[] {
   const data = JSON.parse(text);
   if (data?.format !== "wool-week-projects" || data.version !== 1 ||
     !Array.isArray(data.projects) || data.projects.length > 1000) throw new Error("Not a supported Wool Week backup.");
-  return data.projects.map((p: Project) => {
+  return data.projects.map((saved: Project) => {
+    // A backup of an older version is brought forward, as a saved project is.
+    const p = saved && saved.version === 1 && Number.isSafeInteger(saved.progress)
+      ? { ...saved, version: currentVersion, progress: progressFromVersion1(saved) }
+      : saved;
     const hat = p && hatById(p.hatId);
     if (!hat || !hat.sizes.some(s => s.id === p.sizeId) ||
       !hat.colourways.some(c => c.id === p.colourwayId && (!c.sizeIds || c.sizeIds.includes(p.sizeId))) ||

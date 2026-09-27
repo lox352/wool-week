@@ -26,11 +26,19 @@ export interface Stitch {
    */
   width?: number;
   rise?: number;
+  /**
+   * The size of needle it is worked on, in millimetres, as the pattern gives
+   * it for the size being knitted. On a "needles" step, the size changed to.
+   */
+  needles?: number;
 }
 
 /**
  * Whether a stitch is fabric: something drawn, on the chart or the hat. The
- * phantom stitch 0 that starts the helix is not, and nor is a turn, which is
- * a step in the knitting but makes no stitch.
+ * phantom stitch 0 that starts the helix is not, and nor is a step - a turn or
+ * a change of needles - which is part of the knitting but makes no stitch.
  */
-export const isFabric = (stitch: Stitch): boolean => stitch.id !== 0 && stitch.type !== "turn";
+export const isStep = (stitch: Stitch): boolean =>
+  stitch.type === "turn" || stitch.type === "needles";
+
+export const isFabric = (stitch: Stitch): boolean => stitch.id !== 0 && !isStep(stitch);

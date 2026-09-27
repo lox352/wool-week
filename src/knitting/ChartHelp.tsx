@@ -5,6 +5,7 @@ import { Mark, forkMark, makeOneMark, markFor } from "../helpers/stitch-marks";
 import { Palette, yarnFor } from "./palette";
 import { indexRounds, runInstruction, upcomingRuns } from "./progress";
 import { KeyEntry, stitchKey } from "./stitch-key";
+import type { NeedleChange } from "./chart-marks";
 import type { StitchKeyId, StitchNote } from "../data/hats/types";
 
 const Cell: React.FC<{ type?: StitchType; mark?: Mark; x: number }> = ({ type, mark = type && markFor(type), x }) => {
@@ -69,6 +70,34 @@ const TurnSwatch: React.FC = () => (
   </svg>
 );
 
+/** A change of needles, dashed as the chart draws it. */
+const NeedlesSwatch: React.FC = () => (
+  <svg className="key-swatch" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <line x1="0" y1="12" x2="24" y2="12" className="key-needles" />
+  </svg>
+);
+
+/**
+ * Where the needles change, in words: "to 3mm after round 14". A pattern
+ * that changes by the round rather than the section - 2026's, which puts
+ * every single-colour round on the smaller needles - does so often, so the
+ * rounds are gathered by the size they change to.
+ */
+function NeedlesText({ changes }: { changes: NeedleChange[] }) {
+  const sizes = [...new Set(changes.map((change) => change.to))];
+  const phrases = sizes.map((size) => {
+    const after = changes.filter((change) => change.to === size).map((change) => change.after);
+    return `to ${size}mm after ${after.length === 1 ? "round" : "rounds"} ${after.join(", ")}`;
+  });
+  return (
+    <>
+      Where the dashed rule crosses the chart, change needles:{" "}
+      {phrases.join("; ")}. Knitting stops at each for you to change, and
+      tapping a stitch says which needles it is worked on.
+    </>
+  );
+}
+
 /** The hatch as the chart draws it over the other face's rounds. */
 export const HatchSwatch: React.FC = () => (
   <svg className="key-swatch" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
@@ -91,27 +120,30 @@ export const hatchSaying =
  * Only the stitches this hat uses, in the words its pattern uses; see
  * stitch-key.ts.
  */
-export function StitchLegend({ stitches, notes, turns }: {
+export function StitchLegend({ stitches, notes, turns, needles }: {
   stitches: Stitch[];
   notes?: Partial<Record<StitchKeyId, StitchNote>>;
   /** Rounds after which the work is turned; see turnsInside. */
   turns?: number[];
+  needles?: NeedleChange[];
 }) {
   const entries = useMemo(() => stitchKey(stitches, notes), [stitches, notes]);
   return (
     <details className="chart-help">
       <summary>Stitch-symbol key</summary>
-      <KeyList entries={entries} turns={turns} />
+      <KeyList entries={entries} turns={turns} needles={needles} />
     </details>
   );
 }
 
 /** The key's entries, each with its mark and how to work it. */
-export function KeyList({ entries, current, turns }: {
+export function KeyList({ entries, current, turns, needles }: {
   entries: KeyEntry[];
   current?: string;
   /** Rounds after which the work is turned, which the key explains last. */
   turns?: number[];
+  /** Where the needles change, explained after the stitches. */
+  needles?: NeedleChange[];
 }) {
   return (
     <ul className="stitch-key">
@@ -127,6 +159,17 @@ export function KeyList({ entries, current, turns }: {
           </div>
         </li>
       ))}
+      {needles && needles.length > 0 && (
+        <li className="stitch-key-needles">
+          <NeedlesSwatch />
+          <div>
+            <strong>Change needles</strong>
+            <p>
+              <NeedlesText changes={needles} />
+            </p>
+          </div>
+        </li>
+      )}
       {turns && turns.length > 0 && (
         <li className="stitch-key-turn">
           <TurnSwatch />

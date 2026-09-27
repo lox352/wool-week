@@ -23,6 +23,8 @@ interface ChartSvgProps {
   cell: number;
   /** Rounds after which the work is turned inside out. */
   turns?: number[];
+  /** Rounds after which the needles are changed. */
+  needleChanges?: number[];
   /** Which way this pattern's make-ones lean, if it says. */
   makeOneLean?: "left" | "right";
   /**
@@ -102,6 +104,7 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
   nextStitchId,
   cell,
   turns,
+  needleChanges,
   makeOneLean,
   hatch = [],
 }) => {
@@ -112,8 +115,8 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
    * read, which is as much use behind you as ahead of you.
    */
   const grid = useMemo(
-    () => gridPaths(layout, cell, turns),
-    [layout, cell, turns],
+    () => gridPaths(layout, cell, turns, needleChanges),
+    [layout, cell, turns, needleChanges],
   );
 
   const veil = useMemo(
@@ -121,8 +124,8 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
     [layout, rounds, progress, cell],
   );
   const numbers = useMemo(
-    () => numberedRounds(layout, turns),
-    [layout, turns],
+    () => numberedRounds(layout, turns, needleChanges),
+    [layout, turns, needleChanges],
   );
   const next = nextStitchId === undefined ? undefined : layout.cells.get(nextStitchId);
 
@@ -169,6 +172,15 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
             />
           ))}
         </>
+      )}
+      {grid.needles && (
+        <g>
+          {/* On a pale ground, so the dashes show on dark wool as on light. */}
+          <path d={grid.needles} className="chart-rule chart-rule-needles-ground" />
+          <path d={grid.needles} className="chart-rule chart-rule-needles">
+            <title>The needles are changed here.</title>
+          </path>
+        </g>
       )}
       {grid.turn && (
         <path d={grid.turn} className="chart-rule chart-rule-turn">

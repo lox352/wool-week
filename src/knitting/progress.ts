@@ -1,4 +1,4 @@
-import { Stitch, isFabric } from "../types/Stitch";
+import { Stitch, isFabric, isStep } from "../types/Stitch";
 import { StitchType } from "../types/StitchType";
 
 /**
@@ -122,6 +122,11 @@ export interface Position {
    * work a stitch. The round is then the one just finished.
    */
   turnNext: boolean;
+  /**
+   * The needle size to change to, where that is the next thing to do. Like
+   * a turn, the round is then the one just finished.
+   */
+  needlesNext?: number;
   finished: boolean;
 }
 
@@ -132,8 +137,13 @@ export const positionOf = (
 ): Position => {
   const lastId = stitches.length > 0 ? stitches[stitches.length - 1].id : 0;
   const nextStitchId = progress >= lastId ? undefined : progress + 1;
-  const turnNext = nextStitchId !== undefined && stitches[nextStitchId]?.type === "turn";
-  const reference = turnNext ? progress : (nextStitchId ?? progress);
+  const next = nextStitchId === undefined ? undefined : stitches[nextStitchId];
+  const turnNext = next?.type === "turn";
+  const needlesNext = next?.type === "needles" ? next.needles : undefined;
+  const stepNext = next !== undefined && isStep(next);
+  // At a step, the round is the last one worked into: back past any steps.
+  let reference = stepNext ? progress : (nextStitchId ?? progress);
+  while (reference > 0 && stitches[reference] && isStep(stitches[reference])) reference--;
   const round = index.roundOf.get(reference) ?? index.totalRounds;
   const ids = index.rounds[round - 1] ?? [];
   const region =
@@ -144,12 +154,13 @@ export const positionOf = (
     round,
     totalRounds: index.totalRounds,
     label: index.labels[round - 1],
-    stitchInRound: turnNext ? ids.length : Math.max(ids.indexOf(reference) + 1, 1),
+    stitchInRound: stepNext ? ids.length : Math.max(ids.indexOf(reference) + 1, 1),
     stitchesInRound: ids.length,
     region: region?.turns ?? 0,
     regionRound: region ? round - region.from + 1 : round,
     nextStitchId,
     turnNext,
+    needlesNext,
     finished: nextStitchId === undefined,
   };
 };
@@ -187,6 +198,7 @@ const words: Record<
   join: { said: "knit", perStitch: true },
   // A step, not a stitch: never part of a run. See currentRun.
   turn: { said: "turn the work inside out", perStitch: false },
+  needles: { said: "change needles", perStitch: false },
 };
 
 /** "knit", "purl", "knit tbl", "k2tog". */
@@ -239,8 +251,8 @@ export const currentRun = (
    */
   const startId = progress + 1;
   const first = stitches[startId];
-  // A turn is worked on its own, not as part of a run: see positionOf.
-  if (!first || first.type === "turn") return undefined;
+  // A step is worked on its own, not as part of a run: see positionOf.
+  if (!first || isStep(first)) return undefined;
 
   const round = index.roundOf.get(startId);
   const type = typeOf(first);

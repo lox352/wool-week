@@ -169,7 +169,8 @@ const parts: Record<string, Record<string, [SlotId, SlotId][]>> = {
 
 const chartsOf = (): Chart[] => [
   // The three charted ones - the lettering, the body and the crown - are all
-  // colourwork, and so all knitted on the larger needles.
+  // colourwork fabric, though their single-colour rounds are knitted on the
+  // smaller needles: see needlesByColours.
   ...charts.charts.map((chart) => ({
     id: chart.id,
     rows: chart.rows as Chart["rows"],
@@ -398,6 +399,13 @@ const sww26: HatPattern = {
    * forty-one rounds to ten centimetres of rib against the colourwork's
    * thirty-three and a half, and finer needles do that.
    */
+  /*
+   * "Throughout the pattern work every single-colour round using smaller
+   * needles, and all two-colour rounds using colourwork needles (this also
+   * applies to single-colour rounds in the charts)."
+   */
+  needlesByColours: true,
+
   tensions: {
     rib: { stitch: 1, round: 9 / 11 },
     colourwork: { stitch: 128 / 160, round: 1 },

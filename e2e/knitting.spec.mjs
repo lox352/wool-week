@@ -3,6 +3,17 @@ import { readFile } from "node:fs/promises";
 
 const pattern = "#/hat/sww18-merrie-dancers-toorie";
 const position = page => page.locator(".knitting-panel [role=status]");
+/** Work to the end of `count` rounds, changing needles wherever asked to. */
+async function workRounds(page, count) {
+  for (let done = 0; done < count;) {
+    const changed = page.getByRole("button", { name: "Changed: carry on" });
+    if (await changed.isVisible()) await changed.click();
+    else {
+      await page.getByRole("button", { name: "End of round", exact: true }).click();
+      done++;
+    }
+  }
+}
 async function openSettings(page) {
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   return page.getByRole("dialog", { name: "Settings", exact: true });
@@ -106,7 +117,7 @@ test("knitting fills the screen, says how to work the round's stitches, and clos
   await page.goto("#/hat/sww19-roadside-beanie");
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
   // The crown's first decrease round.
-  for (let i = 0; i < 54; i++) await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await workRounds(page, 54);
   await expect(position(page)).toContainText("Round 55, stitch 1.");
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 1)).toBe(true);
 
@@ -176,7 +187,7 @@ test("the Birsie Beanny's brim takes your own words, until they are knitted", as
 
   // Knitted into the lettering, the words are set.
   await page.getByRole("link", { name: /^(Start|Keep) knitting$/ }).first().click();
-  for (let i = 0; i < 12; i++) await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await workRounds(page, 12);
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
   await page.getByRole("link", { name: "Overview & colours", exact: true }).click();
   await expect(page.getByLabel("Your words")).toHaveCount(0);
@@ -195,7 +206,7 @@ test("turning the work is a step of its own, and turns the chart over with it", 
   await expect.poll(firstStitchAtRight).toBe(true);
   await expect(page.locator(".chart-hatch").first()).toBeAttached();
 
-  for (let i = 0; i < 51; i++) await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await workRounds(page, 51);
   await expect(page.locator(".knitting-panel")).toContainText("Turn your work inside out");
   await expect(page.getByRole("button", { name: "End of round", exact: true })).toHaveCount(0);
 
@@ -208,6 +219,24 @@ test("turning the work is a step of its own, and turns the chart over with it", 
   // Undo takes the turn back, and the chart with it.
   await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect(page.locator(".knitting-panel")).toContainText("Turn your work inside out");
+});
+
+test("changing needles is a step of its own, which the chart and key mark", async ({ page }) => {
+  await page.goto("#/hat/sww25-aal-ower-toorie");
+  await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
+  // The cast-on, ten rounds of rib and the increase round, on the rib's needles.
+  for (let i = 0; i < 12; i++) await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await expect(page.locator(".knitting-panel")).toContainText(/Change to [\d.]+mm needles/);
+  await expect(page.getByRole("button", { name: "End of round", exact: true })).toHaveCount(0);
+  await expect(page.locator(".chart-rule-needles")).toBeAttached();
+
+  await page.getByRole("button", { name: "Changed: carry on" }).click();
+  await expect(position(page)).toContainText("Round 13, stitch 1.");
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect(page.locator(".knitting-panel")).toContainText(/Change to [\d.]+mm needles/);
+
+  await page.getByRole("button", { name: "Key", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Key" })).toContainText("Change needles");
 });
 
 test("the key explains the turn, on a hat that is turned inside out", async ({ page }) => {
