@@ -15,7 +15,6 @@ import { Palette, inkOn, yarnFor } from "../knitting/palette";
 import Button from "./ui/Button";
 import { KeyEntry, keyEntryAt, stitchKey } from "../knitting/stitch-key";
 import {
-  JoinSwatch,
   NeedlesSwatch,
   Swatch as StitchSwatch,
   TurnSwatch,
@@ -118,6 +117,13 @@ const StepHeading: React.FC<{ symbol: React.ReactNode; children: React.ReactNode
   </strong>
 );
 
+/** The join's heading takes a single arrow, the way the round carries on. */
+const JoinArrow: React.FC = () => (
+  <svg className="key-swatch" width="24" height="24" viewBox="0 0 1 1" aria-hidden="true">
+    <path d="M0.95 0.5H0.08M0.3 0.28L0.08 0.5L0.3 0.72" className="key-join" />
+  </svg>
+);
+
 const TurnStep: React.FC<{ insideOut: boolean }> = ({ insideOut }) => (
   <div className="knitting-turn knitting-turn-open">
     <StepHeading symbol={<TurnSwatch />}>
@@ -155,7 +161,7 @@ const NeedlesStep: React.FC<{ to: number; from?: number }> = ({ to, from }) => (
  */
 const JoinStep: React.FC<{ across: boolean }> = ({ across }) => (
   <div className="knitting-turn knitting-turn-open">
-    <StepHeading symbol={<JoinSwatch />}>Join in the round</StepHeading>
+    <StepHeading symbol={<JoinArrow />}>Join in the round</StepHeading>
     <span className="quiet">
       {across
         ? "Don't turn: knit the next stitch, the first of the row, as the next " +
