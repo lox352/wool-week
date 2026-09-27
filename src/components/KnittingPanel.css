@@ -190,14 +190,23 @@
   padding: 0.1rem 2.5rem 0.1rem 0;
 }
 
-/* The turn keeps the accent, as the chart's rule does; the others are in ink. */
-.knitting-join.knitting-turn strong,
-.knitting-needles.knitting-turn strong {
-  color: var(--ink);
+/* Every step's heading alike: in ink, after the key's symbol for it. */
+.knitting-step-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* One width for every symbol, so the headings line up from step to step. */
+.knitting-step-symbol {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  width: 48px;
 }
 
 .knitting-turn strong {
-  color: var(--crimson-dark);
+  color: var(--ink);
   font-size: 1rem;
 }
 

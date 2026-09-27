@@ -24,7 +24,7 @@ const Cell: React.FC<{ type?: StitchType; mark?: Mark; x: number }> = ({ type, m
  * The join in the round as the chart draws it: the round leaving one end of
  * a stitch and coming back in at the other.
  */
-const JoinSwatch: React.FC = () => (
+export const JoinSwatch: React.FC = () => (
   <svg className="key-swatch" width="48" height="24" viewBox="-0.6 -0.04 2.2 1.08" aria-hidden="true">
     <Cell x={0} />
     <path
@@ -82,14 +82,14 @@ function TurnText({ turns, joinedAfter }: { turns: number[]; joinedAfter?: numbe
  * The rule as the key draws it: a line on its own, as on the chart, where it
  * runs between two rounds rather than through any cell.
  */
-const TurnSwatch: React.FC = () => (
+export const TurnSwatch: React.FC = () => (
   <svg className="key-swatch" width="24" height="24" viewBox="0 0 1 1" aria-hidden="true">
     <line x1="0" y1="0.5" x2="1" y2="0.5" className="key-turn" />
   </svg>
 );
 
 /** A change of needles, dashed as the chart draws it. */
-const NeedlesSwatch: React.FC = () => (
+export const NeedlesSwatch: React.FC = () => (
   <svg className="key-swatch" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
     <line x1="0" y1="12" x2="24" y2="12" className="key-needles" />
   </svg>
