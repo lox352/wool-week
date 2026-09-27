@@ -80,7 +80,7 @@ test("DK selection, accessible chart controls and text instructions", async ({ p
   await expect(page.locator(".chart-yarn-numbers li")).not.toHaveCount(0);
   await page.getByText("Text round instructions", { exact: true }).click();
   await expect(page.getByText(/Cast on 108 in/)).toBeVisible();
-  await expect(page.getByText("Join in the round.", { exact: true })).toBeVisible();
+  await expect(page.getByText(/^Join in the round, lifting/)).toBeVisible();
   await page.getByLabel("Read round").selectOption("2");
   await expect(page.getByText("Round 2:", { exact: false })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
