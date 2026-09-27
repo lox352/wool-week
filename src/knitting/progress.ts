@@ -127,6 +127,8 @@ export interface Position {
    * a turn, the round is then the one just finished.
    */
   needlesNext?: number;
+  /** Whether the next thing to do is join the cast-on into a round. */
+  joinNext: boolean;
   finished: boolean;
 }
 
@@ -140,6 +142,7 @@ export const positionOf = (
   const next = nextStitchId === undefined ? undefined : stitches[nextStitchId];
   const turnNext = next?.type === "turn";
   const needlesNext = next?.type === "needles" ? next.needles : undefined;
+  const joinNext = next?.type === "join";
   const stepNext = next !== undefined && isStep(next);
   // At a step, the round is the last one worked into: back past any steps.
   let reference = stepNext ? progress : (nextStitchId ?? progress);
@@ -161,6 +164,7 @@ export const positionOf = (
     nextStitchId,
     turnNext,
     needlesNext,
+    joinNext,
     finished: nextStitchId === undefined,
   };
 };
@@ -184,6 +188,7 @@ const words: Record<
   StitchType,
   { said: string; after?: string; perStitch: boolean }
 > = {
+  castOn: { said: "cast on", perStitch: true },
   k1: { said: "knit", perStitch: true },
   p1: { said: "purl", perStitch: true },
   // The count goes in the middle, as a pattern writes it: "knit 2 tbl".
@@ -194,8 +199,8 @@ const words: Record<
   k2togtbl: { said: "k2tog tbl", perStitch: false },
   s2kp: { said: "s2kp", perStitch: false },
   sk2p: { said: "sk2p", perStitch: false },
-  // Never worked: the seam that closes the cast-on round. See below.
-  join: { said: "knit", perStitch: true },
+  // Steps, not stitches: never part of a run. See currentRun.
+  join: { said: "join in the round", perStitch: false },
   // A step, not a stitch: never part of a run. See currentRun.
   turn: { said: "turn the work inside out", perStitch: false },
   needles: { said: "change needles", perStitch: false },
@@ -223,14 +228,6 @@ export const runInstruction = (run: Run): string => {
   return phrase.charAt(0).toUpperCase() + phrase.slice(1);
 };
 
-/*
- * The seam that closes the cast-on round is not a stitch anybody works - see
- * workable - so it must not break the run it sits in. Reading it as a knit
- * does that, and costs nothing: a cast-on round is knits and one seam.
- */
-const typeOf = (stitch: Stitch): StitchType =>
-  stitch.type === "join" ? "k1" : stitch.type;
-
 /**
  * The run of one yarn and one stitch starting at the next stitch.
  *
@@ -255,7 +252,7 @@ export const currentRun = (
   if (!first || isStep(first)) return undefined;
 
   const round = index.roundOf.get(startId);
-  const type = typeOf(first);
+  const type = first.type;
 
   // A KFB is one action at the needles but produces two physical loops. The
   // engine stores the second as a paired m1 so the graph has two stitches;
@@ -282,7 +279,7 @@ export const currentRun = (
     const candidate = stitches[id];
     if (!candidate) break;
     if (candidate.slot !== first.slot) break;
-    if (typeOf(candidate) !== type) break;
+    if (candidate.type !== type) break;
     if (index.roundOf.get(id) !== round) break;
     endId = id;
   }
@@ -308,11 +305,10 @@ export const upcomingRuns = (
 };
 
 /**
- * Stitch ids that are worked, so the phantom, the seam and any turn - a step,
- * but no stitch - are excluded.
+ * Stitch ids that are worked, so the phantom and the steps - joining the
+ * round, a turn, a change of needles - are excluded.
  */
-export const workable = (stitches: Stitch[]): Stitch[] =>
-  stitches.filter((stitch) => isFabric(stitch) && stitch.type !== "join");
+export const workable = (stitches: Stitch[]): Stitch[] => stitches.filter(isFabric);
 
 export const totals = (
   index: RoundIndex,

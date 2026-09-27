@@ -177,6 +177,8 @@ export interface Size {
 
 /** An entry in the stitch-symbol key. A KFB's second loop is part of "kfb". */
 export type StitchKeyId =
+  | "castOn"
+  | "join"
   | "k1"
   | "p1"
   | "k1tbl"
@@ -285,6 +287,12 @@ export type RoundSpec =
    * writing.
    */
   | { type: "turn" }
+  /**
+   * "Place marker and join to work in the round." Where the cast-on is
+   * joined, for a pattern that does not do it straight away - 2022 works its
+   * first row flat. Without one, the join comes right after the cast-on.
+   */
+  | { type: "join" }
   /**
    * "Change to larger needles." Not a round either: from here the knitting
    * is on the size's main needles, having started on its rib needles, where

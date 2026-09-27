@@ -3,11 +3,14 @@ import { readFile } from "node:fs/promises";
 
 const pattern = "#/hat/sww18-merrie-dancers-toorie";
 const position = page => page.locator(".knitting-panel [role=status]");
-/** Work to the end of `count` rounds, changing needles wherever asked to. */
+/**
+ * Work to the end of `count` rounds, taking any step on the way - joining the
+ * round, changing needles - as asked.
+ */
 async function workRounds(page, count) {
   for (let done = 0; done < count;) {
-    const changed = page.getByRole("button", { name: "Changed: carry on" });
-    if (await changed.isVisible()) await changed.click();
+    const step = page.getByRole("button", { name: /^(Joined|Changed): carry on$/ });
+    if (await step.isVisible()) await step.click();
     else {
       await page.getByRole("button", { name: "End of round", exact: true }).click();
       done++;
@@ -76,7 +79,8 @@ test("DK selection, accessible chart controls and text instructions", async ({ p
   await page.getByRole("button", { name: "Done", exact: true }).click();
   await expect(page.locator(".chart-yarn-numbers li")).not.toHaveCount(0);
   await page.getByText("Text round instructions", { exact: true }).click();
-  await expect(page.getByText(/Cast on 108 stitches/)).toBeVisible();
+  await expect(page.getByText(/Cast on 108 in/)).toBeVisible();
+  await expect(page.getByText("Join in the round.", { exact: true })).toBeVisible();
   await page.getByLabel("Read round").selectOption("2");
   await expect(page.getByText("Round 2:", { exact: false })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
@@ -89,6 +93,7 @@ test("the chart is its own page, and closing the knitting keeps you on it", asyn
   await page.getByRole("button", { name: "Start knitting", exact: true }).click();
   await expect(page).toHaveURL(/\/project\/[^/]+\/chart\?knitting=1$/);
   await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await page.getByRole("button", { name: "Joined: carry on" }).click();
 
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
   await expect(page).toHaveURL(/\/project\/[^/]+\/chart$/);
@@ -225,7 +230,7 @@ test("changing needles is a step of its own, which the chart and key mark", asyn
   await page.goto("#/hat/sww25-aal-ower-toorie");
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
   // The cast-on, ten rounds of rib and the increase round, on the rib's needles.
-  for (let i = 0; i < 12; i++) await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await workRounds(page, 12);
   await expect(page.locator(".knitting-panel")).toContainText(/Change to [\d.]+mm needles/);
   await expect(page.getByRole("button", { name: "End of round", exact: true })).toHaveCount(0);
   await expect(page.locator(".chart-rule-needles")).toBeAttached();
@@ -237,6 +242,17 @@ test("changing needles is a step of its own, which the chart and key mark", asyn
 
   await page.getByRole("button", { name: "Key", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "Key" })).toContainText("Change needles");
+});
+
+test("the cast-on is cast on, then joined in the round as a step of its own", async ({ page }) => {
+  await start(page);
+  await expect(page.locator(".knitting-panel")).toContainText(/Cast on \d+ in/);
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await expect(page.locator(".knitting-panel")).toContainText("Join in the round");
+  await page.getByRole("button", { name: "Joined: carry on" }).click();
+  await expect(position(page)).toContainText("Round 2, stitch 1.");
+  await page.getByRole("button", { name: "Key", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Key" })).toContainText("Join in the round");
 });
 
 test("the key explains the turn, on a hat that is turned inside out", async ({ page }) => {
@@ -322,6 +338,9 @@ test("the chart page does not pan sideways, and zooming leaves the chart where i
 
 test("progress survives reload and undo; a second tab stays in sync", async ({ page, context }) => {
   await start(page);
+  // Cast on and joined, so every step below is a round.
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await page.getByRole("button", { name: "Joined: carry on" }).click();
   const original = await position(page).textContent();
   await page.getByRole("button", { name: "End of round", exact: true }).click();
   const advanced = await position(page).textContent();

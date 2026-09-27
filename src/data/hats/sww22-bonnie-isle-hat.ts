@@ -227,8 +227,12 @@ const sww22: HatPattern = {
       label: "Brim",
       rounds: [
         { type: "castOn", count: 140, slot: "A" },
-        // Row 1 of chart A is the rib worked flat before the round is joined.
-        { type: "chart", chart: "A", rows: [1, 13], repeats: 14 },
+        // Row 1 of chart A is the rib worked flat before the round is joined:
+        // "Row 1 (RS): [K1, p1] to end ... Do not turn. Place marker and join
+        // to work in the round."
+        { type: "chart", chart: "A", rows: [1, 1], repeats: 14 },
+        { type: "join" },
+        { type: "chart", chart: "A", rows: [2, 13], repeats: 14 },
         {
           type: "shaping",
           slot: "A",
