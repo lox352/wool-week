@@ -38,6 +38,11 @@ export interface HatStitches {
    * which is the parity that decides which way about its stitches go.
    */
   turns: number[];
+  /**
+   * The rounds after which the needles are changed, numbered as turns are.
+   * Every stitch carries the size it is worked on; see Stitch.needles.
+   */
+  needleChanges: number[];
   /** How tall a round is, in the units the stitches are placed in. */
   roundHeight: number;
 }
@@ -289,6 +294,48 @@ export const buildHat = (
   );
   let backwards = turnCount % 2 === 1;
 
+  /*
+   * Which needles. A pattern gives a size its main needles and, often, finer
+   * ones for the rib, and the knitting starts on the rib's: every one of
+   * these patterns casts on for its brim. A change after that is a step of
+   * its own, placed where the pattern says to make it. Unsized, the hat is
+   * the middle size, as its tension is.
+   */
+  const needleSize = size ?? pattern.sizes[Math.floor(pattern.sizes.length / 2)];
+  const needleFor = (which: "rib" | "main") =>
+    which === "rib"
+      ? (needleSize?.ribNeedlesMm ?? needleSize?.needlesMm)
+      : needleSize?.needlesMm;
+  const startingNeedles = needleFor("rib");
+  let needles = startingNeedles;
+  const needleChanges: number[] = [];
+  const changeNeedles = (to: number | undefined) => {
+    if (to === undefined || to === needles) return;
+    if (knitter.rounds.length > 0) {
+      needleChanges.push(knitter.rounds.length);
+      knitter.changeNeedles(to);
+    }
+    needles = to;
+  };
+  /*
+   * Or by the round, for a pattern that says so: one yarn, rib needles; two,
+   * main ones. A part is resolved to its yarn first, because a chart drawn in
+   * parts may give both parts the same yarn on a row - and it does so in
+   * every casting alike, one being the other with light and dark swapped, so
+   * any one of them tells.
+   */
+  const yarnOf = (slot: string): string => {
+    const [chartId, row, part] = slot.split(":");
+    const rows = part && pattern.charts.find((chart) => chart.id === chartId)?.parts;
+    const casting = rows && Object.values(rows)[0]?.[Number(row) - 1];
+    return casting ? casting[part === "motif" ? 1 : 0] : slot;
+  };
+  const needlesForRound = (work: { slot: string }[]) => {
+    if (!pattern.needlesByColours) return;
+    const yarns = new Set(work.map(({ slot }) => yarnOf(slot)));
+    changeNeedles(needleFor(yarns.size > 1 ? "main" : "rib"));
+  };
+
   const apply = (round: RoundSpec, section: string) => {
     switch (round.type) {
       case "turn": {
@@ -301,6 +348,10 @@ export const buildHat = (
           knitter.turn();
         }
         backwards = !backwards;
+        return;
+      }
+      case "needles": {
+        if (!pattern.needlesByColours) changeNeedles(needleFor(round.to));
         return;
       }
       case "fold": {
@@ -332,6 +383,7 @@ export const buildHat = (
             type: asStitch[sequence[i % sequence.length]],
             slot: round.slot,
           }));
+          needlesForRound(work);
           runRound(
             knitter,
             labels,
@@ -348,6 +400,7 @@ export const buildHat = (
         const types = expand(round.ops, count);
         const work = types.map((type) => ({ type, slot: round.slot }));
         const after = types.length;
+        needlesForRound(work);
         runRound(
           knitter,
           labels,
@@ -397,6 +450,7 @@ export const buildHat = (
                 }),
               );
             }
+            needlesForRound(work);
             runRound(
               knitter,
               labels,
@@ -420,5 +474,12 @@ export const buildHat = (
 
   const { stitches, rounds } = knitter.finish();
   foldAt(stitches, rounds, folds);
-  return { stitches, rounds, roundLabels: labels, turns, roundHeight };
+  // Every stitch on the needles it is worked on, the steps between saying
+  // when that changes.
+  let on: number | undefined = startingNeedles;
+  for (const stitch of stitches) {
+    if (stitch.type === "needles") on = stitch.needles;
+    else if (on !== undefined) stitch.needles = on;
+  }
+  return { stitches, rounds, roundLabels: labels, turns, needleChanges, roundHeight };
 };

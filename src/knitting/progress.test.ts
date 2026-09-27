@@ -174,6 +174,22 @@ describe("the regions a turn divides a hat into", () => {
     ).toMatchObject({ round: turn + 2, regionRound: 2 });
   });
 
+  it("stops for a change of needles between two rounds, and has no run there", () => {
+    const { stitches, index } = hatOf("sww25-aal-ower-toorie");
+    const step = stitches.find((stitch) => stitch.type === "needles")!;
+    const last = step.id - 1;
+    const round = index.roundOf.get(last)!;
+    expect(positionOf(stitches, last, index)).toMatchObject(
+      { round, needlesNext: step.needles, turnNext: false, stitchInRound: index.rounds[round - 1].length },
+    );
+    expect(currentRun(stitches, last, index)).toBeUndefined();
+    // Changed, the next round opens as usual.
+    expect(positionOf(stitches, step.id, index)).toMatchObject(
+      { round: round + 1, stitchInRound: 1, needlesNext: undefined },
+    );
+    expect(currentRun(stitches, step.id, index)?.startId).toBe(step.id + 1);
+  });
+
   it("leaves a hat that is never turned in one region throughout", () => {
     const { stitches, turns, index } = hatOf("sww15-baa-ble-hat");
     expect(turns).toEqual([]);

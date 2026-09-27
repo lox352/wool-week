@@ -112,7 +112,7 @@ export const stitchKey = (
 ): KeyEntry[] => {
   const used = new Set<StitchKeyId>();
   stitches.forEach((stitch, index) => {
-    if (stitch.id <= 0 || stitch.type === "join" || stitch.type === "turn") return;
+    if (stitch.id <= 0 || stitch.type === "join" || stitch.type === "turn" || stitch.type === "needles") return;
     if (stitch.type === "m1" && pairedWithKfb(stitches, index)) return;
     used.add(stitch.type);
   });
@@ -143,7 +143,9 @@ export const keyEntryAt = (
   notes: Partial<Record<StitchKeyId, StitchNote>> = {},
 ): KeyEntry | undefined => {
   const stitch = stitches[id];
-  if (!stitch || stitch.type === "join" || stitch.type === "turn") return undefined;
+  if (!stitch || stitch.type === "join" || stitch.type === "turn" || stitch.type === "needles") {
+    return undefined;
+  }
   const type: StitchKeyId = pairedWithKfb(stitches, id) ? "kfb" : stitch.type;
   const note = notes[type];
   return {

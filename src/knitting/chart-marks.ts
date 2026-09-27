@@ -40,3 +40,27 @@ export const turnsInside = (turns: number[] | undefined, roundCount: number): nu
   [...new Set(turns ?? [])]
     .filter((round) => round > 0 && round < roundCount)
     .sort((a, b) => a - b);
+
+/** Where the needles change: after which round, and to what size. */
+export interface NeedleChange {
+  after: number;
+  to: number;
+}
+
+/**
+ * The needle changes in a hat, each placed after the last round worked
+ * before it. Like the turns, only those with fabric on both sides are drawn.
+ */
+export const needleChangesIn = (stitches: Stitch[], rounds: number[][]): NeedleChange[] => {
+  const roundOf = new Map<number, number>();
+  rounds.forEach((ids, index) => ids.forEach((id) => roundOf.set(id, index + 1)));
+  const out: NeedleChange[] = [];
+  let last = 0;
+  for (const stitch of stitches) {
+    last = roundOf.get(stitch.id) ?? last;
+    if (stitch.type === "needles" && stitch.needles !== undefined && last > 0 && last < rounds.length) {
+      out.push({ after: last, to: stitch.needles });
+    }
+  }
+  return out;
+};

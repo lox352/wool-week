@@ -171,6 +171,8 @@ const sww17: HatPattern = {
     {
       label: "Body",
       rounds: [
+        // "Change to 3.5mm needles."
+        { type: "needles", to: "main" },
         // Rounds 1-14 three times, then rounds 1-7 once more.
         { type: "chart", chart: "A", rows: [1, 14], repeats: 36, passes: 3 },
         { type: "chart", chart: "A", rows: [1, 7], repeats: 36 },

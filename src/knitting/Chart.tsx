@@ -5,7 +5,7 @@ import { Palette, yarnFor } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
 import { StitchLegend, TextRound } from "./ChartHelp";
-import { turnsInside } from "./chart-marks";
+import { needleChangesIn, turnsInside } from "./chart-marks";
 import StitchPicker from "./StitchPicker";
 import { keyEntryAt } from "./stitch-key";
 import { stitchAtPoint } from "./jump";
@@ -174,6 +174,8 @@ const Chart: React.FC<ChartProps> = ({
   const flipped = (turnIds.length - turned) % 2 === 1;
   const layout = useMemo(() => (flipped ? mirrorLayout(laid) : laid), [laid, flipped]);
   const marked = useMemo(() => turnsInside(turns, layout.rounds), [turns, layout.rounds]);
+  const needles = useMemo(() => needleChangesIn(stitches, rounds), [stitches, rounds]);
+  const needleRounds = useMemo(() => needles.map((change) => change.after), [needles]);
   /*
    * The rounds worked with the other face towards you from the one you are
    * on now, hatched: a knit there is a purl from here, and the chart shows
@@ -235,10 +237,11 @@ const Chart: React.FC<ChartProps> = ({
       token("--ink-faint", "#a29a91"),
       marked,
       makeOneLean,
+      needleRounds,
     );
     // Size is derived from the same values this already depends on.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [drawn, layout, palette, width, height, ratio, drawWith, makeOneLean]);
+  }, [drawn, layout, palette, width, height, ratio, drawWith, makeOneLean, needleRounds]);
 
   /*
    * And the two things that change as you knit, on a sheet of their own over
@@ -489,6 +492,7 @@ const Chart: React.FC<ChartProps> = ({
               nextStitchId={nextId}
               cell={cellSize}
               turns={marked}
+              needleChanges={needleRounds}
               hatch={hatch}
               makeOneLean={makeOneLean}
             />
@@ -519,7 +523,7 @@ const Chart: React.FC<ChartProps> = ({
           )}
         </div>
       </div>
-      <StitchLegend stitches={stitches} notes={stitchNotes} turns={marked} />
+      <StitchLegend stitches={stitches} notes={stitchNotes} turns={marked} needles={needles} />
       {writtenRounds && <details className="chart-help" onToggle={e => setShowText(e.currentTarget.open)}>
         <summary>Text round instructions</summary>
         <label>Read round <select value={follow && focusRound ? focusRound : textRound} disabled={follow && !!focusRound} onChange={e => setTextRound(Number(e.target.value))}>

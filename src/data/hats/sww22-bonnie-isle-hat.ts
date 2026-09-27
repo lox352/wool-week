@@ -252,6 +252,8 @@ const sww22: HatPattern = {
     {
       label: "Body",
       rounds: [
+        // "Change to larger needles."
+        { type: "needles", to: "main" },
         { type: "chart", chart: "B", rows: [1, 14], repeats: 13 },
         { type: "chart", chart: "C", rows: [1, 13], repeats: 12 },
         { type: "chart", chart: "D", rows: [1, 14], repeats: 13 },

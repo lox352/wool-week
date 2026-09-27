@@ -692,8 +692,10 @@ describe("where the work is turned inside out", () => {
     expect(step.links).toEqual([]);
     expect(stitches.some((stitch) => stitch.links.includes(step.id))).toBe(false);
     expect(stitches[after[0]].links).toContain(before[before.length - 1]);
-    // Every other stitch is in a round, bar the phantom the hat hangs from.
-    expect(stitches).toHaveLength(rounds.flat().length + 2);
+    // Every other stitch is in a round, bar the phantom the hat hangs from
+    // and the changes of needles, which are steps of the same kind.
+    const changes = stitches.filter((stitch) => stitch.type === "needles").length;
+    expect(stitches).toHaveLength(rounds.flat().length + 2 + changes);
   });
 
   it("turns alternate, so n of them leave n + 1 regions", () => {
@@ -756,3 +758,58 @@ describe("where the work is turned inside out", () => {
     expect(ways([1, 3])).toEqual([forwards, backwards, backwards, forwards]);
   });
 });
+
+describe("which needles each stitch is worked on", () => {
+  it("changes needles as a step of its own, where the pattern says", () => {
+    // 2022: "Using yarn A and smaller needles, cast on 140 sts ... Body.
+    // Change to larger needles."
+    const hat = hatById("sww22-bonnie-isle-hat")!;
+    const { stitches, rounds, roundLabels, needleChanges } = buildHat(hat, "medium");
+    const steps = stitches.filter((stitch) => stitch.type === "needles");
+    expect(steps).toHaveLength(1);
+    const [step] = steps;
+    expect(step.needles).toBe(3);
+    expect(step.links).toEqual([]);
+    expect(rounds.flat()).not.toContain(step.id);
+    expect(needleChanges).toHaveLength(1);
+    const [after] = needleChanges;
+    expect(roundLabels[after - 1]).toBe("Brim · shaping round");
+    expect(roundLabels[after]).toBe("Chart B, row 1");
+    // Everything before on the rib's needles, everything after on the main.
+    expect(stitches[rounds[after - 1].at(-1)!].needles).toBe(2.75);
+    expect(stitches[rounds[after][0]].needles).toBe(3);
+    expect(stitches.at(-1)!.needles).toBe(3);
+  });
+
+  it("changes nothing on a hat knitted on one size throughout", () => {
+    const { stitches, needleChanges } = buildHat(hatById("sww24-islesburgh-toorie")!, "small");
+    expect(needleChanges).toEqual([]);
+    expect(stitches.some((stitch) => stitch.type === "needles")).toBe(false);
+    expect(stitches[1].needles).toBe(2.5);
+  });
+
+  it("puts 2026's single-colour rounds on the smaller needles and two-colour ones on the larger", () => {
+    const hat = hatById("sww26-birsie-beanny")!;
+    const { stitches, rounds } = buildHat(hat, "large");
+    rounds.forEach((ids) => {
+      const yarns = new Set(ids.map((id) => stitches[id].slot));
+      const needles = new Set(ids.map((id) => stitches[id].needles));
+      expect(needles.size).toBe(1);
+      // A part drawn in the same yarn as the other on its row is one colour.
+      const [part] = [...yarns];
+      const oneColour = yarns.size === 1 || (part.includes(":") && sameYarn(hat, [...yarns]));
+      expect([...needles][0]).toBe(oneColour ? 2.5 : 3);
+    });
+  });
+});
+
+/** Whether the part keys all name the same yarn, in the first casting. */
+const sameYarn = (hat: HatPattern, keys: string[]): boolean =>
+  new Set(
+    keys.map((key) => {
+      const [chart, row, part] = key.split(":");
+      const parts = hat.charts.find((candidate) => candidate.id === chart)?.parts;
+      const casting = parts && Object.values(parts)[0][Number(row) - 1];
+      return casting ? casting[part === "motif" ? 1 : 0] : key;
+    }),
+  ).size === 1;

@@ -206,6 +206,8 @@ const sww25: HatPattern = {
     {
       label: "Body",
       rounds: [
+        // "Rounds 1-32: Using main needles..."
+        { type: "needles", to: "main" },
         { type: "chart", chart: "A", rows: [1, 16], repeats: 9, passes: 2 },
         { type: "chart", chart: "A", rows: [1, 13], repeats: 9 },
       ],

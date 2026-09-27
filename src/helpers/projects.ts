@@ -1,4 +1,7 @@
 import { Overrides } from "../knitting/palette";
+import { hatById } from "../data/hats";
+import { withLettering } from "../knitting/lettering/apply";
+import { hatStitches } from "../knitting/useHat";
 
 /**
  * A project is a hat you are knitting.
@@ -10,7 +13,39 @@ import { Overrides } from "../knitting/palette";
  * opens after a chart is corrected, because it never held a copy of one.
  */
 
-export const currentVersion = 1;
+export const currentVersion = 2;
+
+/**
+ * Where a version 1 project's knitter has got to, in today's numbering.
+ *
+ * Progress is a stitch id, and version 2 put a step among the stitches
+ * wherever the needles change, which moved every stitch after one up by one.
+ * So the stitch a version 1 project had reached is found by counting past
+ * the steps it did not have: left alone it would put somebody who is well
+ * into their hat a stitch or several behind. One the site cannot build is
+ * left as it is, to be reported as it would have been.
+ */
+export const progressFromVersion1 = (
+  project: Pick<Project, "hatId" | "sizeId" | "brimText" | "progress">,
+): number => {
+  try {
+    const hat = hatById(project.hatId);
+    if (!hat?.sizes.some((size) => size.id === project.sizeId)) return project.progress;
+    const { stitches } = hatStitches(withLettering(hat, project.brimText), project.sizeId);
+    let old = -1;
+    for (const stitch of stitches) {
+      if (stitch.type === "needles") continue;
+      old++;
+      if (old === project.progress) return stitch.id;
+    }
+  } catch {
+    // Reported as it stands, below.
+  }
+  return project.progress;
+};
+
+/** Versions a project may have been saved in: older ones are brought forward. */
+const readable = [1, currentVersion];
 
 export interface Project {
   version: number;
@@ -88,7 +123,7 @@ const isProject = (value: unknown): value is Project => {
   if (!validDate(candidate.startedAt) || !validDate(candidate.updatedAt) ||
     (candidate.name !== undefined && typeof candidate.name !== "string") ||
     (candidate.brimText !== undefined && typeof candidate.brimText !== "string") ||
-    (candidate.version !== undefined && candidate.version !== currentVersion)) return false;
+    (candidate.version !== undefined && !readable.includes(candidate.version))) return false;
   if (candidate.shades !== undefined) {
     if (!candidate.shades || typeof candidate.shades !== "object" || Array.isArray(candidate.shades)) return false;
     if (Object.values(candidate.shades).some(shade => !shade || typeof shade !== "object" ||
@@ -121,6 +156,7 @@ export const readProject = (id: string): Project | undefined => {
       : new Date(0).toISOString();
     return {
       ...parsed,
+      progress: parsed.version === currentVersion ? parsed.progress : progressFromVersion1(parsed),
       version: currentVersion,
       id: storageKeyFor(id),
       startedAt: parsed.startedAt ?? stamp,

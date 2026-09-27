@@ -160,8 +160,10 @@ export const gridPaths = (
   layout: ChartLayout,
   cell: number,
   turns: number[] = [],
-): { light: string; heavy: string; turn: string } => {
+  needleChanges: number[] = [],
+): { light: string; heavy: string; turn: string; needles: string } => {
   const turnsAt = new Set(turns);
+  const needlesAt = new Set(needleChanges);
   const rows = byRound(layout);
   const runs = new Map<number, Cell[][]>();
   rows.forEach((cells, round) => runs.set(round, runsOf(cells)));
@@ -169,6 +171,7 @@ export const gridPaths = (
   const light: string[] = [];
   const heavy: string[] = [];
   const turn: string[] = [];
+  const needles: string[] = [];
 
   /*
    * Horizontal rules: a boundary needs one wherever there is fabric on
@@ -190,7 +193,9 @@ export const gridPaths = (
      */
     const into = turnsAt.has(round)
       ? turn
-      : round !== 0 && round % emphasis === 0
+      : needlesAt.has(round)
+        ? needles
+        : round !== 0 && round % emphasis === 0
         ? heavy
         : light;
     let open: { left: number; right: number } | null = null;
@@ -252,6 +257,7 @@ export const gridPaths = (
     light: light.join(""),
     heavy: heavy.join(""),
     turn: turn.join(""),
+    needles: needles.join(""),
   };
 };
 
@@ -353,15 +359,17 @@ export const progressPath = (
 /**
  * Which rounds get a number down the right-hand edge.
  *
- * Every fifth, the first and the last - and both rounds a turn falls between,
- * so the line across the chart can be named in words and found by eye.
+ * Every fifth, the first and the last - and both rounds a turn or a change of
+ * needles falls between, so the line across the chart can be named in words
+ * and found by eye.
  */
 export const numberedRounds = (
   layout: ChartLayout,
   turns: number[] = [],
+  needleChanges: number[] = [],
 ): number[] => {
   const named = new Set<number>();
-  turns.forEach((round) => {
+  [...turns, ...needleChanges].forEach((round) => {
     named.add(round);
     named.add(round + 1);
   });

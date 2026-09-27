@@ -174,6 +174,8 @@ const sww19: HatPattern = {
       rounds: [
         { type: "castOn", count: 132, slot: "A" },
         { type: "chart", chart: "A", rows: [1, 14], repeats: 33 },
+        // "Change to larger needles and yarn A." Then the increase round.
+        { type: "needles", to: "main" },
         {
           type: "shaping", slot: "A", to: 168,
           ops: [

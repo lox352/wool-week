@@ -25,6 +25,8 @@ const grid = "rgba(0, 0, 0, 0.22)";
 const gridStrong = "rgba(0, 0, 0, 0.7)";
 /** The seam between two regions worked on opposite faces. See gridPaths. */
 const gridTurn = "#a8202a";
+/** Where the needles are changed, dashed. */
+const gridNeedles = "#1d1a17";
 
 /** Where a cell's top left corner is, in pixels. */
 export const cellAt = (
@@ -97,8 +99,10 @@ export const drawChart = (
   ink = "#a29a91",
   turns: number[] = [],
   makeOneLean?: "left" | "right",
+  needleChanges: number[] = [],
 ) => {
   const turnsAt = new Set(turns);
+  const needlesAt = new Set(needleChanges);
   const { width, height } = chartSize(layout, cell);
   ctx.clearRect(0, 0, width, height);
 
@@ -137,6 +141,7 @@ export const drawChart = (
     const majorRow = at.round !== 1 && (at.round - 1) % emphasis === 0;
     // A cell draws its bottom edge, so round r's is the boundary below it.
     const turnRow = turnsAt.has(at.round - 1);
+    const needlesRow = !turnRow && needlesAt.has(at.round - 1);
     ctx.beginPath();
     ctx.strokeStyle = majorCol ? gridStrong : grid;
     ctx.moveTo(x + 0.5, y);
@@ -148,6 +153,22 @@ export const drawChart = (
     ctx.moveTo(x, y + cell - 0.5);
     ctx.lineTo(x + cell, y + cell - 0.5);
     ctx.stroke();
+    if (needlesRow) {
+      // Dashed, on a pale line so it shows on dark wool as well as light.
+      for (const [colour, wide, dash] of [
+        ["#ffffff", 4, []],
+        [gridNeedles, 2, [5, 3]],
+      ] as const) {
+        ctx.beginPath();
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = wide;
+        ctx.setLineDash([...dash]);
+        ctx.moveTo(x, y + cell - 0.5);
+        ctx.lineTo(x + cell, y + cell - 0.5);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+    }
     ctx.lineWidth = 1;
 
     ctx.strokeStyle = grid;
@@ -193,7 +214,7 @@ export const drawChart = (
     ctx.lineWidth = 1;
   }
 
-  drawRoundNumbers(ctx, layout, cell, ink, turns);
+  drawRoundNumbers(ctx, layout, cell, ink, [...turns, ...needleChanges]);
 };
 
 /**

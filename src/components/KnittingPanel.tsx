@@ -114,6 +114,28 @@ const TurnStep: React.FC<{ onTurned: () => void }> = ({ onTurned }) => (
   </div>
 );
 
+/**
+ * A change of needles: a step between rounds, like a turn, and worked the
+ * same way. The size is the one the pattern gives for the size being knitted.
+ */
+const NeedlesStep: React.FC<{ to: number; from?: number; onChanged: () => void }> = ({
+  to,
+  from,
+  onChanged,
+}) => (
+  <div className="knitting-turn knitting-turn-open knitting-needles">
+    <strong>Change to {to}mm needles</strong>
+    <span className="quiet">
+      {from !== undefined && `From the ${from}mm ones, `}
+      {from !== undefined ? "before" : "Before"} you knit the next round. The
+      chart marks the change with a dashed rule.
+    </span>
+    <Button variant="primary" size="lg" className="knitting-go" onClick={onChanged}>
+      Changed: carry on
+    </Button>
+  </div>
+);
+
 const UndoButton: React.FC<{ onUndo: () => void; canUndo: boolean }> = ({
   onUndo,
   canUndo,
@@ -248,7 +270,7 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [step, finishRun, finishRound, onUndo]);
 
-  if (position.turnNext) {
+  if (position.turnNext || position.needlesNext !== undefined) {
     return (
       <div className="knitting-panel">
         <div className="knitting-bar" aria-hidden="true">
@@ -266,11 +288,27 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
           </svg>
         </button>
         <p className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
-          Round {position.round} done. Turn your work inside out.
+          Round {position.round} done.{" "}
+          {position.turnNext
+            ? "Turn your work inside out."
+            : `Change to ${position.needlesNext}mm needles.`}
         </p>
-        <TurnStep onTurned={() => setProgress(progress + 1)} />
+        {position.turnNext ? (
+          <TurnStep onTurned={() => setProgress(progress + 1)} />
+        ) : (
+          <NeedlesStep
+            to={position.needlesNext ?? 0}
+            from={stitches[progress]?.needles}
+            onChanged={() => setProgress(progress + 1)}
+          />
+        )}
         <div className="knitting-actions">
           <UndoButton onUndo={onUndo} canUndo={canUndo} />
+          {onOpenKey && (
+            <Button variant="secondary" className="knitting-key" onClick={onOpenKey}>
+              Key
+            </Button>
+          )}
         </div>
       </div>
     );

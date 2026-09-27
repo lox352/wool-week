@@ -45,6 +45,8 @@ const size1Sections: Section[] = [
           { work: "k", times: 2 }, { work: "kfb" }, { work: "k", times: 3 },
         ],
       },
+      // "Change to larger needles and knit 1 round in Yarn A."
+      { type: "needles", to: "main" },
       { type: "rounds", count: 1, slot: "A" },
     ],
   },
@@ -116,6 +118,8 @@ const standardSections: Section[] = [
           { work: "k", times: 1 }, { work: "kfb" }, { work: "k", times: 2 },
         ],
       },
+      // "Change to larger needles and knit 1 round in Yarn A."
+      { type: "needles", to: "main" },
       { type: "rounds", count: 1, slot: "A" },
       { type: "rounds", count: 2, slot: "B" },
       { type: "chart", chart: "A", rows: [1, 4], repeats: 28 },

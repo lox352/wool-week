@@ -1,5 +1,7 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { getStorageNotice, listProjects, readProject, retrySaving, startProject, writeProject } from "./projects";
+import { hatById } from "../data/hats";
+import { buildHat } from "../knitting/engine";
 
 afterEach(() => { vi.restoreAllMocks(); retrySaving(); localStorage.clear(); });
 
@@ -46,4 +48,18 @@ it("recovers failed saves as copies when another tab changed the persisted proje
   expect(readProject(original.id)?.progress).toBe(20);
   expect(listProjects().find(p => p.id !== original.id)?.progress).toBe(5);
   expect(getStorageNotice()).toContain("recovered copy");
+});
+
+it("brings a version 1 project's progress past the needle changes it did not have", () => {
+  // Version 1 numbered the stitches without the steps for changing needles,
+  // so the same stitch had an id one lower for each change before it.
+  const { stitches } = buildHat(hatById("sww26-birsie-beanny")!, "medium");
+  const steps = stitches.filter((stitch) => stitch.type === "needles").map((stitch) => stitch.id);
+  const target = stitches.find((stitch) => stitch.id > steps[3] && stitch.type === "k1")!;
+  const project = startProject("sww26-birsie-beanny", "medium", "col-1");
+  localStorage.setItem(project.id, JSON.stringify({ ...project, version: 1, progress: target.id - 4 }));
+  expect(readProject(project.id)).toMatchObject({ version: 2, progress: target.id });
+  // Before any change, nothing moves.
+  localStorage.setItem(project.id, JSON.stringify({ ...project, version: 1, progress: 5 }));
+  expect(readProject(project.id)?.progress).toBe(5);
 });

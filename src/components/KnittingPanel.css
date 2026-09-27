@@ -191,6 +191,15 @@
   border-top: 2.5px solid var(--crimson);
 }
 
+/* A change of needles: the chart's dashed rule, in ink rather than the accent. */
+.knitting-needles {
+  border-top: 2px dashed var(--ink);
+}
+
+.knitting-needles.knitting-turn strong {
+  color: var(--ink);
+}
+
 .knitting-turn strong {
   color: var(--crimson-dark);
   font-size: 1rem;
