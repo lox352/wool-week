@@ -151,19 +151,20 @@ export default class Knitter {
         position: this.place(i, count),
         links: i === 0 ? [] : [i - 1],
         fixed: true,
-        type: "k1",
+        type: "castOn",
         slot,
         width,
         rise: this.rise,
       });
     }
-    // The seam closes the round by standing in for the phantom stitch 0.
+    // The last stitch cast on closes the round, standing in for the phantom
+    // stitch 0: the one stitch more that a join in the round takes up.
     this.stitches.push({
       id: count,
       position: this.place(count, count),
       links: [0, count - 1],
       fixed: true,
-      type: "join",
+      type: "castOn",
       slot,
       width,
       rise: this.rise,
@@ -261,6 +262,11 @@ export default class Knitter {
     return this.step("turn");
   }
 
+  /** Join the cast-on into a round: a step, placed like a turn. */
+  join(): this {
+    return this.step("join");
+  }
+
   /**
    * Change to needles of another size, between one round and the next. A
    * step like a turn, and placed like one; it carries the size.
@@ -271,7 +277,7 @@ export default class Knitter {
     return this;
   }
 
-  private step(type: "turn" | "needles"): this {
+  private step(type: "turn" | "needles" | "join"): this {
     this.endRound();
     this.stitches.push({
       id: this.last.id + 1,

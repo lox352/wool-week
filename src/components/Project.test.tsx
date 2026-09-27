@@ -31,13 +31,17 @@ it("saves once per action under StrictMode and undoes more than one step", async
     expect(saves).toHaveBeenCalledTimes(1);
     expect(readProject(project.id)?.progress).toBe(120);
     expect(getStorageNotice()).toBe("");
-    await click("End of round");
+    // Joined in the round, a step of its own.
+    await click("Joined: carry on");
     expect(saves).toHaveBeenCalledTimes(2);
-    expect(readProject(project.id)?.progress).toBe(240);
-    await click("Undo");
+    expect(readProject(project.id)?.progress).toBe(121);
+    await click("End of round");
     expect(saves).toHaveBeenCalledTimes(3);
-    expect(readProject(project.id)?.progress).toBe(120);
+    expect(readProject(project.id)?.progress).toBe(241);
     await click("Undo");
-    expect(readProject(project.id)?.progress).toBe(0);
+    expect(saves).toHaveBeenCalledTimes(4);
+    expect(readProject(project.id)?.progress).toBe(121);
+    await click("Undo");
+    expect(readProject(project.id)?.progress).toBe(120);
   } finally { await act(async () => root.unmount()); host.remove(); }
 });

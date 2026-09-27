@@ -66,15 +66,19 @@ describe("what to work next", () => {
     expect(run.endId).toBeLessThanOrEqual(plain[plain.length - 1]);
   });
 
-  it("reads the seam of the cast-on round as a knit, not as a stitch", () => {
-    // The join closes the round and is not worked. Breaking a run on it would
-    // leave a knitter told to work one of something they never do.
+  it("says to cast on the cast-on round, then stops to join it", () => {
     const { stitches, rounds, index } = hatOf("sww26-birsie-beanny");
     const castOn = rounds[0];
-    expect(stitches[castOn[castOn.length - 1]].type).toBe("join");
     const run = currentRun(stitches, castOn[0] - 1, index)!;
-    expect(run.type).toBe("k1");
+    expect(run.type).toBe("castOn");
     expect(run.length).toBe(castOn.length);
+    expect(runInstruction(run)).toBe("Cast on 128");
+    // Then the join: a step of its own, between the cast-on and round 2.
+    const last = castOn[castOn.length - 1];
+    expect(stitches[last + 1].type).toBe("join");
+    expect(positionOf(stitches, last, index)).toMatchObject({ round: 1, joinNext: true });
+    expect(currentRun(stitches, last, index)).toBeUndefined();
+    expect(positionOf(stitches, last + 1, index)).toMatchObject({ round: 2, stitchInRound: 1, joinNext: false });
   });
 
   it("counts the one-for-one stitches, and repeats the rest", () => {

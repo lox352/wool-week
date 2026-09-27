@@ -35,10 +35,11 @@ export interface Stitch {
 
 /**
  * Whether a stitch is fabric: something drawn, on the chart or the hat. The
- * phantom stitch 0 that starts the helix is not, and nor is a step - a turn or
- * a change of needles - which is part of the knitting but makes no stitch.
+ * phantom stitch 0 that starts the helix is not, and nor is a step - joining
+ * the round, a turn or a change of needles - which is part of the knitting
+ * but makes no stitch.
  */
 export const isStep = (stitch: Stitch): boolean =>
-  stitch.type === "turn" || stitch.type === "needles";
+  stitch.type === "turn" || stitch.type === "needles" || stitch.type === "join";
 
 export const isFabric = (stitch: Stitch): boolean => stitch.id !== 0 && !isStep(stitch);

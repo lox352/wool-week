@@ -107,6 +107,21 @@ const marks: Partial<Record<StitchType, Mark>> = {
   },
 };
 
+/*
+ * Joining the round: a ring, the cast-on closed into one. Drawn on the stitch
+ * the join comes after, being a step with no cell of its own, and open
+ * rather than filled, so it reads apart from a purl's dot and can sit round
+ * one.
+ */
+marks.join = {
+  strokes: [
+    Array.from({ length: 17 }, (_, i): [number, number] => {
+      const angle = (i / 16) * Math.PI * 2;
+      return [mid + 0.27 * Math.cos(angle), mid + 0.27 * Math.sin(angle)];
+    }),
+  ],
+};
+
 export const markFor = (type: StitchType): Mark | undefined => marks[type];
 
 /**

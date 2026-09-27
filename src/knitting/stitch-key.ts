@@ -26,6 +26,26 @@ export interface KeyEntry {
 }
 
 const standard: Record<StitchKeyId, Omit<KeyEntry, "note">> = {
+  castOn: {
+    id: "castOn",
+    type: "castOn",
+    abbreviation: "CO",
+    label: "Cast on",
+    how:
+      "The chart's bottom row: cast these stitches on, and one more, which " +
+      "the join in the round takes up.",
+  },
+  join: {
+    id: "join",
+    type: "join",
+    label: "Join in the round",
+    how:
+      "Lay the stitches round the needles without twisting the cast-on edge. " +
+      "Slip the first stitch from the left needle to the right, lift the " +
+      "extra stitch cast on over it and off, and slip it back: the round is " +
+      "closed and the count is right. Place a marker for the start of the " +
+      "round. The ring marks the stitch the join comes after.",
+  },
   k1: {
     id: "k1",
     type: "k1",
@@ -100,7 +120,7 @@ const standard: Record<StitchKeyId, Omit<KeyEntry, "note">> = {
   },
 };
 
-const order: StitchKeyId[] = ["k1", "p1", "k1tbl", "kfb", "m1", "k2tog", "k2togtbl", "s2kp", "sk2p"];
+const order: StitchKeyId[] = ["castOn", "join", "k1", "p1", "k1tbl", "kfb", "m1", "k2tog", "k2togtbl", "s2kp", "sk2p"];
 
 /** Whether an m1 is the second loop of the KFB just before it. */
 export const pairedWithKfb = (stitches: Stitch[], index: number): boolean =>
@@ -112,7 +132,7 @@ export const stitchKey = (
 ): KeyEntry[] => {
   const used = new Set<StitchKeyId>();
   stitches.forEach((stitch, index) => {
-    if (stitch.id <= 0 || stitch.type === "join" || stitch.type === "turn" || stitch.type === "needles") return;
+    if (stitch.id <= 0 || stitch.type === "turn" || stitch.type === "needles") return;
     if (stitch.type === "m1" && pairedWithKfb(stitches, index)) return;
     used.add(stitch.type);
   });
@@ -143,7 +163,7 @@ export const keyEntryAt = (
   notes: Partial<Record<StitchKeyId, StitchNote>> = {},
 ): KeyEntry | undefined => {
   const stitch = stitches[id];
-  if (!stitch || stitch.type === "join" || stitch.type === "turn" || stitch.type === "needles") {
+  if (!stitch || stitch.type === "turn" || stitch.type === "needles") {
     return undefined;
   }
   const type: StitchKeyId = pairedWithKfb(stitches, id) ? "kfb" : stitch.type;

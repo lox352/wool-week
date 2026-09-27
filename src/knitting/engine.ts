@@ -293,6 +293,10 @@ export const buildHat = (
     0,
   );
   let backwards = turnCount % 2 === 1;
+  /** Whether the pattern says where the round is joined; see RoundSpec. */
+  const joinsLater = sections.some((section) =>
+    section.rounds.some((round) => round.type === "join"),
+  );
 
   /*
    * Which needles. A pattern gives a size its main needles and, often, finer
@@ -368,6 +372,11 @@ export const buildHat = (
         );
         count = round.count;
         labels.push(`${section} · cast on`);
+        if (!joinsLater) knitter.join();
+        return;
+      }
+      case "join": {
+        knitter.join();
         return;
       }
       case "rounds": {

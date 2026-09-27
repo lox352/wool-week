@@ -191,6 +191,15 @@
   border-top: 2.5px solid var(--crimson);
 }
 
+/* Joining the round: in ink, as the chart's ring is. */
+.knitting-join {
+  border-top: 2px solid var(--ink);
+}
+
+.knitting-join.knitting-turn strong {
+  color: var(--ink);
+}
+
 /* A change of needles: the chart's dashed rule, in ink rather than the accent. */
 .knitting-needles {
   border-top: 2px dashed var(--ink);

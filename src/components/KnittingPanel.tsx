@@ -136,6 +136,26 @@ const NeedlesStep: React.FC<{ to: number; from?: number; onChanged: () => void }
   </div>
 );
 
+/**
+ * Joining the cast-on into a round: a step after it, like a turn. The
+ * stitches were cast on with one to spare, and the join takes it up.
+ */
+const JoinStep: React.FC<{ onJoined: () => void }> = ({ onJoined }) => (
+  <div className="knitting-turn knitting-turn-open knitting-join">
+    <strong>
+      <span aria-hidden="true">◯</span> Join in the round
+    </strong>
+    <span className="quiet">
+      Without twisting the cast-on, slip the first stitch to the right needle,
+      lift the extra stitch over it and off, and slip it back. Place a marker
+      for the start of the round.
+    </span>
+    <Button variant="primary" size="lg" className="knitting-go" onClick={onJoined}>
+      Joined: carry on
+    </Button>
+  </div>
+);
+
 const UndoButton: React.FC<{ onUndo: () => void; canUndo: boolean }> = ({
   onUndo,
   canUndo,
@@ -270,7 +290,7 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [step, finishRun, finishRound, onUndo]);
 
-  if (position.turnNext || position.needlesNext !== undefined) {
+  if (position.turnNext || position.joinNext || position.needlesNext !== undefined) {
     return (
       <div className="knitting-panel">
         <div className="knitting-bar" aria-hidden="true">
@@ -291,10 +311,14 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
           Round {position.round} done.{" "}
           {position.turnNext
             ? "Turn your work inside out."
-            : `Change to ${position.needlesNext}mm needles.`}
+            : position.joinNext
+              ? "Join in the round."
+              : `Change to ${position.needlesNext}mm needles.`}
         </p>
         {position.turnNext ? (
           <TurnStep onTurned={() => setProgress(progress + 1)} />
+        ) : position.joinNext ? (
+          <JoinStep onJoined={() => setProgress(progress + 1)} />
         ) : (
           <NeedlesStep
             to={position.needlesNext ?? 0}

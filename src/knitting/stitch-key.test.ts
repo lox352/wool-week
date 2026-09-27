@@ -76,10 +76,13 @@ describe("the key's entry for one stitch", () => {
     expect(keyEntryAt(stitches, m1, hat.stitchNotes)?.how).toMatch(/back to front/);
   });
 
-  it("has nothing to say about the seam", () => {
+  it("keys the cast-on and the join in the round first", () => {
     const { stitches } = built("sww15-baa-ble-hat");
-    const seam = stitches.findIndex((stitch) => stitch.type === "join");
-    expect(seam).toBeGreaterThanOrEqual(0);
-    expect(keyEntryAt(stitches, seam)).toBeUndefined();
+    const keyed = stitchKey(stitches).map((entry) => entry.id);
+    expect(keyed.slice(0, 2)).toEqual(["castOn", "join"]);
+    expect(keyEntryAt(stitches, 1)?.id).toBe("castOn");
+    // The last stitch cast on closes the round, and is cast on like the rest.
+    const join = stitches.findIndex((stitch) => stitch.type === "join");
+    expect(keyEntryAt(stitches, join - 1)?.id).toBe("castOn");
   });
 });

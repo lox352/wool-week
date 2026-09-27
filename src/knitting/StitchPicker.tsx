@@ -53,6 +53,7 @@ const StitchPicker: React.FC<{
   const { width } = chartSize(layout, cell);
   const explains = entry !== undefined && entry.id !== "k1";
   const needles = stitches[id]?.needles;
+  const joinsAfter = stitches[id + 1]?.type === "join";
   const bubble = explains || otherFace ? explainingWidth : bubbleWidth;
   const left = Math.min(
     Math.max(x + cell / 2 - bubble / 2, 4),
@@ -112,6 +113,9 @@ const StitchPicker: React.FC<{
               )}
               {needles !== undefined && (
                 <span className="stitch-picker-needles">On {needles}mm needles</span>
+              )}
+              {joinsAfter && (
+                <span className="stitch-picker-needles">Then join in the round</span>
               )}
               {explains && <p>{entry.how}</p>}
               {explains && entry.note && <p className="stitch-note">{entry.note}</p>}

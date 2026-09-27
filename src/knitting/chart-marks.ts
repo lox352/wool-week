@@ -17,6 +17,19 @@ export const markAt = (
   /** Which way this pattern's make-ones lean, if it says. */
   makeOneLean?: "left" | "right",
 ): Mark | undefined => {
+  const own = ownMarkAt(stitch, byId, layout, makeOneLean);
+  // The stitch the round is joined after carries the join's ring as well.
+  if (byId.get(stitch.id + 1)?.type !== "join") return own;
+  const ring = markFor("join");
+  return { strokes: [...(own?.strokes ?? []), ...(ring?.strokes ?? [])], dot: own?.dot };
+};
+
+const ownMarkAt = (
+  stitch: Stitch,
+  byId: Map<number, Stitch>,
+  layout: ChartLayout,
+  makeOneLean?: "left" | "right",
+): Mark | undefined => {
   if (isSecondLoop(stitch, byId)) return undefined;
   if (stitch.type === "m1") return makeOneMark(makeOneLean);
   if (stitch.type !== "kfb") return markFor(stitch.type);

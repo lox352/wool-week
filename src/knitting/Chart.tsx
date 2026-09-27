@@ -199,8 +199,10 @@ const Chart: React.FC<ChartProps> = ({
     return Math.max(1, Math.min(wanted, 2, maxCanvasSide / longest));
   }, [width, height]);
 
+  // The join in the round comes along, though it has no cell to draw: the
+  // stitch before it carries its ring. See markAt.
   const drawn = useMemo(
-    () => stitches.filter(isFabric),
+    () => stitches.filter((stitch) => isFabric(stitch) || stitch.type === "join"),
     [stitches],
   );
 

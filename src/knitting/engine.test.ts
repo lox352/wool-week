@@ -693,9 +693,10 @@ describe("where the work is turned inside out", () => {
     expect(stitches.some((stitch) => stitch.links.includes(step.id))).toBe(false);
     expect(stitches[after[0]].links).toContain(before[before.length - 1]);
     // Every other stitch is in a round, bar the phantom the hat hangs from
-    // and the changes of needles, which are steps of the same kind.
-    const changes = stitches.filter((stitch) => stitch.type === "needles").length;
-    expect(stitches).toHaveLength(rounds.flat().length + 2 + changes);
+    // and the other steps - the join and the changes of needles.
+    const others = stitches.filter((stitch) => stitch.type === "needles" || stitch.type === "join");
+    expect(others.some((stitch) => stitch.type === "join")).toBe(true);
+    expect(stitches).toHaveLength(rounds.flat().length + 2 + others.length);
   });
 
   it("turns alternate, so n of them leave n + 1 regions", () => {
@@ -813,3 +814,26 @@ const sameYarn = (hat: HatPattern, keys: string[]): boolean =>
       return casting ? casting[part === "motif" ? 1 : 0] : key;
     }),
   ).size === 1;
+
+describe("casting on and joining in the round", () => {
+  it("casts on the first round, then joins it as a step of its own", () => {
+    const { stitches, rounds } = buildHat(hatById("sww25-aal-ower-toorie")!, "medium");
+    const [castOn] = rounds;
+    expect(castOn.every((id) => stitches[id].type === "castOn")).toBe(true);
+    const join = stitches.filter((stitch) => stitch.type === "join");
+    expect(join).toHaveLength(1);
+    // Straight after the last stitch cast on, which closes the round in place
+    // of the phantom: the one stitch more that a join takes up.
+    expect(join[0].id).toBe(castOn[castOn.length - 1] + 1);
+    expect(stitches[castOn[castOn.length - 1]].links).toContain(0);
+    expect(rounds[1][0]).toBe(join[0].id + 1);
+  });
+
+  it("joins 2022 after the row it works flat, where its pattern says", () => {
+    const { stitches, rounds, roundLabels } = buildHat(hatById("sww22-bonnie-isle-hat")!, "medium");
+    const join = stitches.find((stitch) => stitch.type === "join")!;
+    const before = rounds.findIndex((ids) => ids.includes(join.id - 1));
+    expect(roundLabels[before]).toBe("Chart A, row 1");
+    expect(rounds[before + 1][0]).toBe(join.id + 1);
+  });
+});

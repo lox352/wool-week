@@ -1,8 +1,15 @@
 /**
  * The stitches these patterns use.
  *
- * "join" is not a stitch a knitter works; it is the seam where the cast-on
- * row closes into a round, and it exists so the tube is a single chain.
+ * "castOn" is a stitch cast on: the loops the first round is made of, which
+ * take nothing from below because there is nothing below.
+ *
+ * "join" is joining the cast-on into a round - a step, like the turn below.
+ * A round is joined by casting on one stitch more than it needs and losing
+ * one where its two ends meet, so the cast-on here is one stitch longer than
+ * its round: the phantom stitch 0, which nothing is worked into, is the one
+ * lost, and the last stitch cast on closes the round in its place. The join
+ * comes after the round it closes, usually the cast-on itself.
  *
  * "turn" is not a stitch either, but it is a step: turning the work inside
  * out, between one round and the next. It takes nothing from the round below
@@ -23,6 +30,7 @@
  * and the chart draws them differently, so they are kept apart here.
  */
 export type StitchType =
+  | "castOn"
   | "k1"
   | "p1"
   | "k1tbl"
@@ -38,6 +46,7 @@ export type StitchType =
 
 /** How many stitches of the round below this one consumes. */
 export const consumption: Record<StitchType, number> = {
+  castOn: 0,
   k1: 1,
   p1: 1,
   k1tbl: 1,
