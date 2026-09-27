@@ -18,9 +18,10 @@ export const markAt = (
   makeOneLean?: "left" | "right",
 ): Mark | undefined => {
   const own = ownMarkAt(stitch, byId, layout, makeOneLean);
-  // The stitch the round is joined after carries the join's ring as well.
-  if (byId.get(stitch.id + 1)?.type !== "join") return own;
-  const ring = markFor("join");
+  // The stitch the round is joined after carries the join's mark as well.
+  const join = byId.get(stitch.id + 1);
+  if (join?.type !== "join" && join?.type !== "joinAcross") return own;
+  const ring = markFor(join.type);
   return { strokes: [...(own?.strokes ?? []), ...(ring?.strokes ?? [])], dot: own?.dot };
 };
 

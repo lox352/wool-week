@@ -31,20 +31,30 @@ const standard: Record<StitchKeyId, Omit<KeyEntry, "note">> = {
     type: "castOn",
     abbreviation: "CO",
     label: "Cast on",
-    how:
-      "The chart's bottom row: cast these stitches on, and one more, which " +
-      "the join in the round takes up.",
+    how: "The chart's bottom row: cast these stitches on.",
   },
   join: {
     id: "join",
     type: "join",
     label: "Join in the round",
     how:
-      "Lay the stitches round the needles without twisting the cast-on edge. " +
-      "Slip the first stitch from the left needle to the right, lift the " +
-      "extra stitch cast on over it and off, and slip it back: the round is " +
-      "closed and the count is right. Place a marker for the start of the " +
-      "round. The ring marks the stitch the join comes after.",
+      "Cast on one stitch more than the chart shows. Without twisting the " +
+      "cast-on, slip the last stitch cast on from the right needle to the " +
+      "left, lift the first stitch cast on over it and off the left needle, " +
+      "then slip the last stitch back to the right needle. The round is " +
+      "closed, one stitch lighter; place a marker for its start. The ring " +
+      "marks the last stitch cast on.",
+  },
+  joinAcross: {
+    id: "joinAcross",
+    type: "joinAcross",
+    label: "Join in the round, across",
+    how:
+      "Without turning, work the next stitch - the first of the row just " +
+      "worked - as the next of the round, pulling the yarn a little tighter " +
+      "than usual so no gap is left. No stitch is lost; place a marker for " +
+      "the start of the round. The arrow marks the stitch the join comes " +
+      "after.",
   },
   k1: {
     id: "k1",
@@ -120,7 +130,7 @@ const standard: Record<StitchKeyId, Omit<KeyEntry, "note">> = {
   },
 };
 
-const order: StitchKeyId[] = ["castOn", "join", "k1", "p1", "k1tbl", "kfb", "m1", "k2tog", "k2togtbl", "s2kp", "sk2p"];
+const order: StitchKeyId[] = ["castOn", "join", "joinAcross", "k1", "p1", "k1tbl", "kfb", "m1", "k2tog", "k2togtbl", "s2kp", "sk2p"];
 
 /** Whether an m1 is the second loop of the KFB just before it. */
 export const pairedWithKfb = (stitches: Stitch[], index: number): boolean =>
@@ -140,11 +150,12 @@ export const stitchKey = (
     .filter((id) => used.has(id))
     .map((id) => {
       const note = notes[id];
+      const how = id === "castOn" && used.has("join") ? extraCastOn : standard[id].how;
       return {
         ...standard[id],
         abbreviation: note?.abbreviation ?? standard[id].abbreviation,
         label: note?.label ?? standard[id].label,
-        how: note?.how ?? standard[id].how,
+        how: note?.how ?? how,
         note: note?.note,
         lean: note?.lean,
       };
@@ -157,6 +168,18 @@ export const stitchKey = (
  * The make-one that is the second loop of a KFB is part of the KFB, and is
  * explained as one.
  */
+/*
+ * A cast-on joined by lifting a stitch over is cast on one stitch longer
+ * than the chart shows, so its key says so. Which join it has is the step
+ * straight after the cast-on round.
+ */
+const extraCastOn = "The chart's bottom row: cast these stitches on, and one more for the join.";
+const liftedJoinAfter = (stitches: Stitch[], id: number): boolean => {
+  let at = id;
+  while (stitches[at]?.type === "castOn") at++;
+  return stitches[at]?.type === "join";
+};
+
 export const keyEntryAt = (
   stitches: Stitch[],
   id: number,
@@ -168,11 +191,12 @@ export const keyEntryAt = (
   }
   const type: StitchKeyId = pairedWithKfb(stitches, id) ? "kfb" : stitch.type;
   const note = notes[type];
+  const how = type === "castOn" && liftedJoinAfter(stitches, id) ? extraCastOn : standard[type].how;
   return {
     ...standard[type],
     abbreviation: note?.abbreviation ?? standard[type].abbreviation,
     label: note?.label ?? standard[type].label,
-    how: note?.how ?? standard[type].how,
+    how: note?.how ?? how,
     note: note?.note,
     lean: note?.lean,
   };

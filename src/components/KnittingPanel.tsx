@@ -90,7 +90,8 @@ const Swatch: React.FC<{ run: Run; palette: Palette; small?: boolean }> = ({
 };
 
 /**
- * The point where the work is turned inside out.
+ * The point where the work is turned: inside out, for a tube, or over, for a
+ * row worked flat.
  *
  * A step of its own, between the last stitch of one round and the first of
  * the next: nothing is knitted, but it has to be done, and done in its place,
@@ -101,12 +102,12 @@ const Swatch: React.FC<{ run: Run; palette: Palette; small?: boolean }> = ({
 const TurnStep: React.FC<{ onTurned: () => void }> = ({ onTurned }) => (
   <div className="knitting-turn knitting-turn-open">
     <strong>
-      <span aria-hidden="true">⟲</span> Turn your work inside out
+      <span aria-hidden="true">⟲</span> Turn your work
     </strong>
     <span className="quiet">
-      So the wrong side of the brim faces you, then carry on round. The other
-      face of the hat is towards you from here, and the chart turns over to
-      match: what you have knitted so far is shown hatched.
+      So its other side faces you - a tube turned inside out, a row turned
+      over - and carry on the other way. The chart turns over to match: what
+      you have knitted so far is shown hatched.
     </span>
     <Button variant="primary" size="lg" className="knitting-go" onClick={onTurned}>
       Turned: carry on
@@ -137,18 +138,23 @@ const NeedlesStep: React.FC<{ to: number; from?: number; onChanged: () => void }
 );
 
 /**
- * Joining the cast-on into a round: a step after it, like a turn. The
- * stitches were cast on with one to spare, and the join takes it up.
+ * Joining the knitting into a round: a step, like a turn. Either the cast-on
+ * was cast on with one to spare, and the join lifts it off, or a row was
+ * worked flat and the join simply carries on across the gap.
  */
-const JoinStep: React.FC<{ onJoined: () => void }> = ({ onJoined }) => (
+const JoinStep: React.FC<{ across: boolean; onJoined: () => void }> = ({ across, onJoined }) => (
   <div className="knitting-turn knitting-turn-open knitting-join">
     <strong>
-      <span aria-hidden="true">◯</span> Join in the round
+      <span aria-hidden="true">{across ? "↻" : "◯"}</span> Join in the round
     </strong>
     <span className="quiet">
-      Without twisting the cast-on, slip the first stitch to the right needle,
-      lift the extra stitch over it and off, and slip it back. Place a marker
-      for the start of the round.
+      {across
+        ? "Don't turn: knit the next stitch, the first of the row, as the next " +
+          "of the round, pulling a little tighter than usual so no gap is left. " +
+          "Place a marker for the start of the round."
+        : "Without twisting the cast-on, slip the last stitch cast on to the " +
+          "left needle, lift the first stitch cast on over it and off, and " +
+          "slip the last stitch back. Place a marker for the start of the round."}
     </span>
     <Button variant="primary" size="lg" className="knitting-go" onClick={onJoined}>
       Joined: carry on
@@ -310,7 +316,7 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
         <p className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
           Round {position.round} done.{" "}
           {position.turnNext
-            ? "Turn your work inside out."
+            ? "Turn your work."
             : position.joinNext
               ? "Join in the round."
               : `Change to ${position.needlesNext}mm needles.`}
@@ -318,7 +324,10 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
         {position.turnNext ? (
           <TurnStep onTurned={() => setProgress(progress + 1)} />
         ) : position.joinNext ? (
-          <JoinStep onJoined={() => setProgress(progress + 1)} />
+          <JoinStep
+            across={position.joinNext === "joinAcross"}
+            onJoined={() => setProgress(progress + 1)}
+          />
         ) : (
           <NeedlesStep
             to={position.needlesNext ?? 0}

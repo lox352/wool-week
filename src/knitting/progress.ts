@@ -127,8 +127,11 @@ export interface Position {
    * a turn, the round is then the one just finished.
    */
   needlesNext?: number;
-  /** Whether the next thing to do is join the cast-on into a round. */
-  joinNext: boolean;
+  /**
+   * Whether the next thing to do is join the knitting into a round, and
+   * which way: by lifting a stitch over, or by working across the gap.
+   */
+  joinNext?: "join" | "joinAcross";
   finished: boolean;
 }
 
@@ -142,7 +145,7 @@ export const positionOf = (
   const next = nextStitchId === undefined ? undefined : stitches[nextStitchId];
   const turnNext = next?.type === "turn";
   const needlesNext = next?.type === "needles" ? next.needles : undefined;
-  const joinNext = next?.type === "join";
+  const joinNext = next?.type === "join" || next?.type === "joinAcross" ? next.type : undefined;
   const stepNext = next !== undefined && isStep(next);
   // At a step, the round is the last one worked into: back past any steps.
   let reference = stepNext ? progress : (nextStitchId ?? progress);
@@ -201,8 +204,9 @@ const words: Record<
   sk2p: { said: "sk2p", perStitch: false },
   // Steps, not stitches: never part of a run. See currentRun.
   join: { said: "join in the round", perStitch: false },
+  joinAcross: { said: "join in the round", perStitch: false },
   // A step, not a stitch: never part of a run. See currentRun.
-  turn: { said: "turn the work inside out", perStitch: false },
+  turn: { said: "turn the work", perStitch: false },
   needles: { said: "change needles", perStitch: false },
 };
 

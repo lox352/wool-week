@@ -40,6 +40,13 @@ export interface Stitch {
  * but makes no stitch.
  */
 export const isStep = (stitch: Stitch): boolean =>
-  stitch.type === "turn" || stitch.type === "needles" || stitch.type === "join";
+  stitch.type === "turn" ||
+  stitch.type === "needles" ||
+  stitch.type === "join" ||
+  stitch.type === "joinAcross";
+
+/** Whether a stitch joins the knitting into a round, by either way of doing it. */
+export const isJoin = (stitch: Stitch | undefined): boolean =>
+  stitch?.type === "join" || stitch?.type === "joinAcross";
 
 export const isFabric = (stitch: Stitch): boolean => stitch.id !== 0 && !isStep(stitch);

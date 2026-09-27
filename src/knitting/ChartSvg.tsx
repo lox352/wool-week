@@ -184,7 +184,7 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
       )}
       {grid.turn && (
         <path d={grid.turn} className="chart-rule chart-rule-turn">
-          <title>The work is turned inside out here.</title>
+          <title>The work is turned here.</title>
         </path>
       )}
       {next && (

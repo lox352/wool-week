@@ -138,7 +138,18 @@ export default class Knitter {
     };
   }
 
-  castOn(count: number, slot: string, width = adjacentStitchDistance, direction = 1): this {
+  /**
+   * Cast on `count` stitches. `closed` for a cast-on joined by losing a
+   * stitch, which closes it into a ring at once; a cast-on whose first row
+   * is worked flat is open until that row is joined across. See "join".
+   */
+  castOn(
+    count: number,
+    slot: string,
+    width = adjacentStitchDistance,
+    direction = 1,
+    closed = true,
+  ): this {
     this.direction = direction;
     this.directions.push(direction);
     this.slot = slot;
@@ -162,7 +173,7 @@ export default class Knitter {
     this.stitches.push({
       id: count,
       position: this.place(count, count),
-      links: [0, count - 1],
+      links: closed ? [0, count - 1] : [count - 1],
       fixed: true,
       type: "castOn",
       slot,
@@ -262,9 +273,9 @@ export default class Knitter {
     return this.step("turn");
   }
 
-  /** Join the cast-on into a round: a step, placed like a turn. */
-  join(): this {
-    return this.step("join");
+  /** Join the knitting into a round: a step, placed like a turn. */
+  join(across = false): this {
+    return this.step(across ? "joinAcross" : "join");
   }
 
   /**
@@ -277,7 +288,7 @@ export default class Knitter {
     return this;
   }
 
-  private step(type: "turn" | "needles" | "join"): this {
+  private step(type: "turn" | "needles" | "join" | "joinAcross"): this {
     this.endRound();
     this.stitches.push({
       id: this.last.id + 1,
