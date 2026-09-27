@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Stitch } from "../types/Stitch";
+import { Stitch, isJoin } from "../types/Stitch";
 import { ChartLayout } from "./layout";
 import { cellAt, chartSize } from "./draw-chart";
 import { progressBefore } from "./jump";
@@ -53,7 +53,7 @@ const StitchPicker: React.FC<{
   const { width } = chartSize(layout, cell);
   const explains = entry !== undefined && entry.id !== "k1";
   const needles = stitches[id]?.needles;
-  const joinsAfter = stitches[id + 1]?.type === "join";
+  const joinsAfter = isJoin(stitches[id + 1]);
   const bubble = explains || otherFace ? explainingWidth : bubbleWidth;
   const left = Math.min(
     Math.max(x + cell / 2 - bubble / 2, 4),

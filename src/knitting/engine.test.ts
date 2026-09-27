@@ -829,11 +829,21 @@ describe("casting on and joining in the round", () => {
     expect(rounds[1][0]).toBe(join[0].id + 1);
   });
 
-  it("joins 2022 after the row it works flat, where its pattern says", () => {
-    const { stitches, rounds, roundLabels } = buildHat(hatById("sww22-bonnie-isle-hat")!, "medium");
-    const join = stitches.find((stitch) => stitch.type === "join")!;
+  it("turns 2022 to work its first row flat, then joins it across without losing a stitch", () => {
+    const { stitches, rounds, roundLabels, turns } = buildHat(hatById("sww22-bonnie-isle-hat")!, "medium");
+    // Cast on and turned, to work row 1 back along the cast-on ...
+    expect(turns).toEqual([1]);
+    expect(stitches[rounds[0].at(-1)! + 1].type).toBe("turn");
+    // ... whose first stitch is worked into the last stitch cast on.
+    expect(stitches[rounds[1][0]].links[0]).toBe(rounds[0].at(-1));
+    // Then joined across, after row 1: no lifted join, and nothing lost.
+    expect(stitches.some((stitch) => stitch.type === "join")).toBe(false);
+    const join = stitches.find((stitch) => stitch.type === "joinAcross")!;
     const before = rounds.findIndex((ids) => ids.includes(join.id - 1));
     expect(roundLabels[before]).toBe("Chart A, row 1");
     expect(rounds[before + 1][0]).toBe(join.id + 1);
+    expect(rounds[before + 1]).toHaveLength(rounds[0].length);
+    // The cast-on is not closed into a ring: the gap is joined a row up.
+    expect(stitches[rounds[0].at(-1)!].links).not.toContain(0);
   });
 });

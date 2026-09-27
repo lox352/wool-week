@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Stitch, isFabric } from "../types/Stitch";
+import { Stitch, isFabric, isJoin } from "../types/Stitch";
 import { layOut, mirrorLayout } from "./layout";
 import { Palette, yarnFor } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress } from "./draw-chart";
@@ -202,7 +202,7 @@ const Chart: React.FC<ChartProps> = ({
   // The join in the round comes along, though it has no cell to draw: the
   // stitch before it carries its ring. See markAt.
   const drawn = useMemo(
-    () => stitches.filter((stitch) => isFabric(stitch) || stitch.type === "join"),
+    () => stitches.filter((stitch) => isFabric(stitch) || isJoin(stitch)),
     [stitches],
   );
 
@@ -468,7 +468,7 @@ const Chart: React.FC<ChartProps> = ({
             `The chart: ${layout.columns} stitches at its widest and ` +
             `${layout.rounds} rounds.` +
             (marked.length > 0
-              ? ` The work is turned inside out after ${
+              ? ` The work is turned after ${
                   marked.length === 1 ? "round" : "rounds"
                 } ${marked.join(", ")}.`
               : "") +
@@ -476,7 +476,7 @@ const Chart: React.FC<ChartProps> = ({
               ? ` You are on ${labels[focusRound - 1]}.`
               : "") +
             (focusRound && regionsBelow(marked, focusRound) > 0
-              ? " You are working it inside out."
+              ? " You are past a turn, working it from its other face."
               : "")
           }
         >

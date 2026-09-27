@@ -229,9 +229,12 @@ const sww22: HatPattern = {
         { type: "castOn", count: 140, slot: "A" },
         // Row 1 of chart A is the rib worked flat before the round is joined:
         // "Row 1 (RS): [K1, p1] to end ... Do not turn. Place marker and join
-        // to work in the round."
+        // to work in the round." Worked flat, it is worked back along the
+        // cast-on, so the work is turned to begin it; and it is joined by
+        // working across the gap, without turning, so nothing is lost.
+        { type: "turn" },
         { type: "chart", chart: "A", rows: [1, 1], repeats: 14 },
-        { type: "join" },
+        { type: "join", across: true },
         { type: "chart", chart: "A", rows: [2, 13], repeats: 14 },
         {
           type: "shaping",

@@ -212,7 +212,7 @@ test("turning the work is a step of its own, and turns the chart over with it", 
   await expect(page.locator(".chart-hatch").first()).toBeAttached();
 
   await workRounds(page, 51);
-  await expect(page.locator(".knitting-panel")).toContainText("Turn your work inside out");
+  await expect(page.locator(".knitting-panel")).toContainText("Turn your work");
   await expect(page.getByRole("button", { name: "End of round", exact: true })).toHaveCount(0);
 
   await page.getByRole("button", { name: "Turned: carry on" }).click();
@@ -223,7 +223,7 @@ test("turning the work is a step of its own, and turns the chart over with it", 
 
   // Undo takes the turn back, and the chart with it.
   await page.getByRole("button", { name: "Undo", exact: true }).click();
-  await expect(page.locator(".knitting-panel")).toContainText("Turn your work inside out");
+  await expect(page.locator(".knitting-panel")).toContainText("Turn your work");
 });
 
 test("changing needles is a step of its own, which the chart and key mark", async ({ page }) => {
@@ -255,16 +255,31 @@ test("the cast-on is cast on, then joined in the round as a step of its own", as
   await expect(page.getByRole("dialog", { name: "Key" })).toContainText("Join in the round");
 });
 
+test("2022 is turned to work its first row flat, then joined across", async ({ page }) => {
+  await page.goto("#/hat/sww22-bonnie-isle-hat");
+  await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await expect(page.locator(".knitting-panel")).toContainText("Turn your work");
+  await page.getByRole("button", { name: "Turned: carry on" }).click();
+  await page.getByRole("button", { name: "End of round", exact: true }).click();
+  await expect(page.locator(".knitting-panel")).toContainText("Join in the round");
+  await expect(page.locator(".knitting-panel")).toContainText("pulling a little tighter");
+  await page.getByRole("button", { name: "Joined: carry on" }).click();
+  await expect(position(page)).toContainText("Round 3, stitch 1.");
+  await page.getByRole("button", { name: "Key", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "Key" })).toContainText("Join in the round, across");
+});
+
 test("the key explains the turn, on a hat that is turned inside out", async ({ page }) => {
   await page.goto("#/hat/sww26-birsie-beanny");
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
   await page.getByRole("button", { name: "Key", exact: true }).click();
-  await expect(page.getByRole("dialog", { name: "Key" })).toContainText("Turn the work inside out");
+  await expect(page.getByRole("dialog", { name: "Key" })).toContainText("Turn the work");
   await expect(page.getByRole("dialog", { name: "Key" })).toContainText("Hatched");
   await page.getByRole("button", { name: "Close the key" }).click();
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
   await page.getByText("Stitch-symbol key", { exact: true }).click();
-  await expect(page.locator(".stitch-key")).toContainText("turned inside out after round 51");
+  await expect(page.locator(".stitch-key")).toContainText("turned after round 51");
 });
 
 test("a hatched stitch says so when tapped", async ({ page }) => {

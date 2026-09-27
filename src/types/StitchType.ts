@@ -4,12 +4,16 @@
  * "castOn" is a stitch cast on: the loops the first round is made of, which
  * take nothing from below because there is nothing below.
  *
- * "join" is joining the cast-on into a round - a step, like the turn below.
- * A round is joined by casting on one stitch more than it needs and losing
- * one where its two ends meet, so the cast-on here is one stitch longer than
- * its round: the phantom stitch 0, which nothing is worked into, is the one
- * lost, and the last stitch cast on closes the round in its place. The join
- * comes after the round it closes, usually the cast-on itself.
+ * "join" is joining the cast-on into a round - a step, like the turn below -
+ * by casting on one stitch more than the round needs and losing one where
+ * its two ends meet: the first stitch cast on is lifted over the last. So
+ * the cast-on here is one stitch longer than its round: the phantom stitch
+ * 0, which nothing is worked into, is the one lost, and the last stitch cast
+ * on closes the round in its place.
+ *
+ * "joinAcross" joins a row worked flat into the round without losing
+ * anything: the next stitch is simply worked across the gap, pulled a little
+ * tighter. 2022 works its first row flat and joins it so.
  *
  * "turn" is not a stitch either, but it is a step: turning the work inside
  * out, between one round and the next. It takes nothing from the round below
@@ -41,6 +45,7 @@ export type StitchType =
   | "s2kp"
   | "sk2p"
   | "join"
+  | "joinAcross"
   | "turn"
   | "needles";
 
@@ -57,6 +62,7 @@ export const consumption: Record<StitchType, number> = {
   s2kp: 3,
   sk2p: 3,
   join: 0,
+  joinAcross: 0,
   turn: 0,
   needles: 0,
 };

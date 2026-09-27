@@ -49,13 +49,13 @@ export const Swatch: React.FC<{ entry: KeyEntry }> = ({ entry }) => {
 function TurnText({ turns }: { turns: number[] }) {
   return (
     <>
-      The work is turned inside out after {turns.length === 1 ? "round" : "rounds"}{" "}
-      {turns.join(", ")}. Each rule divides two stretches worked with opposite
-      faces of the hat towards you. The chart shows the face you are working
-      on: working the turn turns the chart over, and the stretch on the other
-      side of the rule is hatched, because you see it from its other face.
-      Which, with the fold, is why a brim charted this way comes out the right
-      way round once it is turned up.
+      The work is turned after {turns.length === 1 ? "round" : "rounds"}{" "}
+      {turns.join(", ")}: inside out, if it is already a tube, or over, if it
+      is a row worked flat. Each rule divides two stretches worked with
+      opposite faces of the knitting towards you. The chart shows the face you
+      are working on: working the turn turns the chart over, and the stretch
+      on the other side of the rule is hatched, because you see it from its
+      other face.
     </>
   );
 }
@@ -174,7 +174,7 @@ export function KeyList({ entries, current, turns, needles }: {
         <li className="stitch-key-turn">
           <TurnSwatch />
           <div>
-            <strong>Turn the work inside out</strong>
+            <strong>Turn the work</strong>
             <p>
               <TurnText turns={turns} />
             </p>
@@ -203,6 +203,7 @@ export function TextRound({ stitches, rounds, round, labels, palette }: {
     .filter(run => run.startId <= (ids.at(-1) ?? 0));
   return <div><p>Round {round}: {labels?.[round - 1]}. Read in working order.</p>
     <ol>{runs.map(run => <li key={run.startId}>{runInstruction(run)} in {yarnFor(palette, run.slot).name}</li>)}
-      {stitches[(ids.at(-1) ?? 0) + 1]?.type === "join" && <li>Join in the round.</li>}</ol>
+      {stitches[(ids.at(-1) ?? 0) + 1]?.type === "join" && <li>Join in the round, lifting the first stitch cast on over the last.</li>}
+      {stitches[(ids.at(-1) ?? 0) + 1]?.type === "joinAcross" && <li>Without turning, join in the round across the gap.</li>}</ol>
   </div>;
 }
