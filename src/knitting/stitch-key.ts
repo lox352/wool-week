@@ -1,4 +1,4 @@
-import { Stitch } from "../types/Stitch";
+import { Stitch, joinsCastOn } from "../types/Stitch";
 import { StitchType } from "../types/StitchType";
 import type { StitchKeyId, StitchNote } from "../data/hats/types";
 
@@ -38,23 +38,8 @@ const standard: Record<StitchKeyId, Omit<KeyEntry, "note">> = {
     type: "join",
     label: "Join in the round",
     how:
-      "Cast on one stitch more than the chart shows. Without twisting the " +
-      "cast-on, slip the last stitch cast on from the right needle to the " +
-      "left, lift the first stitch cast on over it and off the left needle, " +
-      "then slip the last stitch back to the right needle. The round is " +
-      "closed, one stitch lighter; place a marker for its start. The ring " +
-      "marks the last stitch cast on.",
-  },
-  joinAcross: {
-    id: "joinAcross",
-    type: "joinAcross",
-    label: "Join in the round, across",
-    how:
-      "Without turning, work the next stitch - the first of the row just " +
-      "worked - as the next of the round, pulling the yarn a little tighter " +
-      "than usual so no gap is left. No stitch is lost; place a marker for " +
-      "the start of the round. The arrow marks the stitch the join comes " +
-      "after.",
+      "The arrows show the round leaving its last stitch and coming back in " +
+      "at its first.",
   },
   k1: {
     id: "k1",
@@ -130,7 +115,7 @@ const standard: Record<StitchKeyId, Omit<KeyEntry, "note">> = {
   },
 };
 
-const order: StitchKeyId[] = ["castOn", "join", "joinAcross", "k1", "p1", "k1tbl", "kfb", "m1", "k2tog", "k2togtbl", "s2kp", "sk2p"];
+const order: StitchKeyId[] = ["castOn", "join", "k1", "p1", "k1tbl", "kfb", "m1", "k2tog", "k2togtbl", "s2kp", "sk2p"];
 
 /** Whether an m1 is the second loop of the KFB just before it. */
 export const pairedWithKfb = (stitches: Stitch[], index: number): boolean =>
@@ -141,7 +126,9 @@ export const stitchKey = (
   notes: Partial<Record<StitchKeyId, StitchNote>> = {},
 ): KeyEntry[] => {
   const used = new Set<StitchKeyId>();
+  let joinAt = -1;
   stitches.forEach((stitch, index) => {
+    if (stitch.type === "join" && joinAt < 0) joinAt = index;
     if (stitch.id <= 0 || stitch.type === "turn" || stitch.type === "needles") return;
     if (stitch.type === "m1" && pairedWithKfb(stitches, index)) return;
     used.add(stitch.type);
@@ -150,7 +137,7 @@ export const stitchKey = (
     .filter((id) => used.has(id))
     .map((id) => {
       const note = notes[id];
-      const how = id === "castOn" && used.has("join") ? extraCastOn : standard[id].how;
+      const how = id === "join" ? joinHow(joinsCastOn(stitches, joinAt)) : standard[id].how;
       return {
         ...standard[id],
         abbreviation: note?.abbreviation ?? standard[id].abbreviation,
@@ -169,16 +156,20 @@ export const stitchKey = (
  * explained as one.
  */
 /*
- * A cast-on joined by lifting a stitch over is cast on one stitch longer
- * than the chart shows, so its key says so. Which join it has is the step
- * straight after the cast-on round.
+ * How a join in the round is made depends on what it follows: see "join".
+ * The key says the way this hat does it.
  */
-const extraCastOn = "The chart's bottom row: cast these stitches on, and one more for the join.";
-const liftedJoinAfter = (stitches: Stitch[], id: number): boolean => {
-  let at = id;
-  while (stitches[at]?.type === "castOn") at++;
-  return stitches[at]?.type === "join";
-};
+const joinHow = (afterCastOn: boolean): string =>
+  (afterCastOn
+    ? "After the cast-on, cast on one more stitch. Then, without twisting " +
+      "the cast-on, slip that stitch from the right needle to the left, lift " +
+      "the first stitch cast on over it and off the left needle, and slip " +
+      "the last stitch back to the right needle. "
+    : "Without turning, knit the next stitch - the first of the row just " +
+      "worked - as the next of the round, pulling a little tighter than " +
+      "usual so no gap is left. ") +
+  "Place a marker for the start of the round. " +
+  standard.join.how;
 
 export const keyEntryAt = (
   stitches: Stitch[],
@@ -191,7 +182,7 @@ export const keyEntryAt = (
   }
   const type: StitchKeyId = pairedWithKfb(stitches, id) ? "kfb" : stitch.type;
   const note = notes[type];
-  const how = type === "castOn" && liftedJoinAfter(stitches, id) ? extraCastOn : standard[type].how;
+  const how = type === "join" ? joinHow(joinsCastOn(stitches, id)) : standard[type].how;
   return {
     ...standard[type],
     abbreviation: note?.abbreviation ?? standard[type].abbreviation,

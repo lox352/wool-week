@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
-import { Stitch } from "../types/Stitch";
+import { Stitch, joinsCastOn } from "../types/Stitch";
 import { StitchType } from "../types/StitchType";
 import { Mark, forkMark, makeOneMark, markFor } from "../helpers/stitch-marks";
 import { Palette, yarnFor } from "./palette";
 import { indexRounds, runInstruction, upcomingRuns } from "./progress";
 import { KeyEntry, stitchKey } from "./stitch-key";
-import type { NeedleChange } from "./chart-marks";
+import type { Join, NeedleChange } from "./chart-marks";
 import type { StitchKeyId, StitchNote } from "../data/hats/types";
 
 const Cell: React.FC<{ type?: StitchType; mark?: Mark; x: number }> = ({ type, mark = type && markFor(type), x }) => {
@@ -20,8 +20,23 @@ const Cell: React.FC<{ type?: StitchType; mark?: Mark; x: number }> = ({ type, m
   );
 };
 
+/**
+ * The join in the round as the chart draws it: the round leaving one end of
+ * a stitch and coming back in at the other.
+ */
+const JoinSwatch: React.FC = () => (
+  <svg className="key-swatch" width="48" height="24" viewBox="-0.6 -0.04 2.2 1.08" aria-hidden="true">
+    <Cell x={0} />
+    <path
+      d="M0 0.5H-0.5M-0.32 0.32L-0.5 0.5L-0.32 0.68M1.5 0.5H1M1.18 0.32L1 0.5L1.18 0.68"
+      className="key-join"
+    />
+  </svg>
+);
+
 /** A KFB is drawn as the pair of cells it makes: the stitch, and the new one to its left. */
 export const Swatch: React.FC<{ entry: KeyEntry }> = ({ entry }) => {
+  if (entry.id === "join") return <JoinSwatch />;
   const pair = entry.id === "kfb";
   return (
     <svg
@@ -46,16 +61,19 @@ export const Swatch: React.FC<{ entry: KeyEntry }> = ({ entry }) => {
 };
 
 /** What the crimson rule across the chart means, and why it is there. */
-function TurnText({ turns }: { turns: number[] }) {
+function TurnText({ turns, joinedAfter }: { turns: number[]; joinedAfter?: number }) {
+  // Once joined in the round the work is a tube, and turning it is turning
+  // it inside out; before, it is a row, and it is turned over.
+  const phrases = turns.map((round) =>
+    `${joinedAfter !== undefined && round >= joinedAfter ? "inside out" : "over"} after round ${round}`,
+  );
   return (
     <>
-      The work is turned after {turns.length === 1 ? "round" : "rounds"}{" "}
-      {turns.join(", ")}: inside out, if it is already a tube, or over, if it
-      is a row worked flat. Each rule divides two stretches worked with
-      opposite faces of the knitting towards you. The chart shows the face you
-      are working on: working the turn turns the chart over, and the stretch
-      on the other side of the rule is hatched, because you see it from its
-      other face.
+      The work is turned {phrases.join(", and ")}. Each rule divides two
+      stretches worked with opposite faces of the knitting towards you. The
+      chart shows the face you are working on: working the turn turns the
+      chart over, and the stretch on the other side of the rule is hatched,
+      because you see it from its other face.
     </>
   );
 }
@@ -120,30 +138,33 @@ export const hatchSaying =
  * Only the stitches this hat uses, in the words its pattern uses; see
  * stitch-key.ts.
  */
-export function StitchLegend({ stitches, notes, turns, needles }: {
+export function StitchLegend({ stitches, notes, turns, needles, join }: {
   stitches: Stitch[];
   notes?: Partial<Record<StitchKeyId, StitchNote>>;
   /** Rounds after which the work is turned; see turnsInside. */
   turns?: number[];
   needles?: NeedleChange[];
+  join?: Join;
 }) {
   const entries = useMemo(() => stitchKey(stitches, notes), [stitches, notes]);
   return (
     <details className="chart-help">
       <summary>Stitch-symbol key</summary>
-      <KeyList entries={entries} turns={turns} needles={needles} />
+      <KeyList entries={entries} turns={turns} needles={needles} join={join} />
     </details>
   );
 }
 
 /** The key's entries, each with its mark and how to work it. */
-export function KeyList({ entries, current, turns, needles }: {
+export function KeyList({ entries, current, turns, needles, join }: {
   entries: KeyEntry[];
   current?: string;
   /** Rounds after which the work is turned, which the key explains last. */
   turns?: number[];
   /** Where the needles change, explained after the stitches. */
   needles?: NeedleChange[];
+  /** Where the knitting is joined in the round, which decides how a turn is made. */
+  join?: Join;
 }) {
   return (
     <ul className="stitch-key">
@@ -176,7 +197,7 @@ export function KeyList({ entries, current, turns, needles }: {
           <div>
             <strong>Turn the work</strong>
             <p>
-              <TurnText turns={turns} />
+              <TurnText turns={turns} joinedAfter={join?.after} />
             </p>
           </div>
         </li>
@@ -203,7 +224,8 @@ export function TextRound({ stitches, rounds, round, labels, palette }: {
     .filter(run => run.startId <= (ids.at(-1) ?? 0));
   return <div><p>Round {round}: {labels?.[round - 1]}. Read in working order.</p>
     <ol>{runs.map(run => <li key={run.startId}>{runInstruction(run)} in {yarnFor(palette, run.slot).name}</li>)}
-      {stitches[(ids.at(-1) ?? 0) + 1]?.type === "join" && <li>Join in the round, lifting the first stitch cast on over the last.</li>}
-      {stitches[(ids.at(-1) ?? 0) + 1]?.type === "joinAcross" && <li>Without turning, join in the round across the gap.</li>}</ol>
+      {stitches[(ids.at(-1) ?? 0) + 1]?.type === "join" && <li>{joinsCastOn(stitches, (ids.at(-1) ?? 0) + 1)
+        ? "Cast on one more stitch and join in the round, lifting the first stitch cast on over it."
+        : "Without turning, join in the round across the gap."}</li>}</ol>
   </div>;
 }

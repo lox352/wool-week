@@ -369,8 +369,6 @@ export const buildHat = (
           round.slot,
           fabricOf(pattern, roundHeight, round.fabric).width,
           backwards ? -1 : 1,
-          // Closed at once unless joined later across a row: see "join".
-          !joinSpec?.across,
         );
         count = round.count;
         labels.push(`${section} · cast on`);
@@ -378,7 +376,7 @@ export const buildHat = (
         return;
       }
       case "join": {
-        knitter.join(round.across);
+        knitter.join();
         return;
       }
       case "rounds": {

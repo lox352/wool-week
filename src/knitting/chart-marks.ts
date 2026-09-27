@@ -17,20 +17,6 @@ export const markAt = (
   /** Which way this pattern's make-ones lean, if it says. */
   makeOneLean?: "left" | "right",
 ): Mark | undefined => {
-  const own = ownMarkAt(stitch, byId, layout, makeOneLean);
-  // The stitch the round is joined after carries the join's mark as well.
-  const join = byId.get(stitch.id + 1);
-  if (join?.type !== "join" && join?.type !== "joinAcross") return own;
-  const ring = markFor(join.type);
-  return { strokes: [...(own?.strokes ?? []), ...(ring?.strokes ?? [])], dot: own?.dot };
-};
-
-const ownMarkAt = (
-  stitch: Stitch,
-  byId: Map<number, Stitch>,
-  layout: ChartLayout,
-  makeOneLean?: "left" | "right",
-): Mark | undefined => {
   if (isSecondLoop(stitch, byId)) return undefined;
   if (stitch.type === "m1") return makeOneMark(makeOneLean);
   if (stitch.type !== "kfb") return markFor(stitch.type);
@@ -77,4 +63,24 @@ export const needleChangesIn = (stitches: Stitch[], rounds: number[][]): NeedleC
     }
   }
   return out;
+};
+
+/**
+ * Where the knitting is joined in the round: after which round, and the
+ * stitches either side of the step - the last of that round, and the first
+ * of the next, where the chart draws the round leaving and coming back in.
+ */
+export interface Join {
+  after: number;
+  last: number;
+  first: number;
+}
+
+export const joinIn = (stitches: Stitch[], rounds: number[][]): Join | undefined => {
+  const step = stitches.find((stitch) => stitch.type === "join");
+  if (!step) return undefined;
+  const after = rounds.findIndex((ids) => ids.includes(step.id - 1)) + 1;
+  const next = rounds[after];
+  if (after < 1 || !next) return undefined;
+  return { after, last: step.id - 1, first: next[0] };
 };

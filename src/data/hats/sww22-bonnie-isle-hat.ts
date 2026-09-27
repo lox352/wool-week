@@ -234,7 +234,7 @@ const sww22: HatPattern = {
         // working across the gap, without turning, so nothing is lost.
         { type: "turn" },
         { type: "chart", chart: "A", rows: [1, 1], repeats: 14 },
-        { type: "join", across: true },
+        { type: "join" },
         { type: "chart", chart: "A", rows: [2, 13], repeats: 14 },
         {
           type: "shaping",

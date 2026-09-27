@@ -43,6 +43,14 @@ export const cellAt = (
 /** Room to the right of the chart for the round numbers. */
 export const gutter = (cell: number) => Math.round(cell * 2.2);
 
+/**
+ * How far the join in the round's arrows reach past a round's end, in cells,
+ * and the room kept to the left of the chart for one to reach into. On the
+ * right, the gutter has room for it short of the round numbers.
+ */
+export const joinArrowLength = 0.42;
+export const leftMargin = (cell: number) => Math.ceil(cell * 0.5);
+
 export const chartSize = (layout: ChartLayout, cell: number) => ({
   width: layout.columns * cell + gutter(cell),
   height: layout.rounds * cell,

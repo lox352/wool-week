@@ -179,7 +179,6 @@ export interface Size {
 export type StitchKeyId =
   | "castOn"
   | "join"
-  | "joinAcross"
   | "k1"
   | "p1"
   | "k1tbl"
@@ -290,12 +289,11 @@ export type RoundSpec =
   | { type: "turn" }
   /**
    * "Place marker and join to work in the round." For a pattern that does
-   * not join straight after casting on - 2022 works its first row flat - this
-   * is where, and `across` says it is joined by working across the gap, which
-   * loses no stitch. Without one, the cast-on is joined as soon as it is
-   * cast on, by casting on one more and lifting one over.
+   * not join straight after casting on - 2022 works its first row flat -
+   * this is where. Without one, the cast-on is joined as soon as it is cast
+   * on. See the "join" stitch for the difference it makes.
    */
-  | { type: "join"; across?: boolean }
+  | { type: "join" }
   /**
    * "Change to larger needles." Not a round either: from here the knitting
    * is on the size's main needles, having started on its rib needles, where
