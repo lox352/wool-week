@@ -254,9 +254,9 @@ export default class Knitter {
    * Turn the work inside out, between rounds: a step in the order of work,
    * with an id of its own, that makes no fabric. So it belongs to no round,
    * nothing is worked into it and it is worked into nothing, and the next
-   * stitch carries on from the last real one. It still needs somewhere to
-   * be, for the physics: pinned on the axis, level with the round before,
-   * where nothing of the hat can come near it.
+   * stitch carries on from the last real one. Nor is it a body in the
+   * physics (see StitchPhysics); its position, on the axis level with the
+   * round before, only keeps the settled positions one to a stitch.
    */
   turn(): this {
     return this.step("turn");

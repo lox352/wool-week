@@ -1,13 +1,16 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { RapierRigidBody, useRapier } from "@react-three/rapier";
 import { createRestDetector, SettleMetrics } from "../helpers/settling";
 import { Tuning } from "./tuning";
 import { Point } from "../types/Point";
 import { adjacentStitchDistance } from "../constants";
+import { Stitch, isStep } from "../types/Stitch";
 interface SettlerProps {
   active: boolean;
   tuning: Tuning;
+  /** Every stitch, by id; a step has a ref but no body. See StitchPhysics. */
+  stitches: Stitch[];
   stitchRefs: React.MutableRefObject<React.RefObject<RapierRigidBody>[]>;
   /** Called once, with every stitch's resting position, when the hat is still. */
   onSettled: (positions: Point[], metrics: SettleMetrics) => void;
@@ -58,10 +61,16 @@ const inflate = (
 
 export default function Settler({
   active,
+  stitches,
   stitchRefs,
   onSettled,
   tuning,
 }: SettlerProps) {
+  /** The stitches that are bodies, which are all the settling is about. */
+  const bodied = useMemo(
+    () => stitches.filter((stitch) => !isStep(stitch)).map((stitch) => stitch.id),
+    [stitches],
+  );
   const { step } = useRapier();
   const rest = useRef(createRestDetector(tuning));
   const complete = useRef(false);
@@ -74,17 +83,17 @@ export default function Settler({
     if (
       !active ||
       complete.current ||
-      stitchRefs.current.some((r) => !r.current)
+      bodied.some((id) => !stitchRefs.current[id]?.current)
     )
       return;
     if (!started.current) started.current = performance.now();
     const deadline = performance.now() + tuning.stepBudgetMs;
+    const bodies = bodied.map((id) => stitchRefs.current[id]);
     for (let i = 0; i < tuning.substeps; i++) {
-      if (tuning.pressure !== 0) inflate(stitchRefs.current, tuning.pressure);
+      if (tuning.pressure !== 0) inflate(bodies, tuning.pressure);
       step(tuning.timeStep);
       count.current++;
 
-      const bodies = stitchRefs.current;
       if (!was.current) was.current = new Float32Array(bodies.length * 3);
       const before = was.current;
 
@@ -127,8 +136,9 @@ export default function Settler({
       };
       if (rest.current(meanMoved)) {
         complete.current = true;
-        const positions = stitchRefs.current.map((r) =>
-          r.current!.translation(),
+        // A step has no body: it is written down where it was built.
+        const positions = stitches.map((stitch) =>
+          isStep(stitch) ? stitch.position : stitchRefs.current[stitch.id].current!.translation(),
         );
         onSettled(positions, {
           steps: count.current,

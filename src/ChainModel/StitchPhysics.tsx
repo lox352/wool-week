@@ -1,6 +1,6 @@
 import { createRef, useMemo, useRef } from "react";
 import { RapierRigidBody } from "@react-three/rapier";
-import { Stitch, isFabric } from "../types/Stitch";
+import { Stitch, isFabric, isStep } from "../types/Stitch";
 import { Palette, rgbOf, yarnFor } from "../knitting/palette";
 import { Tuning, ropeLength } from "./tuning";
 import { SettleMetrics } from "../helpers/settling";
@@ -58,6 +58,22 @@ export default function StitchPhysics({
   // neither is drawn.
   const drawn = useMemo(() => stitches.filter(isFabric), [stitches]);
 
+  /*
+   * And a step is no body either. Joining the round, turning the work and
+   * changing needles are things a knitter does, not loops of yarn, so the
+   * world is built without them: the same bodies, joints and rope lengths,
+   * in the same order, as a hat with no steps in it at all. They still have
+   * ids, so a rope's span is counted in stitches, not ids - a stitch just
+   * after a step is still the next one along from the stitch before it.
+   */
+  const place = useMemo(() => {
+    const out = new Map<number, number>();
+    stitches.forEach((stitch) => {
+      if (!isStep(stitch)) out.set(stitch.id, out.size);
+    });
+    return out;
+  }, [stitches]);
+
   const positionAt = useMemo(
     () => (id: number) =>
       stitchRefs.current[id]?.current?.translation() ?? stitches[id]?.position,
@@ -93,11 +109,12 @@ export default function StitchPhysics({
     <>
       <Settler
         active={simulationActive}
+        stitches={stitches}
         stitchRefs={stitchRefs}
         onSettled={onSettled}
         tuning={tuning}
       />
-      {stitches.map((stitch) => (
+      {stitches.filter((stitch) => !isStep(stitch)).map((stitch) => (
         <StitchBody
           key={stitch.id}
           rigidBodyRef={stitchRefs.current[stitch.id]}
@@ -133,7 +150,7 @@ export default function StitchPhysics({
               bodyB={stitchRefs.current[link]}
               length={ropeLength(
                 tuning,
-                stitch.id - link,
+                (place.get(stitch.id) ?? stitch.id) - (place.get(link) ?? link),
                 startsAt,
                 stitch.rise ?? roundHeight,
                 stitch.width,
