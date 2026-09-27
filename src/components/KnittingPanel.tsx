@@ -14,7 +14,12 @@ import {
 import { Palette, inkOn, yarnFor } from "../knitting/palette";
 import Button from "./ui/Button";
 import { KeyEntry, keyEntryAt, stitchKey } from "../knitting/stitch-key";
-import { Swatch as StitchSwatch } from "../knitting/ChartHelp";
+import {
+  JoinSwatch,
+  NeedlesSwatch,
+  Swatch as StitchSwatch,
+  TurnSwatch,
+} from "../knitting/ChartHelp";
 import type { StitchKeyId, StitchNote } from "../data/hats/types";
 import "./KnittingPanel.css";
 
@@ -99,11 +104,25 @@ const Swatch: React.FC<{ run: Run; palette: Palette; small?: boolean }> = ({
  * turns the chart over too: from here the other face of the hat is towards
  * you, and the chart shows it that way.
  */
+/**
+ * A step's heading - the same for every kind of step, with the symbol the
+ * key gives it, so a turn, a join and a change of needles read alike.
+ */
+const StepHeading: React.FC<{ symbol: React.ReactNode; children: React.ReactNode }> = ({
+  symbol,
+  children,
+}) => (
+  <strong className="knitting-step-heading">
+    <span className="knitting-step-symbol">{symbol}</span>
+    <span>{children}</span>
+  </strong>
+);
+
 const TurnStep: React.FC<{ insideOut: boolean }> = ({ insideOut }) => (
   <div className="knitting-turn knitting-turn-open">
-    <strong>
-      <span aria-hidden="true">⟲</span> Turn your work{insideOut && " inside out"}
-    </strong>
+    <StepHeading symbol={<TurnSwatch />}>
+      Turn your work{insideOut && " inside out"}
+    </StepHeading>
     <span className="quiet">
       {insideOut
         ? "It is joined in the round, so turn the whole tube inside out and "
@@ -119,8 +138,8 @@ const TurnStep: React.FC<{ insideOut: boolean }> = ({ insideOut }) => (
  * same way. The size is the one the pattern gives for the size being knitted.
  */
 const NeedlesStep: React.FC<{ to: number; from?: number }> = ({ to, from }) => (
-  <div className="knitting-turn knitting-turn-open knitting-needles">
-    <strong>Change to {to}mm needles</strong>
+  <div className="knitting-turn knitting-turn-open">
+    <StepHeading symbol={<NeedlesSwatch />}>Change to {to}mm needles</StepHeading>
     <span className="quiet">
       {from !== undefined && `From the ${from}mm ones, `}
       {from !== undefined ? "before" : "Before"} you knit the next round. The
@@ -135,10 +154,8 @@ const NeedlesStep: React.FC<{ to: number; from?: number }> = ({ to, from }) => (
  * worked flat and the join simply carries on across the gap.
  */
 const JoinStep: React.FC<{ across: boolean }> = ({ across }) => (
-  <div className="knitting-turn knitting-turn-open knitting-join">
-    <strong>
-      <span aria-hidden="true">←</span> Join in the round
-    </strong>
+  <div className="knitting-turn knitting-turn-open">
+    <StepHeading symbol={<JoinSwatch />}>Join in the round</StepHeading>
     <span className="quiet">
       {across
         ? "Don't turn: knit the next stitch, the first of the row, as the next " +
