@@ -24,7 +24,7 @@ const Cell: React.FC<{ type?: StitchType; mark?: Mark; x: number }> = ({ type, m
  * The join in the round as the chart draws it: the round leaving one end of
  * a stitch and coming back in at the other.
  */
-export const JoinSwatch: React.FC = () => (
+const JoinSwatch: React.FC = () => (
   <svg className="key-swatch" width="48" height="24" viewBox="-0.6 -0.04 2.2 1.08" aria-hidden="true">
     <Cell x={0} />
     <path
