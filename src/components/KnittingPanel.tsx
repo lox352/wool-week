@@ -99,10 +99,7 @@ const Swatch: React.FC<{ run: Run; palette: Palette; small?: boolean }> = ({
  * turns the chart over too: from here the other face of the hat is towards
  * you, and the chart shows it that way.
  */
-const TurnStep: React.FC<{ insideOut: boolean; onTurned: () => void }> = ({
-  insideOut,
-  onTurned,
-}) => (
+const TurnStep: React.FC<{ insideOut: boolean }> = ({ insideOut }) => (
   <div className="knitting-turn knitting-turn-open">
     <strong>
       <span aria-hidden="true">⟲</span> Turn your work{insideOut && " inside out"}
@@ -114,9 +111,6 @@ const TurnStep: React.FC<{ insideOut: boolean; onTurned: () => void }> = ({
       carry on the other way. The chart turns over to match: what you have
       knitted so far is shown hatched.
     </span>
-    <Button variant="primary" size="lg" className="knitting-go" onClick={onTurned}>
-      Turned: carry on
-    </Button>
   </div>
 );
 
@@ -124,11 +118,7 @@ const TurnStep: React.FC<{ insideOut: boolean; onTurned: () => void }> = ({
  * A change of needles: a step between rounds, like a turn, and worked the
  * same way. The size is the one the pattern gives for the size being knitted.
  */
-const NeedlesStep: React.FC<{ to: number; from?: number; onChanged: () => void }> = ({
-  to,
-  from,
-  onChanged,
-}) => (
+const NeedlesStep: React.FC<{ to: number; from?: number }> = ({ to, from }) => (
   <div className="knitting-turn knitting-turn-open knitting-needles">
     <strong>Change to {to}mm needles</strong>
     <span className="quiet">
@@ -136,9 +126,6 @@ const NeedlesStep: React.FC<{ to: number; from?: number; onChanged: () => void }
       {from !== undefined ? "before" : "Before"} you knit the next round. The
       chart marks the change with a dashed rule.
     </span>
-    <Button variant="primary" size="lg" className="knitting-go" onClick={onChanged}>
-      Changed: carry on
-    </Button>
   </div>
 );
 
@@ -147,7 +134,7 @@ const NeedlesStep: React.FC<{ to: number; from?: number; onChanged: () => void }
  * was cast on with one to spare, and the join lifts it off, or a row was
  * worked flat and the join simply carries on across the gap.
  */
-const JoinStep: React.FC<{ across: boolean; onJoined: () => void }> = ({ across, onJoined }) => (
+const JoinStep: React.FC<{ across: boolean }> = ({ across }) => (
   <div className="knitting-turn knitting-turn-open knitting-join">
     <strong>
       <span aria-hidden="true">←</span> Join in the round
@@ -162,9 +149,6 @@ const JoinStep: React.FC<{ across: boolean; onJoined: () => void }> = ({ across,
           "off, and slip it back to the right needle. Place a marker for the " +
           "start of the round."}
     </span>
-    <Button variant="primary" size="lg" className="knitting-go" onClick={onJoined}>
-      Joined: carry on
-    </Button>
   </div>
 );
 
@@ -328,18 +312,11 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
               : `Change to ${position.needlesNext}mm needles.`}
         </p>
         {position.turnNext ? (
-          <TurnStep insideOut={position.joined} onTurned={() => setProgress(progress + 1)} />
+          <TurnStep insideOut={position.joined} />
         ) : position.joinNext ? (
-          <JoinStep
-            across={position.joinNext === "across"}
-            onJoined={() => setProgress(progress + 1)}
-          />
+          <JoinStep across={position.joinNext === "across"} />
         ) : (
-          <NeedlesStep
-            to={position.needlesNext ?? 0}
-            from={stitches[progress]?.needles}
-            onChanged={() => setProgress(progress + 1)}
-          />
+          <NeedlesStep to={position.needlesNext ?? 0} from={stitches[progress]?.needles} />
         )}
         <div className="knitting-actions">
           <UndoButton onUndo={onUndo} canUndo={canUndo} />
@@ -348,6 +325,19 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
               Key
             </Button>
           )}
+          {/* Laid out as the usual panel is: Undo and Key, then the one thing to do. */}
+          <Button
+            variant="primary"
+            size="lg"
+            className="knitting-go"
+            onClick={() => setProgress(progress + 1)}
+          >
+            {position.turnNext
+              ? "Turned: carry on"
+              : position.joinNext
+                ? "Joined: carry on"
+                : "Changed: carry on"}
+          </Button>
         </div>
       </div>
     );
