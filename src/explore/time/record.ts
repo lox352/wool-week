@@ -10,7 +10,7 @@
  * this long, or reached at an unknown pace - and whether each gap between
  * taps looked like knitting or like a break.
  */
-import type { Action } from "./simulate";
+import type { Action, PageEvent, PageKind } from "./simulate";
 
 export interface Observation {
   /** The stitches after `from` up to and including `to`. */
@@ -161,6 +161,176 @@ export class Log implements Recorder {
     const kept = new Set(reached);
     const live = observations.filter((_, n) => kept.has(n));
     return { observations: live, otherMs, bytes: JSON.stringify(rows).length };
+  }
+}
+
+/* ------------------------------------------------- B+. log with the page */
+
+/** Which of the page's own events the timeline listens to. */
+export interface Uses {
+  /** Knitting opened by its button and closed with the X. */
+  exits?: boolean;
+  /** The page loaded straight into knitting: a break, unless Safari did it. */
+  loads?: boolean;
+  /**
+   * Out of sight: a break - read only while the page keeps the screen awake
+   * itself, so that going out of sight can only have been done on purpose.
+   */
+  hidden?: boolean;
+}
+
+const pageCode: Record<PageKind, number> = { enter: 2, exit: 3, load: 4, hide: 5, show: 6 };
+
+/**
+ * The log, with the page's own comings and goings written in among the taps.
+ *
+ * A gap between two taps that holds an X and a later opening is split: the
+ * knitting before the X (at most what the next run should take) and after
+ * the opening count, and what lies between is a break for certain. That
+ * only ever shortens a gap the taps alone would have counted as knitting. A load
+ * can be read the same way, from when the page was last hidden. Out-of-sight
+ * spans are only read as breaks while the page holds the screen awake: on a
+ * phone that locks itself, being out of sight is mostly knitting.
+ */
+export class Timeline implements Recorder {
+  private actions: Action[] = [];
+  private page: PageEvent[] = [];
+  constructor(
+    private uses: Uses,
+    /** Whether the page kept the screen awake (a wake lock) while knitting. */
+    private awake = false,
+  ) {}
+  record(action: Action) {
+    this.actions.push(action);
+  }
+  note(event: PageEvent) {
+    this.page.push(event);
+  }
+  derive(rule: PauseRule, expect: (from: number, to: number) => number): Derived {
+    const between: PageEvent[][] = this.actions.map(() => []);
+    for (const e of this.page) if (e.seq > 0 && e.seq < this.actions.length) between[e.seq].push(e);
+
+    // Spans out of sight, and whether this knitter's page is mostly hidden while knitting.
+    const hiddenIn = (i: number) => {
+      let at = this.actions[i - 1].t;
+      let out = this.hiddenAfter(i - 1);
+      let total = 0;
+      let long = 0;
+      const close = (t: number) => {
+        if (out !== undefined) {
+          const span = t - Math.max(out, at);
+          total += Math.max(0, span);
+          if (t - out > 60_000) long += Math.max(0, span);
+        }
+      };
+      for (const e of between[i]) {
+        if (e.kind === "hide") {
+          if (out === undefined) out = e.t;
+        } else if (e.kind === "show" || e.kind === "load" || e.kind === "enter") {
+          close(e.t);
+          out = undefined;
+          at = e.t;
+        }
+      }
+      close(this.actions[i].t);
+      return { total, long };
+    };
+    const readHidden = this.uses.hidden && this.awake;
+
+    const observations: Observation[] = [];
+    let otherMs = 0;
+    for (let i = 0; i < this.actions.length; i++) {
+      const action = this.actions[i];
+      const gap = i === 0 ? NaN : action.t - this.actions[i - 1].t;
+      if (action.kind === "undo" || action.to <= action.from) {
+        if (!Number.isNaN(gap) && !rule(gap, 60_000)) otherMs += gap;
+        continue;
+      }
+      const expected = expect(action.from, action.to);
+      let ms: number | undefined | null = null;
+      if (!Number.isNaN(gap) && gap >= 0) {
+        const events = between[i];
+        const previous = this.actions[i - 1].t;
+        /**
+         * Knitting before the break and after it, judged together. It can
+         * only take time away: a gap already judged a break stays one, and
+         * its stitches are credited at the usual pace, since the time after
+         * opening also holds finding your place.
+         */
+        const split = (stopped: number, started: number) => {
+          if (rule(gap, expected)) return undefined;
+          const before = Math.min(Math.max(0, stopped - previous), expected);
+          const after = action.t - started;
+          const both = before + after;
+          // Knitted first and only opened the page to tap: nothing to go on.
+          if (after < 0 || both < 0.3 * expected) return undefined;
+          return rule(both, expected) ? undefined : both;
+        };
+        const exit = this.uses.exits ? events.findIndex((e) => e.kind === "exit") : -1;
+        if (exit >= 0) {
+          const enter = events.findLast((e, n) => n > exit && e.kind === "enter");
+          ms = enter ? split(events[exit].t, enter.t) : undefined;
+        }
+        if (ms === null && this.uses.loads) {
+          const load = events.findLastIndex((e) => e.kind === "load");
+          if (load >= 0) {
+            const hid = events.findLast((e, n) => n < load && e.kind === "hide");
+            ms = split(hid?.t ?? this.hiddenAfter(i - 1) ?? events[load].t, events[load].t);
+          }
+        }
+        if (ms === null && readHidden) {
+          const active = gap - hiddenIn(i).long;
+          ms = rule(active, expected) ? undefined : active;
+        }
+        if (ms === null) ms = rule(gap, expected) ? undefined : gap;
+      }
+      observations.push({ from: action.from, to: action.to, ms: ms ?? undefined });
+    }
+    const reached = new Int32Array(Math.max(0, ...this.actions.map((a) => a.to)) + 1).fill(-1);
+    observations.forEach((o, n) => {
+      for (let id = o.from + 1; id <= o.to; id++) reached[id] = n;
+    });
+    const kept = new Set(reached);
+    const live = observations.filter((_, n) => kept.has(n));
+    return { observations: live, otherMs, bytes: this.bytes() };
+  }
+
+  /** When the page went out of sight, if it was out of sight just after action `i`. */
+  private hiddenAfter(i: number): number | undefined {
+    let out: number | undefined;
+    for (const e of this.page) {
+      if (e.seq > i) break;
+      if (e.kind === "hide") out ??= e.t;
+      else if (e.kind !== "exit") out = undefined;
+    }
+    return out;
+  }
+
+  /** The log's rows, with the page's events among them as [seconds, 0, code]. */
+  private bytes() {
+    const kinds = new Set<PageKind>([
+      ...(this.uses.exits ? (["enter", "exit"] as const) : []),
+      ...(this.uses.loads ? (["load", "hide"] as const) : []),
+      ...(this.uses.hidden ? (["hide", "show", "load"] as const) : []),
+    ]);
+    const rows: number[][] = [];
+    let last = 0;
+    let lastTo = 0;
+    let p = 0;
+    const push = (t: number, row: number[]) => {
+      const s = Math.round(t / 1000);
+      rows.push([rows.length === 0 ? s : s - last, ...row]);
+      last = s;
+    };
+    this.actions.forEach((a, i) => {
+      for (; p < this.page.length && this.page[p].seq <= i; p++) {
+        const e = this.page[p];
+        if (kinds.has(e.kind)) push(e.t, [0, pageCode[e.kind]]);
+      }
+      push(a.t, a.kind === "undo" ? [a.to - lastTo, 1] : [a.to - lastTo]);
+      lastTo = a.to;
+    });
+    return JSON.stringify(rows).length;
   }
 }
 

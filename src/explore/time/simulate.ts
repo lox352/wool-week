@@ -8,6 +8,12 @@
  * puts the knitting down, comes back the next day, and makes the mistakes
  * the site has to survive: a run tapped twice and undone, a jump to the
  * wrong stitch, a round frogged and knitted again, the phone's clock moving.
+ *
+ * It also leaves the trail a page can see of itself: knitting opened and
+ * closed with the X, the page loaded, hidden and shown again. A phone that
+ * locks itself hides the page for most of the knitting, one kept awake only
+ * when it is put away; and Safari sometimes throws a hidden page away, so
+ * coming back loads it afresh.
  */
 import { HatFeatures, Operation, priced } from "./features";
 import { endOfRound, currentRun, indexRounds, RoundIndex } from "../../knitting/progress";
@@ -35,9 +41,23 @@ export const defaultTap = 1.5;
 
 export type Style = "runs" | "rounds" | "mixed" | "catchup";
 
+/** How often the knitter closes knitting with the X: at the end of a sitting, and for a short break. */
+export const exitHabits = {
+  /** Closes knitting for a cup of tea too, as a pause button. */
+  breaks: { sitting: 0.9, break: 0.7 },
+  always: { sitting: 0.9, break: 0.15 },
+  sometimes: { sitting: 0.4, break: 0.05 },
+  never: { sitting: 0, break: 0 },
+};
+export type ExitHabit = keyof typeof exitHabits;
+/** `locks`: the phone locks itself 30 s after a touch. `on`: the screen is kept awake while knitting. */
+export type Screen = "locks" | "on";
+
 export interface Scenario {
   name: string;
   style: Style;
+  exits?: ExitHabit;
+  screen?: Screen;
   /** Taps twice and undoes, jumps wrongly and undoes, frogs rounds. */
   messy?: boolean;
   /** The phone's clock goes back an hour partway through. */
@@ -53,6 +73,20 @@ export interface Action {
   kind: ActionKind;
 }
 
+/**
+ * What the page sees of itself. `enter`: knitting opened by its button;
+ * `exit`: closed with the X; `load`: the page loaded straight into knitting
+ * (a reload, or Safari having thrown it away); `hide` and `show`: the page
+ * went out of sight (locked, another app or tab) and came back.
+ */
+export type PageKind = "enter" | "exit" | "load" | "hide" | "show";
+export interface PageEvent {
+  t: number;
+  kind: PageKind;
+  /** How many actions came before it, so it can be placed among them. */
+  seq: number;
+}
+
 export interface Knitter {
   /** This knitter's own seconds per operation. */
   costs: Record<Operation, number>;
@@ -62,6 +96,7 @@ export interface Knitter {
 export interface Simulation {
   knitter: Knitter;
   actions: Action[];
+  page: PageEvent[];
   truth: {
     /** Time spent knitting (and tapping), pauses excluded, frogged work included. */
     activeMs: number;
@@ -109,7 +144,10 @@ export const simulate = (
   const last = stitches.length - 1;
   const perStitchMs = new Float64Array(stitches.length);
   const actions: Action[] = [];
+  const page: PageEvent[] = [];
   const activeAt: number[] = [];
+  const habit = exitHabits[scenario.exits ?? "never"];
+  const locks = (scenario.screen ?? "locks") === "locks";
 
   let clock = Date.UTC(2026, 8, 20, 18, 0, 0);
   let skew = 0;
@@ -146,21 +184,104 @@ export const simulate = (
   const pause = (ms: number) => {
     clock += ms;
   };
+
+  // The page's own state, as it would see it.
+  let inKnitting = true;
+  let hidden = false;
+  let hiddenSince = 0;
+  /** When the phone will lock itself, unless touched first. */
+  let lockAt: number | undefined;
+  const emit = (kind: PageKind, at: number) => page.push({ t: at + skew, kind, seq: actions.length });
+  /** Let the phone lock itself if its time came before `at`. */
+  const settle = (at: number) => {
+    if (lockAt !== undefined && lockAt < at && !hidden) {
+      emit("hide", lockAt);
+      hidden = true;
+      hiddenSince = lockAt;
+    }
+    lockAt = undefined;
+  };
+  const hide = (at: number) => {
+    settle(at);
+    if (hidden) return;
+    emit("hide", at);
+    hidden = true;
+    hiddenSince = at;
+  };
+  /** The page comes back into sight - loaded afresh, if Safari threw it away meanwhile. */
+  const wake = (at: number) => {
+    settle(at);
+    if (!hidden) return;
+    const thrownAway = r.next() < 1 - Math.exp(-(at - hiddenSince) / (3 * 3600_000));
+    emit(thrownAway ? "load" : "show", at);
+    hidden = false;
+  };
+  /** Picked up to look or to tap: shown, knitting opened if it was closed. */
+  const lookAt = (at: number) => {
+    wake(at - 2500);
+    if (!inKnitting) {
+      emit("enter", at - 1200);
+      inKnitting = true;
+    }
+  };
+  const afterTouch = () => {
+    if (locks) lockAt = clock + 30_000;
+  };
+  /**
+   * Away from the knitting for `ms`: maybe closed with the X first, the
+   * phone locked or used for something else, and on coming back, maybe a
+   * look at the chart before carrying on (or straight on knitting, and the
+   * phone only picked up at the next tap).
+   */
+  const away = (ms: number, closeChance: number, putAway: boolean) => {
+    if (r.next() < closeChance) {
+      lookAt(clock);
+      emit("exit", clock);
+      inKnitting = false;
+      afterTouch();
+    }
+    if (putAway || !locks) {
+      if (putAway || r.next() < 0.5) hide(clock + 5000);
+    }
+    pause(ms);
+    if (r.next() < 0.7) {
+      lookAt(clock);
+      afterTouch();
+      pause(1000 * (20 + 100 * r.next()));
+    }
+  };
+
   const record = (to: number, kind: ActionKind) => {
     if (clockJumpAt >= 0 && skew === 0 && to >= clockJumpAt) skew = -60 * 60 * 1000;
+    lookAt(clock);
     actions.push({ t: clock + skew, from: site, to, kind });
+    afterTouch();
     activeAt.push(active);
     site = to;
   };
 
   /** Knit the stitches after `progress` up to `to`, in real time. */
   const knit = (to: number) => {
+    const long = to - progress > 20;
     for (let id = progress + 1; id <= to; id++) {
       const ms = 1000 * priced(features.ops[id], knitter.costs) * warmth(id) * r.lognormal(0.35);
       spend(ms);
       perStitchMs[id] = ms;
+      // A glance at the chart partway through a long stretch.
+      if (long && r.next() < 1 / 40) {
+        lookAt(clock);
+        afterTouch();
+      }
+      // Knitting on while reading something else: the pattern, a message.
+      if (!locks && r.next() < 1 / 2000) {
+        hide(clock);
+        spend(1000 * (20 + 40 * r.next()));
+      }
       // Put down for a moment mid-run, now and then.
-      if (r.next() < 1 / 900) pause(60_000 * (1 + 7 * r.next()));
+      if (r.next() < 1 / 900) {
+        if (!locks && r.next() < 0.3) hide(clock);
+        pause(60_000 * (1 + 7 * r.next()));
+      }
     }
     progress = to;
   };
@@ -190,7 +311,7 @@ export const simulate = (
   while (progress < last) {
     // A new session, after a night's sleep.
     if (sessionLeft <= 0) {
-      pause(60 * 60 * 1000 * (6 + 14 * r.next()));
+      away(60 * 60 * 1000 * (6 + 14 * r.next()), habit.sitting, true);
       sessionLeft = 60 * 60 * 1000 * r.lognormal(0.4);
     }
     const to = Math.min(nextStop(), last);
@@ -242,10 +363,11 @@ export const simulate = (
     // A short break between actions - the kettle, the door - about one in
     // every three quarters of an hour of knitting.
     if (r.next() < 1 - Math.exp(-(active - activeAtLastTap) / (45 * 60_000))) {
-      pause(60_000 * (2 + 10 * r.next()));
+      away(60_000 * (2 + 10 * r.next()), habit.break, false);
     }
     activeAtLastTap = active;
   }
 
-  return { knitter, actions, truth: { activeMs: active, perStitchMs, activeAt } };
+  settle(clock);
+  return { knitter, actions, page, truth: { activeMs: active, perStitchMs, activeAt } };
 };
