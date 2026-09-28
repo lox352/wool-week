@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from "react";
-import { downloadBackup, parseBackup, restoreBackup } from "../helpers/backups";
-import { getStorageNotice, type Project } from "../helpers/projects";
+import { downloadBackup, maxBackupBytes, parseBackup, restoreBackup, type BackupProject } from "../helpers/backups";
+import { getStorageNotice } from "../helpers/projects";
 import { updateSettings, useSettings } from "../helpers/settings";
 import Button from "./ui/Button";
 import Dialog from "./ui/Dialog";
@@ -71,8 +71,30 @@ const ChartSettings: React.FC = () => {
   );
 };
 
+const StatisticsSettings: React.FC = () => {
+  const settings = useSettings();
+  const headingId = useId();
+  return (
+    <section className="settings-group" aria-labelledby={headingId}>
+      <h3 id={headingId}>Knitting time</h3>
+      <ul>
+        <SettingRow
+          title="Don't record knitting statistics"
+          detail="Stops timing your knitting, and hides how long each hat has taken and has left. Times already recorded stay with their projects, and come back if you turn this off again."
+        >
+          <Toggle
+            label="Don't record knitting statistics"
+            checked={settings.noStatistics}
+            onChange={(noStatistics) => updateSettings({ noStatistics })}
+          />
+        </SettingRow>
+      </ul>
+    </section>
+  );
+};
+
 const Backups: React.FC = () => {
-  const [pending, setPending] = useState<Project[]>();
+  const [pending, setPending] = useState<BackupProject[]>();
   const [message, setMessage] = useState("");
   const inputId = useId();
   return (
@@ -103,8 +125,8 @@ const Backups: React.FC = () => {
               event.target.value = "";
               if (!file) return;
               try {
-                if (file.size > 2_000_000) {
-                  throw new Error("That backup is too large (the most is 2 MB).");
+                if (file.size > maxBackupBytes) {
+                  throw new Error("That backup is too large (the most is 10 MB).");
                 }
                 setPending(parseBackup(await file.text()));
                 setMessage("");
@@ -201,6 +223,7 @@ const Settings: React.FC = () => {
               </Button>
             </div>
             <ChartSettings />
+            <StatisticsSettings />
             <Backups />
           </div>
         )}

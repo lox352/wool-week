@@ -1,7 +1,8 @@
 import { afterEach, expect, it } from "vitest";
 import { hats } from "../data/hats";
 import { backupText, parseBackup, restoreBackup } from "./backups";
-import { listProjects, startProject } from "./projects";
+import { deleteProject, listProjects, startProject } from "./projects";
+import { readLog, writeLog } from "../knitting/timing/log";
 afterEach(() => localStorage.clear());
 it("round trips without overwriting existing projects", () => {
   const h = hats[0];
@@ -35,4 +36,24 @@ it("keeps a brim's own words, and refuses words the brim cannot knit", () => {
   const plain = hats.find(h => !h.lettering)!;
   startProject(plain.id, plain.sizes[0].id, plain.colourways[0].id, {}, "HELLO");
   expect(() => parseBackup(backupText())).toThrow("lettering");
+});
+
+it("carries each project's knitting times with it, and refuses a broken log", () => {
+  const h = hats[0];
+  const p = startProject(h.id, h.sizes[0].id, h.colourways[0].id);
+  writeLog(p.id, [[1_790_000_000, 0, 10], [40, 12]]);
+  const [copy] = restoreBackup(parseBackup(backupText()));
+  expect(readLog(copy.id)).toEqual([[1_790_000_000, 0, 10], [40, 12]]);
+  expect(JSON.parse(localStorage.getItem(copy.id)!).timeLog).toBeUndefined();
+  const broken = JSON.parse(backupText());
+  broken.projects[0].timeLog = [[1, 0, 99]];
+  expect(() => parseBackup(JSON.stringify(broken))).toThrow("knitting times");
+});
+
+it("forgets a project's knitting times when the project is deleted", () => {
+  const h = hats[0];
+  const p = startProject(h.id, h.sizes[0].id, h.colourways[0].id);
+  writeLog(p.id, [[1_790_000_000, 12]]);
+  deleteProject(p.id);
+  expect(readLog(p.id)).toEqual([]);
 });

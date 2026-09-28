@@ -1,4 +1,5 @@
 import { Overrides } from "../knitting/palette";
+import { deleteLog } from "../knitting/timing/log";
 
 /**
  * A project is a hat you are knitting.
@@ -196,6 +197,7 @@ export const startProject = (
 export const deleteProject = (id: string) => {
   try {
     localStorage.removeItem(storageKeyFor(id));
+    deleteLog(storageKeyFor(id));
     pending.delete(storageKeyFor(id));
     pendingBase.delete(storageKeyFor(id));
     notifyChanged();

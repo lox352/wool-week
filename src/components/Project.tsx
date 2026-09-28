@@ -25,6 +25,9 @@ import KnittingPanel from "./KnittingPanel";
 import { KeySheet } from "./KnitKey";
 import BrimLettering from "./BrimLettering";
 import { withLettering } from "../knitting/lettering/apply";
+import { recordProgress } from "../knitting/timing/log";
+import { useKnittingTime, useTimeRecording } from "../knitting/timing/useKnittingTime";
+import { TimeFigures, TimeLine } from "./KnittingTime";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
@@ -49,7 +52,8 @@ const ChartPageFoot: React.FC<{
   finished: boolean;
   overview: string;
   onKnit: () => void;
-}> = ({ percent, worked, total, round, rounds, finished, overview, onKnit }) => (
+  time?: React.ReactNode;
+}> = ({ percent, worked, total, round, rounds, finished, overview, onKnit, time }) => (
   <section className="section chart-foot" aria-label="Your progress">
     <div className="chart-foot-figure">
       <em>{finished ? "100%" : percentKnitted(worked, percent)}</em>
@@ -65,6 +69,7 @@ const ChartPageFoot: React.FC<{
         ? `Finished · ${total.toLocaleString()} stitches`
         : `Round ${round} of ${rounds} · ${worked.toLocaleString()} of ${total.toLocaleString()} stitches`}
     </p>
+    {time}
     <div className="chart-foot-actions">
       <Link to="/" className="btn btn-quiet">
         Home
@@ -111,6 +116,7 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
 
   const knitting = params.get(knittingParam) === "1";
   const hat = project ? hatById(project.hatId) : undefined;
+  useTimeRecording(project && hat && view === "chart" ? project.id : undefined, knitting);
 
   useEffect(() => {
     adopt(projectId ? readProject(projectId) : undefined);
@@ -134,26 +140,33 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
     };
   }, [projectId, adopt]);
 
+  /** Move progress, and write the change into the knitting-time log if it was saved. */
+  const moveTo = useCallback((next: number, undo = false) => {
+    const current = currentProject.current;
+    if (!current || next === current.progress) return false;
+    change(project => ({ ...project, progress: next }));
+    const saved = currentProject.current;
+    if (saved?.progress !== next) return false;
+    recordProgress(saved.id, current.progress, next, undo);
+    return true;
+  }, [change]);
+
   const setProgress = useCallback(
     (next: number) => {
-      change((current) => {
-        const progress = Math.max(next, 0);
-        if (progress !== current.progress) {
-          const from = current.progress;
-          setHistory((past) => [...past.slice(-(undoLimit - 1)), from]);
-        }
-        return { ...current, progress };
-      });
+      const from = currentProject.current?.progress;
+      if (from !== undefined && moveTo(Math.max(next, 0))) {
+        setHistory((past) => [...past.slice(-(undoLimit - 1)), from]);
+      }
     },
-    [change],
+    [moveTo],
   );
 
   const undo = useCallback(() => {
     const previous = history.at(-1);
     if (previous === undefined) return;
-    change(current => ({ ...current, progress: previous }));
+    moveTo(previous, true);
     setHistory((past) => past.slice(0, -1));
-  }, [history, change]);
+  }, [history, moveTo]);
 
   const setColourway = useCallback((colourwayId: string) => {
     change(current => ({ ...current, colourwayId }));
@@ -287,6 +300,7 @@ const ProjectView: React.FC<{
 
   const counts = totals(index, project.progress);
   const position = positionOf(stitches, project.progress, index);
+  const time = useKnittingTime(project.id, stitches, project.progress);
 
   const stageRef = useRef<HTMLDivElement>(null);
   const choicesRef = useRef<HTMLElement>(null);
@@ -369,6 +383,7 @@ const ProjectView: React.FC<{
             finished={position.finished}
             overview={overviewPath(project.id)}
             onKnit={() => setKnitting(true)}
+            time={time && <TimeLine time={time} finished={position.finished} className="chart-foot-time" />}
           />
         )}
         {knitting && keyOpen && (
@@ -430,6 +445,7 @@ const ProjectView: React.FC<{
               <dt>Left to go</dt>
               <dd>{counts.remaining.toLocaleString()} stitches</dd>
             </div>
+            {time && <TimeFigures time={time} finished={position.finished} />}
           </dl>
         </div>
   );
