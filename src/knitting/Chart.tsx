@@ -20,12 +20,14 @@ const regionsBelow = (turns: number[], round: number): number =>
   turns.filter((at) => at < round).length;
 
 /**
- * How far above the panel the stitch being worked should sit, in rounds.
- *
- * Enough that the round you are on and the few just finished are all clear of
- * it, rather than the stitch you want hugging its top edge.
+ * How far above the panel the stitch being worked should sit: a quarter of
+ * the way up what shows of the chart, so there is more of what has been
+ * knitted in view and less of what is to come. Never under five rounds,
+ * so the round you are on and the few just finished are clear of the panel
+ * however short the window.
  */
 const clearance = 5;
+const lift = (showing: number, cell: number) => Math.max(clearance * cell, showing / 4);
 
 /**
  * The largest canvas to ask a browser for, in pixels along either side.
@@ -304,7 +306,7 @@ const Chart: React.FC<ChartProps> = ({
       scroller.scrollTo({
         left: Math.max(x - scroller.clientWidth / 2 + cell / 2, 0),
         top: contained
-          ? Math.max(y + cell - (scroller.clientHeight - clearance * cell), 0)
+          ? Math.max(y + cell - (scroller.clientHeight - lift(scroller.clientHeight, cell)), 0)
           : undefined,
         behavior,
       });
@@ -415,7 +417,7 @@ const Chart: React.FC<ChartProps> = ({
     const panel = document.querySelector<HTMLElement>(".knitting-panel");
     const floor = window.innerHeight - (panel?.offsetHeight ?? 0);
     const bottom = sheets.getBoundingClientRect().top + y + cellSize;
-    const delta = bottom - (floor - clearance * cellSize);
+    const delta = bottom - (floor - lift(floor, cellSize));
     if (Math.abs(delta) < 1) return;
     window.scrollBy({ top: delta, behavior: reducedMotion() ? "auto" : "smooth" });
     // Re-aim only when the round changes; the rest is in the closure.
