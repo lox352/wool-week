@@ -34,8 +34,10 @@
   text-decoration: none;
 }
 
-.masthead-title:hover {
-  color: var(--crimson);
+@media (hover: hover) {
+  .masthead-title:hover {
+    color: var(--crimson);
+  }
 }
 
 .page-title {

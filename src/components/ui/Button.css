@@ -49,9 +49,11 @@
   color: #fff;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: var(--crimson-dark);
-  border-color: var(--crimson-dark);
+@media (hover: hover) {
+  .btn-primary:hover:not(:disabled) {
+    background: var(--crimson-dark);
+    border-color: var(--crimson-dark);
+  }
 }
 
 /* Paper with a hairline round it. */
@@ -61,9 +63,11 @@
   color: var(--ink);
 }
 
-.btn-secondary:hover:not(:disabled) {
-  border-color: var(--ink-faint);
-  background: var(--paper-sunk);
+@media (hover: hover) {
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--ink-faint);
+    background: var(--paper-sunk);
+  }
 }
 
 .btn-danger {
@@ -72,9 +76,11 @@
   color: var(--crimson-dark);
 }
 
-.btn-danger:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--crimson) 10%, transparent);
-  border-color: var(--crimson);
+@media (hover: hover) {
+  .btn-danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--crimson) 10%, transparent);
+    border-color: var(--crimson);
+  }
 }
 
 /* A link that happens to be a button. */
@@ -101,9 +107,11 @@
   }
 }
 
-.btn-quiet:hover:not(:disabled) {
-  color: var(--crimson);
-  text-decoration-color: currentColor;
+@media (hover: hover) {
+  .btn-quiet:hover:not(:disabled) {
+    color: var(--crimson);
+    text-decoration-color: currentColor;
+  }
 }
 
 .btn-quiet:active:not(:disabled) {

@@ -86,8 +86,10 @@
   cursor: pointer;
 }
 
-.yarn-option:hover {
-  background: var(--paper-sunk);
+@media (hover: hover) {
+  .yarn-option:hover {
+    background: var(--paper-sunk);
+  }
 }
 
 .yarn-option.is-chosen {

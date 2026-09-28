@@ -137,9 +137,11 @@
   cursor: pointer;
 }
 
-.knitting-close:hover {
-  background: var(--paper-sunk);
-  color: var(--ink);
+@media (hover: hover) {
+  .knitting-close:hover {
+    background: var(--paper-sunk);
+    color: var(--ink);
+  }
 }
 
 .knitting-readout {

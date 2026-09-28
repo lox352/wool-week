@@ -12,8 +12,10 @@
   cursor: pointer;
 }
 
-.settings-button:hover {
-  color: var(--crimson);
+@media (hover: hover) {
+  .settings-button:hover {
+    color: var(--crimson);
+  }
 }
 
 @media (pointer: coarse) {
