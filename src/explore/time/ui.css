@@ -1,0 +1,65 @@
+.explore-time {
+  color: var(--ink-soft);
+}
+
+.explore-figures {
+  margin-top: 0.8rem;
+}
+
+.explore-panel {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+}
+
+.explore-finish h3 {
+  margin-top: 1.2rem;
+}
+
+.explore-hero strong {
+  font-size: 1.6rem;
+}
+
+.explore-days {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 64px;
+  margin: 0.6rem 0;
+}
+
+.explore-day {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.explore-day span {
+  display: block;
+  width: 100%;
+  background: #2a78d6;
+  border-radius: 4px 4px 0 0;
+}
+
+.explore-ops {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+}
+
+.explore-ops th,
+.explore-ops td {
+  text-align: left;
+  padding: 0.25rem 0.5rem 0.25rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.explore-ops td:nth-child(n + 2),
+.explore-ops th:nth-child(n + 2) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.explore-rounds {
+  padding-left: 1.2rem;
+}

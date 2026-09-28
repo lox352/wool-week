@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { demoTiming, exploreMode } from "../explore/time/demo";
+import { HomeTime } from "../explore/time/ui";
 import { Link, useNavigate } from "react-router-dom";
 import { hats, hatById } from "../data/hats";
 import {
@@ -105,6 +107,9 @@ const ProjectCard: React.FC<{
               ? status
               : `${counts.worked > 0 && counts.percent < 1 ? "Under 1" : Math.floor(counts.percent)}% knitted · ${status}`}
           </span>
+          {exploreMode() && counts.worked > 0 && (
+            <HomeTime timing={demoTiming(withLettering(hat, project.brimText), project.sizeId, project.progress)} />
+          )}
         </span>
       </Link>
       {actions}

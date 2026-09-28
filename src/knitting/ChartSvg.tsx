@@ -1,4 +1,6 @@
 import React, { useMemo } from "react";
+import { HeatCells, HeatRounds, currentDemo } from "../explore/time/ui";
+import { exploreMode } from "../explore/time/demo";
 import { Stitch } from "../types/Stitch";
 import { ChartLayout } from "./layout";
 import { joinArrowLength } from "./draw-chart";
@@ -150,8 +152,10 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
         grid={grid}
         makeOneLean={makeOneLean}
       />
+      {exploreMode() === "rounds" && currentDemo() && <HeatRounds timing={currentDemo()!} layout={layout} cell={cell} />}
       {yarnLabels && <YarnLabels stitches={stitches} layout={layout} cell={cell} labels={yarnLabels} />}
       {veil && <path d={veil} className="chart-done" />}
+      {exploreMode() === "cells" && currentDemo() && <HeatCells timing={currentDemo()!} layout={layout} cell={cell} />}
       {hatch.length > 0 && (
         <>
           <defs>

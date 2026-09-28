@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { PickerTime, currentDemo } from "../explore/time/ui";
 import { Stitch } from "../types/Stitch";
 import { ChartLayout } from "./layout";
 import { cellAt, chartSize } from "./draw-chart";
@@ -114,6 +115,7 @@ const StitchPicker: React.FC<{
               {needles !== undefined && (
                 <span className="stitch-picker-needles">On {needles}mm needles</span>
               )}
+              {currentDemo() && <PickerTime timing={currentDemo()!} id={id} />}
               {joinsAfter && (
                 <span className="stitch-picker-needles">Then join in the round</span>
               )}

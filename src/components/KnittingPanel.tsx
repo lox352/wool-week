@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from "react";
+import { PanelTime, currentDemo } from "../explore/time/ui";
 import { Stitch } from "../types/Stitch";
 import {
   Run,
@@ -444,6 +445,7 @@ const KnittingPanel: React.FC<KnittingPanelProps> = ({
           </span>
         )}
       </div>
+      {currentDemo() && <PanelTime timing={currentDemo()!} />}
 
 
       {inRound.length > 0 && <StitchHint entries={inRound} current={current} />}

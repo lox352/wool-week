@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { demoTiming, exploreMode } from "../explore/time/demo";
+import { FinishReport, TimeFigures, setCurrentDemo } from "../explore/time/ui";
 import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
@@ -287,6 +289,11 @@ const ProjectView: React.FC<{
 
   const counts = totals(index, project.progress);
   const position = positionOf(stitches, project.progress, index);
+  // The time prototypes, on the explore branch only.
+  const explore = exploreMode();
+  const demo = explore && project.progress > 0 ? demoTiming(hat, size.id, project.progress) : undefined;
+  setCurrentDemo(demo);
+  const finished = explore === "finish" ? demoTiming(hat, size.id, stitches.length - 1) : undefined;
 
   const stageRef = useRef<HTMLDivElement>(null);
   const choicesRef = useRef<HTMLElement>(null);
@@ -431,6 +438,7 @@ const ProjectView: React.FC<{
               <dd>{counts.remaining.toLocaleString()} stitches</dd>
             </div>
           </dl>
+          {demo && explore !== "finish" && <TimeFigures timing={demo} />}
         </div>
   );
   const woolEl = (
@@ -485,6 +493,7 @@ const ProjectView: React.FC<{
             {stageEl}
             {figuresEl}
           </div>
+          {finished && <FinishReport timing={finished} labels={roundLabels} />}
           <div className="peerie-rule" aria-hidden="true" />
           {woolEl}
           {printed.lettering && (
