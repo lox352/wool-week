@@ -20,6 +20,9 @@ import Button from "./ui/Button";
 import Dialog from "./ui/Dialog";
 import NameDialog from "./ui/NameDialog";
 import BodyStrip from "./BodyStrip";
+import { useKnittingTime } from "../knitting/timing/useKnittingTime";
+import { timeLine } from "../knitting/timing/format";
+import type { Stitch } from "../types/Stitch";
 import "./Home.css";
 
 const formatDate = (iso: string) =>
@@ -33,14 +36,16 @@ const formatDate = (iso: string) =>
 const describe = (project: Project) => {
   const hat = hatById(project.hatId);
   if (!hat) return undefined;
-  const { rounds, roundLabels } = hatStitches(withLettering(hat, project.brimText), project.sizeId);
+  const { stitches, rounds, roundLabels } = hatStitches(withLettering(hat, project.brimText), project.sizeId);
   const index = indexRounds(rounds, roundLabels);
   const counts = totals(index, project.progress);
   const colourway =
     hat.colourways.find((c) => c.id === project.colourwayId) ?? hat.colourways[0];
   const size = hat.sizes.find((s) => s.id === project.sizeId) ?? hat.sizes[0];
-  return { hat, counts, colourway, size, index };
+  return { hat, counts, colourway, size, index, stitches, rounds };
 };
+
+const noStitches: Stitch[] = [];
 
 const ProjectCard: React.FC<{
   project: Project;
@@ -49,8 +54,9 @@ const ProjectCard: React.FC<{
 }> = ({ project, onRename, onDelete }) => {
   const navigate = useNavigate();
   const described = describe(project);
+  const time = useKnittingTime(project.id, described?.stitches ?? noStitches, project.progress);
   if (!described) return null;
-  const { hat, counts, colourway, size } = described;
+  const { hat, counts, colourway, size, stitches, rounds } = described;
   const id = bareIdFor(project.id);
   const palette = paletteOf(colourway, project.shades, hat.charts);
   const done = counts.percent >= 100;
@@ -74,8 +80,6 @@ const ProjectCard: React.FC<{
   const status = done
     ? `Finished · ${counts.total.toLocaleString()} stitches`
     : `${counts.worked.toLocaleString()} of ${counts.total.toLocaleString()} stitches · started ${formatDate(project.startedAt)}`;
-
-  const { stitches, rounds } = hatStitches(withLettering(hat, project.brimText), project.sizeId);
 
   /*
    * The hat's body in this project's own wool, with a line along its foot
@@ -105,6 +109,7 @@ const ProjectCard: React.FC<{
               ? status
               : `${counts.worked > 0 && counts.percent < 1 ? "Under 1" : Math.floor(counts.percent)}% knitted · ${status}`}
           </span>
+          {time && <span className="quiet">{timeLine(time, done)}</span>}
         </span>
       </Link>
       {actions}

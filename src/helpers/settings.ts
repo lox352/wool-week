@@ -11,15 +11,17 @@ export interface Settings {
   highContrast: boolean;
   /** Offer the chart as written instructions, a round at a time. */
   writtenRounds: boolean;
+  /** Don't time the knitting, and don't show how long hats have taken or have left. */
+  noStatistics: boolean;
 }
 
-const defaults: Settings = { highContrast: false, writtenRounds: false };
+const defaults: Settings = { highContrast: false, writtenRounds: false, noStatistics: false };
 const key = "settings";
 const changed = "settingsChanged";
 
 let cached: Settings | undefined;
 
-const read = (): Settings => {
+export const readSettings = (): Settings => {
   if (cached) return cached;
   let stored: Partial<Settings> = {};
   try {
@@ -40,7 +42,7 @@ const read = (): Settings => {
 };
 
 export const updateSettings = (change: Partial<Settings>) => {
-  cached = { ...read(), ...change };
+  cached = { ...readSettings(), ...change };
   try {
     localStorage.setItem(key, JSON.stringify(cached));
   } catch {
@@ -65,4 +67,4 @@ const subscribe = (notify: () => void) => {
 };
 
 export const useSettings = (): Settings =>
-  useSyncExternalStore(subscribe, read, () => defaults);
+  useSyncExternalStore(subscribe, readSettings, () => defaults);

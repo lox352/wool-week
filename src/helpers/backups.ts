@@ -2,16 +2,26 @@ import { hatById } from "../data/hats";
 import { buildHat } from "../knitting/engine";
 import { fitLettering } from "../knitting/lettering/fit";
 import { currentVersion, listProjects, type Project, writeProject } from "./projects";
+import { isLog, readLog, writeLog, type Row } from "../knitting/timing/log";
+
+/** A project as a backup holds it: with its knitting-time log, if it has one. */
+export type BackupProject = Project & { timeLog?: Row[] };
+
+/** Room for knitting-time logs, which run to tens of KB for a big hat. */
+export const maxBackupBytes = 10_000_000;
 
 export const backupText = () => JSON.stringify({ format: "wool-week-projects", version: 1,
-  exportedAt: new Date().toISOString(), projects: listProjects() }, null, 2);
+  exportedAt: new Date().toISOString(), projects: listProjects().map((project): BackupProject => {
+    const timeLog = readLog(project.id);
+    return timeLog.length > 0 ? { ...project, timeLog } : project;
+  }) });
 
-export function parseBackup(text: string): Project[] {
-  if (text.length > 2_000_000) throw new Error("Backup is too large (maximum 2 MB).");
+export function parseBackup(text: string): BackupProject[] {
+  if (text.length > maxBackupBytes) throw new Error("Backup is too large (maximum 10 MB).");
   const data = JSON.parse(text);
   if (data?.format !== "wool-week-projects" || data.version !== 1 ||
     !Array.isArray(data.projects) || data.projects.length > 1000) throw new Error("Not a supported Wool Week backup.");
-  return data.projects.map((p: Project) => {
+  return data.projects.map((p: BackupProject): BackupProject => {
     const hat = p && hatById(p.hatId);
     if (!hat || !hat.sizes.some(s => s.id === p.sizeId) ||
       !hat.colourways.some(c => c.id === p.colourwayId && (!c.sizeIds || c.sizeIds.includes(p.sizeId))) ||
@@ -36,14 +46,21 @@ export function parseBackup(text: string): Project[] {
           (shade.hex !== undefined && !/^#[0-9a-f]{6}$/i.test(shade.hex))) throw new Error("Invalid yarn choices.");
       }
     }
+    if (p.timeLog !== undefined && !isLog(p.timeLog)) throw new Error("Invalid knitting times.");
     return { version: currentVersion, id: `project-${crypto.randomUUID()}`, name: p.name,
       hatId: p.hatId, sizeId: p.sizeId, colourwayId: p.colourwayId, progress: p.progress,
-      shades: p.shades, brimText: p.brimText, startedAt: p.startedAt, updatedAt: new Date().toISOString() };
+      shades: p.shades, brimText: p.brimText, startedAt: p.startedAt, updatedAt: new Date().toISOString(),
+      ...(p.timeLog ? { timeLog: p.timeLog } : {}) };
   });
 }
 
 /** Restore as copies: never overwrite a knitter's existing work. */
-export const restoreBackup = (projects: Project[]) => projects.map(writeProject);
+export const restoreBackup = (projects: BackupProject[]) =>
+  projects.map(({ timeLog, ...project }) => {
+    const saved = writeProject(project);
+    if (timeLog) writeLog(saved.id, timeLog);
+    return saved;
+  });
 
 export function downloadBackup() {
   const url = URL.createObjectURL(new Blob([backupText()], { type: "application/json" }));
