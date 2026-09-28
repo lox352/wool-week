@@ -24,9 +24,14 @@
   padding: 0.4rem 0.6rem;
 }
 
-.wool-row:hover,
 .wool-row:focus-visible {
   border-color: var(--crimson);
+}
+
+@media (hover: hover) {
+  .wool-row:hover {
+    border-color: var(--crimson);
+  }
 }
 
 .wool-row .shade-chip {

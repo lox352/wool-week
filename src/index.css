@@ -88,8 +88,10 @@ a {
   text-decoration-thickness: from-font;
 }
 
-a:hover {
-  color: var(--crimson);
+@media (hover: hover) {
+  a:hover {
+    color: var(--crimson);
+  }
 }
 
 hr {
