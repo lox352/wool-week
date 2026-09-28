@@ -5,7 +5,7 @@
 import { HatFeatures, operations } from "./features";
 import { Action, Scenario, Simulation, simulate } from "./simulate";
 import { Log, Observation, PauseRule, Recorder, Sessions, Stamps, fixedPause, relativePause } from "./record";
-import { Costs, Estimator, Prefix, clamp, columns, fitCosts, perStitch, predict, remaining, typical } from "./estimate";
+import { Costs, Estimator, Prefix, clamp, columns, fitCosts, perStitch, predict, remaining, typical, windowed, workingOrder } from "./estimate";
 
 export const recorders = {
   stamps: (size: number) => new Stamps(size),
@@ -60,6 +60,12 @@ export interface Run {
   costRatio: Record<string, number>;
   /** How well each stitch's time is recovered: correlation with the truth. */
   heat: Record<string, { stitch: number; round: number }>;
+  /**
+   * Running averages over n stitches: correlation with each stitch's true
+   * time, and with the true running average over the same window; and the
+   * share of stitches that came in a single tap longer than the window.
+   */
+  windows: Record<string, { raw: number; smoothed: number; coarse: number }>;
 }
 
 export const checkpoints = [0.1, 0.25, 0.5, 0.75];
@@ -141,7 +147,33 @@ export const scoreRun = (features: HatFeatures, hat: string, scenario: Scenario,
     }
   }
 
+  const windows: Record<string, { raw: number; smoothed: number; coarse: number }> = {};
+  {
+    const derived = replay("log", sim.actions, size).derive(relativePause, expectTypical);
+    const clamped = clamp(derived.observations, prefix);
+    const costs = fitCosts(clamped, prefix, 400);
+    const est = perStitch(clamped, features, prefix, costs);
+    const order = workingOrder(features);
+    const span = new Float64Array(size).fill(Infinity);
+    for (const o of clamped) if (o.ms !== undefined) for (let id = o.from + 1; id <= o.to; id++) span[id] = o.to - o.from;
+    const ids = order.filter((id) => Number.isFinite(est[id]) && truthStitch[id] > 0);
+    const r = (a: ArrayLike<number>, b: ArrayLike<number>) => pearson(ids.map((id) => a[id]), ids.map((id) => b[id]));
+    windows["1 (no window)"] = { raw: r(est, truthStitch), smoothed: r(est, truthStitch), coarse: 0 };
+    for (const n of [10, 30, 60]) {
+      for (const centred of [false, true]) {
+        const smooth = windowed(est, order, n, centred);
+        const truth = windowed(truthStitch, order, n, centred);
+        windows[`${n} ${centred ? "centred" : "trailing"}`] = {
+          raw: r(smooth, truthStitch),
+          smoothed: r(smooth, truth),
+          coarse: ids.filter((id) => span[id] > n).length / ids.length,
+        };
+      }
+    }
+  }
+
   return {
+    windows,
     hat,
     scenario: scenario.name,
     seed,

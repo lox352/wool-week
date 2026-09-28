@@ -155,7 +155,9 @@ const ChartSvg: React.FC<ChartSvgProps> = ({
       {exploreMode() === "rounds" && currentDemo() && <HeatRounds timing={currentDemo()!} layout={layout} cell={cell} />}
       {yarnLabels && <YarnLabels stitches={stitches} layout={layout} cell={cell} labels={yarnLabels} />}
       {veil && <path d={veil} className="chart-done" />}
-      {exploreMode() === "cells" && currentDemo() && <HeatCells timing={currentDemo()!} layout={layout} cell={cell} />}
+      {/^(cells|window|truth)/.test(exploreMode() ?? "") && currentDemo() && (
+        <HeatCells timing={currentDemo()!} layout={layout} cell={cell} mode={exploreMode()!} />
+      )}
       {hatch.length > 0 && (
         <>
           <defs>

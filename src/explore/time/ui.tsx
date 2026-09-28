@@ -91,28 +91,49 @@ export const PickerTime: React.FC<{ timing: DemoTiming; id: number }> = ({ timin
 
 /* ------------------------------------------------------------- heat maps */
 
-// Sequential blue, light to dark: seconds a stitch took.
-const blues = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"];
 // Diverging: blue for faster than expected, red for slower, grey for as expected.
 const diverging = ["#256abf", "#6da7ec", "#b7d3f6", "#f0efec", "#f3b7b6", "#e66767", "#c53d3c"];
 
-const quantiles = (values: number[], n: number) => {
+const median = (values: number[]) => {
   const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
-  return Array.from({ length: n - 1 }, (_, i) => sorted[Math.floor(((i + 1) * sorted.length) / n)] ?? 0);
+  return sorted[Math.floor(sorted.length / 2)] ?? 1;
 };
 const step = (value: number, cuts: number[]) => cuts.filter((c) => value > c).length;
 
-/** Each stitch's cell painted by how long it took, over the chart. */
-export const HeatCells: React.FC<{ timing: DemoTiming; layout: ChartLayout; cell: number }> = ({ timing, layout, cell }) => {
-  const cuts = quantiles(Array.from(timing.perStitch), blues.length);
+/**
+ * Each stitch's cell painted by how long it took, over the chart.
+ *
+ * `mode` picks what is painted: `cells`, each stitch's own estimate;
+ * `window30` (or any size), a running average over that many stitches;
+ * `truth` and `truth30`, the simulated knitter's real times, for comparison.
+ * All use one scale, against the knitter's usual pace (the median of its
+ * own 30-stitch running average): blue quicker, red slower, grey as usual. With a window, stitches that came in a tap
+ * longer than it are faded: their average is mostly that one tap's.
+ */
+export const HeatCells: React.FC<{ timing: DemoTiming; layout: ChartLayout; cell: number; mode: string }> = ({
+  timing,
+  layout,
+  cell,
+  mode,
+}) => {
+  const match = /^(cells|window|truth)(\d*)$/.exec(mode);
+  const kind = match?.[1] ?? "cells";
+  const size = Number(match?.[2] || 0);
+  const base = kind === "truth" ? timing.truth : timing.perStitch;
+  const values = size > 1 ? timing.window(base, size) : base;
+  // Against the knitter's own usual pace, so a 5% wobble isn't painted as a 7-step swing.
+  // The truth leaves out short pauses the estimate can't see, so each is scaled by its own usual.
+  const usual = median(Array.from(timing.window(base, 30)));
+  const cuts = [0.75, 0.87, 0.95, 1.05, 1.15, 1.33].map((k) => k * usual);
   const rects: React.ReactNode[] = [];
   layout.cells.forEach((at, id) => {
-    const s = timing.perStitch[id];
+    const s = values[id];
     if (!Number.isFinite(s)) return;
     const { x, y } = cellAt(layout, at.round, at.column, cell);
+    const faded = kind === "window" && size > 1 && timing.tapSpan[id] > size;
     rects.push(
-      <rect key={id} x={x} y={y} width={cell} height={cell} fill={blues[step(s, cuts)]}>
-        <title>{`${s.toFixed(1)} s`}</title>
+      <rect key={id} x={x} y={y} width={cell} height={cell} fill={diverging[step(s, cuts)]} opacity={faded ? 0.35 : 1}>
+        <title>{`${s.toFixed(1)} s a stitch, ${Math.round((s / usual - 1) * 100)}% against your usual`}</title>
       </rect>,
     );
   });

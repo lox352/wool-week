@@ -13,13 +13,20 @@ import { HatPattern } from "../../data/hats/types";
 import { HatFeatures, featuresOf } from "./features";
 import { simulate } from "./simulate";
 import { Log, relativePause } from "./record";
-import { Costs, Prefix, clamp, fitCosts, perStitch, predict, remaining, typical } from "./estimate";
+import { Costs, Prefix, clamp, fitCosts, perStitch, predict, remaining, typical, windowed, workingOrder } from "./estimate";
 import { activeMs } from "./score";
 
 export const exploreMode = (): string | undefined => {
   if (typeof window === "undefined") return undefined;
   const query = window.location.hash.split("?")[1] ?? window.location.search.slice(1);
   return new URLSearchParams(query).get("timeExplore") ?? undefined;
+};
+
+/** Which simulated knitter the demo shows: `?knitter=run` for one who taps every run. */
+const knitterStyle = (): "mixed" | "runs" => {
+  if (typeof window === "undefined") return "mixed";
+  const query = window.location.hash.split("?")[1] ?? window.location.search.slice(1);
+  return new URLSearchParams(query).get("knitter") === "run" ? "runs" : "mixed";
 };
 
 export interface Session {
@@ -37,6 +44,12 @@ export interface DemoTiming {
   sessions: Session[];
   /** Seconds per stitch, estimated; NaN where not reached. */
   perStitch: Float64Array;
+  /** The simulated knitter's true seconds per stitch, for comparison. */
+  truth: Float64Array;
+  /** How many stitches the tap each stitch came in covered. */
+  tapSpan: Float64Array;
+  /** A running average of `values` over `size` stitches in knitting order. */
+  window: (values: Float64Array, size: number) => Float64Array;
   /** Seconds per round, and what it should have taken at this pace. */
   perRound: { actual: number; expected: number }[];
   costs: Costs;
@@ -67,13 +80,14 @@ export const demoTiming = (hat: HatPattern, sizeId: string, progress: number): D
     f = featuresOf(hat, sizeId);
     features.set(key, f);
   }
-  const memo = `${key}:${progress}`;
+  const style = knitterStyle();
+  const memo = `${key}:${progress}:${style}`;
   const known = cache.get(memo);
   if (known) return known;
 
   const last = f.ops.length - 1;
   const seed = [...hat.id].reduce((s, c) => s + c.charCodeAt(0), 0);
-  const sim = simulate(f, { name: "demo", style: "mixed", messy: true }, seed);
+  const sim = simulate(f, { name: "demo", style, messy: true }, seed);
   const upTo = sim.actions.findIndex((a) => a.to > progress);
   const seen = upTo < 0 ? sim.actions : sim.actions.slice(0, upTo);
   const prefix = new Prefix(f);
@@ -138,7 +152,15 @@ export const demoTiming = (hat: HatPattern, sizeId: string, progress: number): D
     });
   }
 
+  const truth = Float64Array.from(sim.truth.perStitchMs, (ms, id) => (id <= progress && ms > 0 ? ms / 1000 : NaN));
+  const tapSpan = new Float64Array(f.ops.length).fill(NaN);
+  for (const o of observations) for (let id = o.from + 1; id <= o.to; id++) tapSpan[id] = o.to - o.from;
+  const order = workingOrder(f);
+
   const timing: DemoTiming = {
+    truth,
+    tapSpan,
+    window: (values, size) => windowed(values, order, size),
     seen: seenCounts,
     progress,
     last,

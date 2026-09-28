@@ -11,6 +11,7 @@
 import { HatFeatures, Operation, operations } from "./features";
 import { defaultCosts, defaultTap } from "./simulate";
 import type { Observation } from "./record";
+import { isFabric } from "../../types/Stitch";
 
 export const columns = [...operations, "tap"] as const;
 export type Column = (typeof columns)[number];
@@ -228,5 +229,40 @@ export const perStitch = (
     const total = weights.reduce((s, w) => s + w, 0) || 1;
     weights.forEach((w, k) => (out[o.from + 1 + k] = (o.ms! * w) / total));
   }
+  return out;
+};
+
+/** The stitches of a hat in the order they are knitted, steps left out. */
+export const workingOrder = (features: HatFeatures): number[] =>
+  features.stitches.filter(isFabric).map((stitch) => stitch.id);
+
+/**
+ * A running average over `size` stitches in the order they were knitted:
+ * the ones just before each stitch and itself (trailing), or the ones either
+ * side of it (centred). Stitches with no time of their own stay without one;
+ * the rest average whatever times their window holds.
+ */
+export const windowed = (
+  values: ArrayLike<number>,
+  order: number[],
+  size: number,
+  centred = false,
+): Float64Array => {
+  const out = new Float64Array(values.length).fill(NaN);
+  const sums = new Float64Array(order.length + 1);
+  const counts = new Float64Array(order.length + 1);
+  order.forEach((id, i) => {
+    const v = values[id];
+    const ok = Number.isFinite(v);
+    sums[i + 1] = sums[i] + (ok ? v : 0);
+    counts[i + 1] = counts[i] + (ok ? 1 : 0);
+  });
+  order.forEach((id, i) => {
+    if (!Number.isFinite(values[id])) return;
+    const lo = Math.max(0, centred ? i - Math.floor(size / 2) : i - size + 1);
+    const hi = Math.min(order.length - 1, centred ? lo + size - 1 : i);
+    const n = counts[hi + 1] - counts[lo];
+    if (n > 0) out[id] = (sums[hi + 1] - sums[lo]) / n;
+  });
   return out;
 };
