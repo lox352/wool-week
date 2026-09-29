@@ -34,6 +34,7 @@ import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
 import BodyStrip from "./BodyStrip";
 import { PreviewBanner } from "./ColourPreview";
+import { ColourwayOptions, colourwayPrototype } from "../explore/colourways/Options";
 import "./Project.css";
 
 /** Marks a chart page's address as open on Explore statistics. */
@@ -532,24 +533,28 @@ const ProjectView: React.FC<{
           people start, then the wool itself. Choosing one sets every yarn
           at once; a row below changes any of them afterwards.
         */}
+        {colourwayPrototype() ? (
+          <ColourwayOptions hat={hat} colourways={colourways} colourway={colourway} overrides={project.shades ?? {}} palette={palette} body={body} />
+        ) : (
         <div className="chooser">
-          {colourways.map((option) => {
-            const optionPalette = paletteOf(option, {}, hat.charts);
-            return (
-              <button
-                key={option.id}
-                type="button"
-                className={`colourway-option${option.id === colourway.id ? " is-chosen" : ""}`}
-                aria-pressed={option.id === colourway.id}
-                onClick={() => setColourway(option.id)}
-              >
-                                <BodyStrip {...body} palette={optionPalette} className="colourway-motif" />
-                <strong>{option.name}</strong>
-                <span className="quiet">{option.brand}</span>
-              </button>
-            );
-          })}
-        </div>
+            {colourways.map((option) => {
+              const optionPalette = paletteOf(option, {}, hat.charts);
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`colourway-option${option.id === colourway.id ? " is-chosen" : ""}`}
+                  aria-pressed={option.id === colourway.id}
+                  onClick={() => setColourway(option.id)}
+                >
+                                  <BodyStrip {...body} palette={optionPalette} className="colourway-motif" />
+                  <strong>{option.name}</strong>
+                  <span className="quiet">{option.brand}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
         <WoolList
           colourway={colourway}
           sizeId={project.sizeId}
