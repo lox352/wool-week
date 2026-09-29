@@ -106,9 +106,17 @@ const DockingStrip: React.FC<{ body: Body; palette: Palette; until?: RefObject<E
     } else {
       // At first the banner's picture shrunk to the card's, stitch for stitch.
       const scale = between(small / large, 1, open);
-      const left = between(place.left, 0, open);
-      const right = between(place.right, 0, open);
       const height = between(place.height, BANNER, open);
+      // Wider in proportion as it grows taller, keeping its shape, and
+      // opened further alongside where that falls short of the screen's
+      // edges, so as to reach them as it reaches its height. On a narrow
+      // screen, keeping its shape reaches the edges first, and it stops there.
+      const shaped = (place.width * height) / place.height;
+      const short = Math.max(0, place.screen - (place.width * BANNER) / place.height);
+      const width = Math.min(place.screen, shaped + short * open);
+      const middle = between(place.left + place.width / 2, place.screen / 2, open);
+      const left = Math.max(0, middle - width / 2);
+      const right = Math.max(0, place.screen - middle - width / 2);
       const across = centre(place.screen - left - right - 2 * EDGE, 0, banner, scale).left;
       const down = between(
         centre(0, cardHeight, inCard, 1).top,
