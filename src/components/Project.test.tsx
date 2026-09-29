@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
 import App from "../App";
 import { bareIdFor, getStorageNotice, readProject, startProject } from "../helpers/projects";
-import { actionsOf, readLog } from "../knitting/timing/log";
+import { actionsOf, readLog, writeLog } from "../knitting/timing/log";
 
 vi.mock("./HatModel", () => ({ default: () => null }));
 vi.mock("../knitting/Chart", () => ({ default: () => null }));
@@ -54,5 +54,51 @@ it("saves once per action under StrictMode and undoes more than one step", async
     expect(actionsOf(rows).map(({ from, to, undo }) => [from, to, !!undo])).toEqual([
       [0, 120, false], [120, 121, false], [121, 241, false], [241, 121, true], [121, 120, true],
     ]);
+  } finally { await act(async () => root.unmount()); host.remove(); }
+});
+
+it("opens Explore statistics from the progress card once there is time to explore", async () => {
+  const project = startProject("sww18-merrie-dancers-toorie", "yw2", "jamieson-smith");
+  // Two evenings of a run of eight every 25 seconds.
+  const rows: number[][] = [[1_790_000_000, 0, 10]];
+  for (let i = 0; i < 160; i++) rows.push([i === 80 ? 20 * 3600 : 25, 8]);
+  writeLog(project.id, rows);
+  localStorage.setItem(project.id, JSON.stringify({ ...readProject(project.id), progress: 1280 }));
+  window.location.hash = `#/project/${bareIdFor(project.id)}/chart`;
+  const host = document.createElement("div");
+  document.body.append(host);
+  const root = createRoot(host);
+  const button = (label: string) => [...host.querySelectorAll("button")].find(b => b.textContent?.trim() === label);
+  try {
+    await act(async () => root.render(<App />));
+    expect(host.textContent).toContain("knitted");
+    await act(async () => button("Explore statistics")!.click());
+    expect(window.location.hash).toContain("stats=1");
+    const panel = host.querySelector(".stats-panel")!;
+    expect(panel.textContent).toMatch(/2\s*sittings/);
+    const radios = [...host.querySelectorAll('[role="radio"]')].map(r => [r.textContent, r.getAttribute("aria-checked")]);
+    expect(radios).toEqual([["Pattern", "false"], ["Pace", "true"], ["Sittings", "false"]]);
+    await act(async () => button("Sittings")!.click());
+    expect(panel.textContent).toContain("Each colour a sitting");
+    await act(async () => button("Your speeds")!.click());
+    const sheet = host.querySelector(".stats-speeds")!;
+    expect(sheet.textContent).toContain("You knit a stitch in about");
+    expect(sheet.textContent).toContain("Knit");
+    await act(async () => button("Done")!.click());
+    expect(host.querySelector(".stats-panel")).toBeNull();
+    expect(window.location.hash).not.toContain("stats=1");
+  } finally { await act(async () => root.unmount()); host.remove(); }
+});
+
+it("offers no statistics while nothing has been timed", async () => {
+  const project = startProject("sww18-merrie-dancers-toorie", "yw2", "jamieson-smith");
+  window.location.hash = `#/project/${bareIdFor(project.id)}/chart?stats=1`;
+  const host = document.createElement("div");
+  document.body.append(host);
+  const root = createRoot(host);
+  try {
+    await act(async () => root.render(<App />));
+    expect(host.querySelector(".stats-panel")).toBeNull();
+    expect(host.textContent).not.toContain("Explore statistics");
   } finally { await act(async () => root.unmount()); host.remove(); }
 });

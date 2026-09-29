@@ -26,14 +26,24 @@ import { KeySheet } from "./KnitKey";
 import BrimLettering from "./BrimLettering";
 import { withLettering } from "../knitting/lettering/apply";
 import { recordProgress } from "../knitting/timing/log";
-import { useKnittingTime, useTimeRecording } from "../knitting/timing/useKnittingTime";
+import { useKnittingTime, useTimeDetail, useTimeRecording } from "../knitting/timing/useKnittingTime";
 import { TimeFigures, TimeLine } from "./KnittingTime";
+import { PaceCells, SittingCells, SpeedsSheet, StatsPanel, StitchTime, type Layer } from "./StatsView";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
 import BodyStrip from "./BodyStrip";
 import { PreviewBanner } from "./ColourPreview";
 import "./Project.css";
+
+/** Marks a chart page's address as open on Explore statistics. */
+const statsParam = "stats";
+
+/** The round a stitch is in, counting from 1; undefined for one in none. */
+const roundOfStitch = (rounds: number[][], id: number) => {
+  const at = rounds.findIndex((ids) => ids.includes(id));
+  return at < 0 ? undefined : at + 1;
+};
 
 /** "Under 1%", "3%": how far through, never rounded up to done. */
 const percentKnitted = (worked: number, percent: number) =>
@@ -53,11 +63,18 @@ const ChartPageFoot: React.FC<{
   overview: string;
   onKnit: () => void;
   time?: React.ReactNode;
-}> = ({ percent, worked, total, round, rounds, finished, overview, onKnit, time }) => (
+  /** Opens Explore statistics; absent while there is no time to explore. */
+  onStats?: () => void;
+}> = ({ percent, worked, total, round, rounds, finished, overview, onKnit, time, onStats }) => (
   <section className="section chart-foot" aria-label="Your progress">
-    <div className="chart-foot-figure">
-      <em>{finished ? "100%" : percentKnitted(worked, percent)}</em>
-      <span className="quiet">knitted</span>
+    <div className="chart-foot-head">
+      <div className="chart-foot-figure">
+        <em>{finished ? "100%" : percentKnitted(worked, percent)}</em>
+        <span className="quiet">knitted</span>
+      </div>
+      <Link to="/" className="btn btn-quiet">
+        Home
+      </Link>
     </div>
     <div className="chart-foot-track">
       <span className="project-card-bar" aria-hidden="true">
@@ -71,12 +88,14 @@ const ChartPageFoot: React.FC<{
     </p>
     {time}
     <div className="chart-foot-actions">
-      <Link to="/" className="btn btn-quiet">
-        Home
-      </Link>
       <Link to={overview} className="btn btn-secondary">
         Overview &amp; colours
       </Link>
+      {onStats && (
+        <Button variant="secondary" onClick={onStats}>
+          Explore statistics
+        </Button>
+      )}
       <Button variant="primary" size="lg" className="chart-foot-knit" onClick={onKnit}>
         {finished ? "See the last stitch" : worked > 0 ? "Resume knitting" : "Start knitting"}
       </Button>
@@ -302,6 +321,21 @@ const ProjectView: React.FC<{
   const position = positionOf(stitches, project.progress, index);
   const time = useKnittingTime(project.id, stitches, project.progress);
 
+  // Explore statistics: open while the address says so, and there is time to explore.
+  const [params, setParams] = useSearchParams();
+  const exploring = view === "chart" && !knitting && params.get(statsParam) === "1" && time !== undefined;
+  const detail = useTimeDetail(exploring ? project.id : undefined, stitches, rounds);
+  const [layer, setLayer] = useState<Layer>("pace");
+  const [speedsOpen, setSpeedsOpen] = useState(false);
+  const closeSpeeds = useCallback(() => setSpeedsOpen(false), []);
+  const setExploring = (on: boolean) => {
+    const next = new URLSearchParams(params);
+    if (on) next.set(statsParam, "1");
+    else next.delete(statsParam);
+    setParams(next, { replace: true });
+    setSpeedsOpen(false);
+  };
+
   const stageRef = useRef<HTMLDivElement>(null);
   const choicesRef = useRef<HTMLElement>(null);
   const body = useMemo(() => ({ stitches, rounds }), [stitches, rounds]);
@@ -325,6 +359,46 @@ const ProjectView: React.FC<{
   const title = project.name ?? hat.name;
   const eyebrow = `Shetland Wool Week ${hat.year} · ${size.label} · ${colourway.name}`;
   const knitLabel = counts.worked > 0 ? "Keep knitting" : "Start knitting";
+
+  if (exploring && detail && time) {
+    return (
+      <PageLayout title={title} eyebrow={eyebrow} showTitle={false} className="knit-screen">
+        <section className="section chart-page">
+          <Chart
+            contained
+            stitches={stitches}
+            rounds={rounds}
+            palette={palette}
+            progress={project.progress}
+            // Looking back: the edge of the knitting near the top, what is done below it.
+            follow
+            followAt={0.85}
+            labels={roundLabels}
+            turns={turns}
+            stitchNotes={hat.stitchNotes}
+            overlay={
+              layer === "pace"
+                ? (layout, cell) => <PaceCells time={detail} layout={layout} cell={cell} />
+                : layer === "sittings"
+                  ? (layout, cell) => <SittingCells time={detail} layout={layout} cell={cell} />
+                  : undefined
+            }
+            pickerNote={(id) => <StitchTime time={detail} id={id} round={roundOfStitch(rounds, id)} />}
+          />
+        </section>
+        <StatsPanel
+          summary={time}
+          time={detail}
+          finished={position.finished}
+          layer={layer}
+          onLayer={setLayer}
+          onSpeeds={() => setSpeedsOpen(true)}
+          onClose={() => setExploring(false)}
+        />
+        {speedsOpen && <SpeedsSheet stitches={stitches} notes={hat.stitchNotes} time={detail} onClose={closeSpeeds} />}
+      </PageLayout>
+    );
+  }
 
   if (view === "chart") {
     return (
@@ -384,6 +458,7 @@ const ProjectView: React.FC<{
             overview={overviewPath(project.id)}
             onKnit={() => setKnitting(true)}
             time={time && <TimeLine time={time} finished={position.finished} className="chart-foot-time" />}
+            onStats={time && (() => setExploring(true))}
           />
         )}
         {knitting && keyOpen && (

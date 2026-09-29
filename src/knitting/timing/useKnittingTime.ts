@@ -3,6 +3,7 @@ import type { Stitch } from "../../types/Stitch";
 import { useSettings } from "../../helpers/settings";
 import { actionsOf, isLog, logChanged, logKeyFor, recordPageEvent } from "./log";
 import { summarise, type TimeSummary } from "./model";
+import { detail, type TimeDetail } from "./detail";
 
 const subscribe = (notify: () => void) => {
   window.addEventListener(logChanged, notify);
@@ -45,6 +46,32 @@ export const useKnittingTime = (
     const summary = summarise(actionsOf(rows), stitches, progress);
     return summary && summary.knitted >= 60 ? summary : undefined;
   }, [noStatistics, raw, stitches, progress]);
+};
+
+/**
+ * The finer grain of a project's time, for Explore statistics: undefined
+ * without a project (so nothing is worked out until it is wanted), without a
+ * log, or when the knitter has asked for no statistics.
+ */
+export const useTimeDetail = (
+  projectId: string | undefined,
+  stitches: Stitch[],
+  rounds: number[][],
+): TimeDetail | undefined => {
+  const { noStatistics } = useSettings();
+  const raw = useSyncExternalStore(subscribe, () => (projectId ? rawLog(projectId) : ""), () => "");
+  return useMemo(() => {
+    if (noStatistics || !raw) return undefined;
+    let rows: unknown;
+    try {
+      rows = JSON.parse(raw);
+    } catch {
+      return undefined;
+    }
+    if (!isLog(rows)) return undefined;
+    const actions = actionsOf(rows);
+    return actions.length > 0 ? detail(actions, stitches, rounds) : undefined;
+  }, [noStatistics, raw, stitches, rounds]);
 };
 
 // Where the site was first opened, to tell a page loaded straight into

@@ -334,3 +334,11 @@
   color: var(--ink-soft);
   line-height: 1.35;
 }
+
+/* Anything drawn over the chart, such as a heat map: seen, never tapped. */
+.chart-overlay {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
