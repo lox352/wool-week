@@ -1,7 +1,8 @@
-import React, { RefObject, useEffect, useRef, useState } from "react";
+import React, { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import type { Colourway, HatPattern } from "../data/hats/types";
 import { ownBalls, paletteOf, type Overrides, type Palette } from "../knitting/palette";
 import BodyStrip from "./BodyStrip";
+import { bodyRounds, stitchScale } from "./bodyScale";
 import type { Body } from "./ColourPreview";
 import Dialog from "./ui/Dialog";
 import "./ColourwayChoice.css";
@@ -10,50 +11,73 @@ const balls = (n: number) => `${n} ${n === 1 ? "yarn" : "yarns"}`;
 
 /** How tall the strip grows to once it is the banner, in CSS pixels. */
 const BANNER = 96;
-/** How far the page scrolls while the banner widens to the screen's edges. */
-const WIDEN = 64;
+/** How far the page scrolls while the strip opens out into the banner. */
+const OPEN = 96;
 const clamp = (x: number) => Math.min(1, Math.max(0, x));
+const between = (from: number, to: number, at: number) => from + (to - from) * at;
 
 /**
  * The colourway's strip, which becomes the banner at the top of the screen
  * once the page scrolls it there, so the hat stays in sight while the wool
- * below is chosen. Reaching the top, it stays, and grows: first taller, to
- * the banner's height, then wider, to the screen's edges. Wider shows more
- * of the hat, not the same stretched, because the strip repeats round it.
- * It is pushed off again with the end of `until`, where the choosing ends.
+ * below is chosen.
+ *
+ * Reaching the top, it stays, and opens out to the banner, taller and wider
+ * together, smoothly, as the page scrolls on. The banner is drawn once, at
+ * its full size and crisp, and shown through a window: at first shrunk to
+ * match the strip exactly, stitch for stitch, then growing about the strip's
+ * middle while the window opens like curtains onto more of the hat on either
+ * side. Nothing slides sideways, and nothing is redrawn while it moves. It is
+ * pushed off again with the end of `until`, where the choosing ends.
  */
 const DockingStrip: React.FC<{ body: Body; palette: Palette; until?: RefObject<Element> }> = ({ body, palette, until }) => {
   const slot = useRef<HTMLDivElement>(null);
-  const [dock, setDock] = useState<React.CSSProperties & { "--dock"?: number }>();
-  const [banner, setBanner] = useState(false);
+  const window_ = useRef<HTMLDivElement>(null);
+  const banner = useRef<HTMLDivElement>(null);
+  const rows = useMemo(() => bodyRounds(body.rounds).length, [body.rounds]);
 
   useEffect(() => {
     let frame = 0;
     const place = () => {
       frame = 0;
       const own = slot.current?.getBoundingClientRect();
-      if (!own || own.top > 0) {
-        setDock(undefined);
-        setBanner(false);
+      const strip = slot.current?.firstElementChild?.getBoundingClientRect();
+      const shown = window_.current;
+      const drawn = banner.current;
+      if (!own || !strip || !shown || !drawn) return;
+      const screen = document.documentElement.clientWidth;
+      drawn.style.width = `${screen}px`;
+      if (own.top > 0) {
+        shown.style.visibility = "hidden";
         return;
       }
-      const scrolled = -own.top;
-      const grow = Math.max(0, BANNER - own.height);
-      const height = own.height + Math.min(scrolled, grow);
-      const widen = grow === 0 ? clamp(scrolled / WIDEN) : clamp((scrolled - grow) / WIDEN);
-      const screen = document.documentElement.clientWidth;
+      const open = clamp(-own.top / OPEN);
+      const density = window.devicePixelRatio || 1;
+
+      // The window: from the strip in the card to the banner across the top.
+      const height = between(own.height, BANNER, open);
       const end = until?.current?.getBoundingClientRect().bottom ?? Infinity;
-      setDock({
-        position: "fixed",
-        top: Math.min(0, end - height),
-        left: own.left * (1 - widen),
-        right: (screen - own.right) * (1 - widen),
-        height,
-        margin: 0,
-        borderRadius: 2 * (1 - widen),
-        "--dock": widen,
+      const top = Math.min(0, end - height);
+      const left = between(own.left, 0, open);
+      Object.assign(shown.style, {
+        visibility: "visible",
+        top: `${top}px`,
+        left: `${left}px`,
+        right: `${between(screen - own.right, 0, open)}px`,
+        height: `${height}px`,
       });
-      setBanner(widen >= 1);
+      shown.style.setProperty("--open", String(open));
+
+      // The banner in it: at first the same size as the strip's stitches,
+      // and in the same place, then its own, about the strip's middle.
+      const small = stitchScale(strip.height * density, rows);
+      const large = stitchScale(BANNER * density, rows);
+      const smallTop = Math.round((strip.height * density - rows * small) / 2) / density;
+      const largeTop = Math.round((BANNER * density - rows * large) / 2) / density;
+      const from = small / large;
+      const scale = between(from, 1, open);
+      const middle = between(strip.left + strip.width / 2, screen / 2, open);
+      const down = between(strip.top - own.top + smallTop - from * largeTop, 0, open);
+      drawn.style.transform = `translate(${middle - (scale * screen) / 2 - left}px, ${down}px) scale(${scale})`;
     };
     const later = () => {
       if (!frame) frame = requestAnimationFrame(place);
@@ -66,17 +90,19 @@ const DockingStrip: React.FC<{ body: Body; palette: Palette; until?: RefObject<E
       window.removeEventListener("scroll", later);
       window.removeEventListener("resize", later);
     };
-  }, [until]);
+  }, [until, rows]);
 
   return (
-    <div className="your-colourway-slot" ref={slot}>
-      <BodyStrip
-        {...body}
-        palette={palette}
-        className={`your-colourway-strip${dock ? " is-docked" : ""}${banner ? " is-banner" : ""}`}
-        style={dock}
-      />
-    </div>
+    <>
+      <div className="your-colourway-slot" ref={slot}>
+        <BodyStrip {...body} palette={palette} className="your-colourway-strip" centred />
+      </div>
+      <div className="colourway-banner" ref={window_} aria-hidden="true">
+        <div className="colourway-banner-hat" ref={banner}>
+          <BodyStrip {...body} palette={palette} centred />
+        </div>
+      </div>
+    </>
   );
 };
 

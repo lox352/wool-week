@@ -3,6 +3,7 @@ import { SlotId } from "../data/hats/types";
 import { Stitch } from "../types/Stitch";
 import { Palette, yarnFor } from "../knitting/palette";
 import "./ColourPreview.css";
+import { bodyRounds, stitchScale } from "./bodyScale";
 
 /**
  * The body of the hat as knitted: every round at its widest, stacked, in the
@@ -21,13 +22,21 @@ import "./ColourPreview.css";
  * a desktop, notably), it is smoothed into a blur.
  */
 
-/** The height an element is drawn at, in screen pixels; 0 until it is known. */
-const useDeviceHeight = (ref: React.RefObject<HTMLElement>) => {
-  const [height, setHeight] = useState(0);
+/** The size an element is drawn at, in screen pixels; 0 until it is known. */
+const useDeviceSize = (ref: React.RefObject<HTMLElement>) => {
+  const [size, setSize] = useState({ width: 0, height: 0 });
   useEffect(() => {
     const element = ref.current;
     if (!element || typeof ResizeObserver === "undefined") return;
-    const measure = () => setHeight(element.getBoundingClientRect().height * (window.devicePixelRatio || 1));
+    const measure = () => {
+      const box = element.getBoundingClientRect();
+      const density = window.devicePixelRatio || 1;
+      setSize((was) =>
+        was.width === box.width * density && was.height === box.height * density
+          ? was
+          : { width: box.width * density, height: box.height * density },
+      );
+    };
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     // Zooming, or moving the window to a screen of another density.
@@ -48,7 +57,7 @@ const useDeviceHeight = (ref: React.RefObject<HTMLElement>) => {
       density?.removeEventListener("change", onDensity);
     };
   }, [ref]);
-  return height;
+  return size;
 };
 
 const BodyStrip: React.FC<{
@@ -58,18 +67,12 @@ const BodyStrip: React.FC<{
   /** Fade every stitch but these yarns', to show where they are knitted. */
   highlight?: SlotId[];
   className?: string;
-  style?: React.CSSProperties;
-}> = ({ stitches, rounds, palette, highlight, className, style }) => {
+  /** Centre the hat in the strip, rather than put stitch 1 at its right. */
+  centred?: boolean;
+}> = ({ stitches, rounds, palette, highlight, className, centred }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const deviceHeight = useDeviceHeight(ref);
-  /** The rounds at the hat's full width, from the first to the last. */
-  const body = useMemo(() => {
-    const widest = Math.max(...rounds.map((round) => round.length));
-    const first = rounds.findIndex((round) => round.length === widest);
-    let last = first;
-    while (rounds[last + 1]?.length === widest) last++;
-    return rounds.slice(first, last + 1);
-  }, [rounds]);
+  const { width: deviceWidth, height: deviceHeight } = useDeviceSize(ref);
+  const body = useMemo(() => bodyRounds(rounds), [rounds]);
 
   /*
    * Painted once per change of wool, a pixel a stitch, and used
@@ -78,11 +81,7 @@ const BodyStrip: React.FC<{
    * the next repeat along is simply more of the hat - which is what lets a
    * strip wider than the body's own proportions be filled edge to edge.
    */
-  // Whole screen pixels a stitch, as near as they come to the strip's
-  // height; until it has been measured, a pixel a stitch for the browser to
-  // scale. A strip that grows (the colourway banner) repaints only when this
-  // steps, not with every pixel it grows by.
-  const scale = Math.max(1, Math.round(deviceHeight / Math.max(1, body.length)));
+  const scale = stitchScale(deviceHeight, body.length);
   const painted = useMemo(() => {
     if (body.length === 0 || typeof document === "undefined") return undefined;
     const element = document.createElement("canvas");
@@ -116,11 +115,15 @@ const BodyStrip: React.FC<{
     if (deviceHeight > 0) {
       const density = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
       // Pinned to whole screen pixels, so nothing is shifted by half of one:
-      // stitch 1 at the right-hand edge, and centred up and down, where it
-      // runs under or over the strip by at most half a stitch each way.
+      // stitch 1 at the right-hand edge (or the hat centred), and centred up
+      // and down, where it runs under or over the strip by at most half a
+      // stitch each way.
       const top = Math.round((deviceHeight - painted.height) / 2);
+      const left = Math.round((deviceWidth - painted.width) / 2);
       picture.backgroundSize = `${painted.width / density}px ${painted.height / density}px`;
-      picture.backgroundPosition = `right 0 top ${top / density}px`;
+      picture.backgroundPosition = centred
+        ? `left ${left / density}px top ${top / density}px`
+        : `right 0 top ${top / density}px`;
     }
   }
 
@@ -128,7 +131,7 @@ const BodyStrip: React.FC<{
     <div
       className={["body-strip", className].filter(Boolean).join(" ")}
       ref={ref}
-      style={{ ...picture, ...style }}
+      style={picture}
       aria-hidden="true"
     />
   );
