@@ -59,6 +59,30 @@ export const PaceCells: React.FC<{ time: TimeDetail; layout: ChartLayout; cell: 
   return <g>{rects}</g>;
 };
 
+/**
+ * A strip beside each round's number: the round's pace against the
+ * knitter's usual. The steadiest figure there is, since a round's time
+ * doesn't depend on how it is shared out among its stitches. Only for
+ * rounds at least half timed.
+ */
+export const RoundStrips: React.FC<{ time: TimeDetail; layout: ChartLayout; cell: number }> = ({ time, layout, cell }) => {
+  let right = 0;
+  layout.cells.forEach((at) => {
+    right = Math.max(right, cellAt(layout, at.round, at.column, cell).x + cell);
+  });
+  const width = Math.max(3, Math.round(cell * 0.28));
+  return (
+    <g>
+      {time.perRound.map((r, i) => {
+        if (r.timed < r.stitches / 2) return null;
+        const { y } = cellAt(layout, i + 1, 1, cell);
+        const fill = paceColours[paceStep(r.seconds / r.timed / time.usual)];
+        return <rect key={i} x={right + 1} y={y} width={width} height={cell} fill={fill} />;
+      })}
+    </g>
+  );
+};
+
 /** Each stitch in the colour of the sitting it was knitted in. */
 export const SittingCells: React.FC<{ time: TimeDetail; layout: ChartLayout; cell: number }> = ({ time, layout, cell }) => {
   const rects: React.ReactNode[] = [];
@@ -167,7 +191,8 @@ export const StatsPanel: React.FC<{
         </button>
       ))}
     </div>
-    {layer === "pace" && <PaceLegend usual={time.usual} />}
+    {/* Every layer has the round strips, so every layer has their key. */}
+    <PaceLegend usual={time.usual} />
     {layer === "sittings" && time.sittings.length > 0 && (
       <p className="quiet stats-hint">
         Each colour a sitting, {day(time.sittings[0].start)} to {day(time.sittings.at(-1)!.start)}. Tap a stitch for when.
