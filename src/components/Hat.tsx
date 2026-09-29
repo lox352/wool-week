@@ -17,8 +17,8 @@ import HatModel from "./HatModel";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
-import BodyStrip from "./BodyStrip";
 import { PreviewBanner } from "./ColourPreview";
+import ColourwayChoice from "./ColourwayChoice";
 import "./Hat.css";
 import { withLettering } from "../knitting/lettering/apply";
 import BrimLettering from "./BrimLettering";
@@ -47,9 +47,8 @@ const Hat: React.FC = () => {
   const [sizeId, setSizeId] = useState(initialSize);
   const [colourwayId, setColourwayId] = useState(hat?.colourways[0]?.id ?? "");
   /*
-   * The wool a knitter has chosen for themselves. Held beside the colourway
-   * rather than instead of it, so that "your own colours" starts from
-   * whichever colourway is showing and changes only what you change.
+   * The wool a knitter has chosen for themselves, over the colourway they
+   * started from. Starting again from another of the pattern's clears it.
    */
   const [own, setOwn] = useState<Overrides>({});
 
@@ -187,24 +186,19 @@ const HatPage: React.FC<{
   const colourEl = (
       <section className="section" ref={choicesRef}>
         <h2>Colourway</h2>
-        <div className="chooser">
-          {colourways.map((option) => {
-            const optionPalette = paletteOf(option, {}, hat.charts);
-            return (
-              <button
-                key={option.id}
-                type="button"
-                className={`colourway-option${option.id === colourway.id ? " is-chosen" : ""}`}
-                aria-pressed={option.id === colourway.id}
-                onClick={() => setColourwayId(option.id)}
-              >
-                                <BodyStrip {...body} palette={optionPalette} className="colourway-motif" />
-                <strong>{option.name}</strong>
-                <span className="quiet">{option.brand}</span>
-              </button>
-            );
-          })}
-        </div>
+        <ColourwayChoice
+          hat={hat}
+          colourways={colourways}
+          colourway={colourway}
+          sizeId={size.id}
+          overrides={own}
+          palette={palette}
+          body={body}
+          onStartFrom={(id) => {
+            setColourwayId(id);
+            setOwn({});
+          }}
+        />
 
         <h3>Your wool</h3>
         <WoolList
@@ -212,7 +206,6 @@ const HatPage: React.FC<{
           sizeId={size.id}
           overrides={own}
           onChange={choose}
-          onRestoreAll={() => setOwn({})}
           body={body}
           palette={palette}
         />

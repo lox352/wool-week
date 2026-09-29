@@ -14,7 +14,7 @@ import {
 import { hatStitches } from "../knitting/useHat";
 import { withLettering } from "../knitting/lettering/apply";
 import { indexRounds, totals } from "../knitting/progress";
-import { paletteOf } from "../knitting/palette";
+import { colourwayLabel, paletteOf } from "../knitting/palette";
 import PageLayout from "./ui/PageLayout";
 import Button from "./ui/Button";
 import Dialog from "./ui/Dialog";
@@ -113,7 +113,7 @@ const ProjectCard: React.FC<{
             </span>
           </span>
           <span className="quiet">
-            {hat.year} · {size.label} · {colourway.name}
+            {hat.year} · {size.label} · {colourwayLabel(colourway, project.shades)}
           </span>
           <span className="quiet">
             {done

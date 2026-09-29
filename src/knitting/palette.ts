@@ -168,3 +168,11 @@ export const ballsOf = (
     ),
   }));
 };
+
+/** How many balls of a colourway have been swapped for wool of the knitter's own. */
+export const ownBalls = (colourway: Colourway, sizeId: string, overrides: Overrides) =>
+  ballsOf(colourway, sizeId, overrides).filter((ball) => ball.slots.some((slot) => overrides[slot])).length;
+
+/** "Vintage", or "Your own, from Vintage" once any of its wool is changed. */
+export const colourwayLabel = (colourway: Colourway, overrides: Overrides | undefined) =>
+  overrides && Object.keys(overrides).length > 0 ? `Your own, from ${colourway.name}` : colourway.name;

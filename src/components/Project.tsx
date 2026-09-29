@@ -3,7 +3,7 @@ import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 import { hatById } from "../data/hats";
 import { SlotId } from "../data/hats/types";
 import { useHat } from "../knitting/useHat";
-import { paletteOf, yarnFor } from "../knitting/palette";
+import { colourwayLabel, paletteOf, yarnFor } from "../knitting/palette";
 import { totals, positionOf, currentRun } from "../knitting/progress";
 import { keyEntryAt } from "../knitting/stitch-key";
 import { joinIn, needleChangesIn, turnsInside } from "../knitting/chart-marks";
@@ -32,8 +32,8 @@ import { PaceCells, RoundStrips, SittingCells, SpeedsSheet, StatsPanel, StitchTi
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
-import BodyStrip from "./BodyStrip";
 import { PreviewBanner } from "./ColourPreview";
+import ColourwayChoice from "./ColourwayChoice";
 import "./Project.css";
 
 /** Marks a chart page's address as open on Explore statistics. */
@@ -188,7 +188,8 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
   }, [history, moveTo]);
 
   const setColourway = useCallback((colourwayId: string) => {
-    change(current => ({ ...current, colourwayId }));
+    // Starting again from one of the pattern's: every yarn becomes its own.
+    change(current => ({ ...current, colourwayId, shades: undefined }));
   }, [change]);
 
   const setShade = useCallback((slots: SlotId[], chosen: Chosen | undefined) => {
@@ -203,10 +204,6 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
         shades: Object.keys(shades).length > 0 ? shades : undefined,
       };
     });
-  }, [change]);
-
-  const restoreShades = useCallback(() => {
-    change(current => ({ ...current, shades: undefined }));
   }, [change]);
 
   const setBrimText = useCallback((brimText: string | undefined) => {
@@ -270,7 +267,6 @@ const Project: React.FC<{ view: "overview" | "chart" }> = ({ view }) => {
       canUndo={history.length > 0}
       setColourway={setColourway}
       setShade={setShade}
-      restoreShades={restoreShades}
       setBrimText={setBrimText}
     />
   );
@@ -287,7 +283,6 @@ const ProjectView: React.FC<{
   canUndo: boolean;
   setColourway: (id: string) => void;
   setShade: (slots: SlotId[], chosen: Chosen | undefined) => void;
-  restoreShades: () => void;
   setBrimText: (text: string | undefined) => void;
 }> = ({
   view,
@@ -300,7 +295,6 @@ const ProjectView: React.FC<{
   canUndo,
   setColourway,
   setShade,
-  restoreShades,
   setBrimText,
 }) => {
   const printed = hatById(hatId)!;
@@ -357,7 +351,7 @@ const ProjectView: React.FC<{
   }, [printed, roundLabels, rounds]);
 
   const title = project.name ?? hat.name;
-  const eyebrow = `Shetland Wool Week ${hat.year} · ${size.label} · ${colourway.name}`;
+  const eyebrow = `Shetland Wool Week ${hat.year} · ${size.label} · ${colourwayLabel(colourway, project.shades)}`;
   const knitLabel = counts.worked > 0 ? "Keep knitting" : "Start knitting";
 
   if (exploring && detail && time) {
@@ -532,30 +526,21 @@ const ProjectView: React.FC<{
           people start, then the wool itself. Choosing one sets every yarn
           at once; a row below changes any of them afterwards.
         */}
-        <div className="chooser">
-          {colourways.map((option) => {
-            const optionPalette = paletteOf(option, {}, hat.charts);
-            return (
-              <button
-                key={option.id}
-                type="button"
-                className={`colourway-option${option.id === colourway.id ? " is-chosen" : ""}`}
-                aria-pressed={option.id === colourway.id}
-                onClick={() => setColourway(option.id)}
-              >
-                                <BodyStrip {...body} palette={optionPalette} className="colourway-motif" />
-                <strong>{option.name}</strong>
-                <span className="quiet">{option.brand}</span>
-              </button>
-            );
-          })}
-        </div>
+        <ColourwayChoice
+          hat={hat}
+          colourways={colourways}
+          colourway={colourway}
+          sizeId={size.id}
+          overrides={project.shades ?? {}}
+          palette={palette}
+          body={body}
+          onStartFrom={setColourway}
+        />
         <WoolList
           colourway={colourway}
           sizeId={project.sizeId}
           overrides={project.shades ?? {}}
           onChange={setShade}
-          onRestoreAll={restoreShades}
           body={body}
           palette={palette}
         />
