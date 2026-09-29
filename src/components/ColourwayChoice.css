@@ -34,16 +34,41 @@
   border-radius: 2px;
 }
 
-/* At the top of the screen, over the page, gaining a banner's shadow as it widens. */
-.your-colourway-strip.is-docked {
+/*
+ * The window onto the banner, over the page at the top of the screen: the
+ * strip's own edge at first, a banner's crimson rule and shadow once open.
+ */
+.colourway-banner {
+  position: fixed;
   z-index: 20;
+  visibility: hidden;
+  overflow: hidden;
   pointer-events: none;
-  box-shadow: 0 6px 18px rgb(0 0 0 / calc(0.14 * var(--dock, 0)));
+  background: var(--paper-sunk);
+  border-radius: calc(2px * (1 - var(--open, 0)));
+  box-shadow:
+    0 2px 0 color-mix(in srgb, var(--crimson) calc(100% * var(--open, 0)), transparent),
+    0 6px 18px rgb(0 0 0 / calc(0.14 * var(--open, 0)));
 }
 
-.your-colourway-strip.is-banner {
-  border-width: 0 0 2px;
-  border-color: var(--crimson);
+.colourway-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(0 0 0 / calc(0.2 * (1 - var(--open, 0))));
+  border-radius: inherit;
+}
+
+.colourway-banner-hat {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 96px;
+  transform-origin: 0 0;
+}
+
+.colourway-banner-hat .body-strip {
+  height: 100%;
 }
 
 .colourway-starts-title {
