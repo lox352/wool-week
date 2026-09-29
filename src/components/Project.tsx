@@ -28,7 +28,7 @@ import { withLettering } from "../knitting/lettering/apply";
 import { recordProgress } from "../knitting/timing/log";
 import { useKnittingTime, useTimeDetail, useTimeRecording } from "../knitting/timing/useKnittingTime";
 import { TimeFigures, TimeLine } from "./KnittingTime";
-import { PaceCells, SittingCells, SpeedsSheet, StatsPanel, StitchTime, type Layer } from "./StatsView";
+import { PaceCells, RoundStrips, SittingCells, SpeedsSheet, StatsPanel, StitchTime, type Layer } from "./StatsView";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
@@ -376,13 +376,13 @@ const ProjectView: React.FC<{
             labels={roundLabels}
             turns={turns}
             stitchNotes={hat.stitchNotes}
-            overlay={
-              layer === "pace"
-                ? (layout, cell) => <PaceCells time={detail} layout={layout} cell={cell} />
-                : layer === "sittings"
-                  ? (layout, cell) => <SittingCells time={detail} layout={layout} cell={cell} />
-                  : undefined
-            }
+            overlay={(layout, cell) => (
+              <>
+                {layer === "pace" && <PaceCells time={detail} layout={layout} cell={cell} />}
+                {layer === "sittings" && <SittingCells time={detail} layout={layout} cell={cell} />}
+                <RoundStrips time={detail} layout={layout} cell={cell} />
+              </>
+            )}
             pickerNote={(id) => <StitchTime time={detail} id={id} round={roundOfStitch(rounds, id)} />}
           />
         </section>

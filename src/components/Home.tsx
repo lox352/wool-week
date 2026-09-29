@@ -74,14 +74,6 @@ const ProjectCard: React.FC<{
           Overview
         </Button>
       )}
-      <span className="project-card-manage">
-        <Button variant="quiet" onClick={onRename}>
-          Rename
-        </Button>
-        <Button variant="quiet" onClick={onDelete}>
-          Delete
-        </Button>
-      </span>
     </div>
   );
   const status = done
@@ -108,7 +100,18 @@ const ProjectCard: React.FC<{
           </span>
         </span>
         <span className="project-card-text">
-          <strong>{project.name ?? hat.name}</strong>
+          <span className="project-card-head">
+            <strong>{project.name ?? hat.name}</strong>
+            {/* Looking after the project, out of the way at the top right. */}
+            <span className="project-card-manage">
+              <Button variant="quiet" onClick={onRename}>
+                Rename
+              </Button>
+              <Button variant="quiet" onClick={onDelete}>
+                Delete
+              </Button>
+            </span>
+          </span>
           <span className="quiet">
             {hat.year} · {size.label} · {colourway.name}
           </span>
