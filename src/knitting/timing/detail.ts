@@ -13,6 +13,7 @@ import type { Action } from "./log";
 import {
   Costs,
   Observation,
+  cancelledBy,
   clamp,
   columns,
   fitCosts,
@@ -110,16 +111,24 @@ export const detail = (actions: Action[], stitches: Stitch[], rounds: number[][]
   const sittings: Sitting[] = [];
   const sittingOf = new Int32Array(size).fill(-1);
   const reachedAt = new Float64Array(size).fill(NaN);
-  for (const a of actions) {
+  // Changes that were undone never happened; going back unpicks what it passes.
+  const cancelled = cancelledBy(actions);
+  actions.forEach((a, i) => {
+    if (cancelled.has(i)) return;
     const open = sittings.at(-1);
     if (!open || a.t - open.end > 30 * 60_000 || a.t < open.end) sittings.push({ start: a.t, end: a.t });
     else open.end = a.t;
-    if (a.undo || a.untimed || a.to <= a.from) continue;
+    if (a.untimed) return;
+    if (a.to < a.from) {
+      sittingOf.fill(-1, Math.max(a.to + 1, 0), Math.min(a.from + 1, size));
+      reachedAt.fill(NaN, Math.max(a.to + 1, 0), Math.min(a.from + 1, size));
+      return;
+    }
     for (let id = Math.max(a.from + 1, 0); id <= Math.min(a.to, size - 1); id++) {
       sittingOf[id] = sittings.length - 1;
       reachedAt[id] = a.t;
     }
-  }
+  });
 
   return { perStitch, smooth, tapSpan, usual: median(smooth), perRound, sittingOf, sittings, reachedAt, costs, seen };
 };

@@ -140,20 +140,67 @@ const paused = (gapMs: number, expectedMs: number) =>
   gapMs < 0 || gapMs > Math.max(3 * expectedMs, expectedMs + 5 * 60_000);
 
 /**
+ * The changes an undo took back: each undo cancels the latest change still
+ * standing, when it reverses it exactly. A cancelled change never happened,
+ * as far as timing goes: a run tapped twice, or a jump ahead to show someone
+ * the chart, and then undone.
+ */
+export const cancelledBy = (actions: Action[]) => {
+  const cancelled = new Set<number>();
+  const standing: number[] = [];
+  actions.forEach((action, i) => {
+    if (action.untimed) {
+      standing.length = 0;
+      return;
+    }
+    if (!action.undo) {
+      standing.push(i);
+      return;
+    }
+    const last = standing.pop();
+    if (last === undefined) return;
+    const undone = actions[last];
+    if (undone.from === action.to && undone.to === action.from) {
+      cancelled.add(last);
+      cancelled.add(i);
+    } else {
+      standing.push(last);
+    }
+  });
+  return cancelled;
+};
+
+/** Faster than a third of this knitter's usual pace is no knitting at all, but a jump. */
+const impossiblyFast = 1 / 3;
+
+/**
  * Every stretch of stitches reached going forwards, and how long it took if
  * the gap before it looked like knitting. A stitch's time is that of the last
  * tap that reached it: knitting frogged and done again counts its second
- * time. Undoing is never knitting, and neither is going back; their gaps are
- * time spent all the same, and are counted apart.
+ * time. Going back is never knitting; its gap is time spent all the same,
+ * and is counted apart.
+ *
+ * Two things are never timed. A change that was undone is left out
+ * altogether, and the next tap is timed from the last change still standing.
+ * And a stretch reached impossibly fast, far quicker than the knitter's own
+ * pace, was jumped to rather than knitted: its stitches count, at the
+ * knitter's usual pace, but it says nothing about how fast they knit.
  */
 export const observe = (actions: Action[], prefix: Prefix) => {
+  const cancelled = cancelledBy(actions);
   const observations: Observation[] = [];
   let otherMs = 0;
+  let previous: Action | undefined;
   actions.forEach((action, i) => {
+    if (cancelled.has(i)) return;
     // Progress that moved while nothing was recording is neither timed nor credited,
     // and the tap after it has no gap of its own to go on.
-    if (action.untimed) return;
-    const gap = i === 0 || actions[i - 1].untimed ? NaN : action.t - actions[i - 1].t;
+    if (action.untimed) {
+      previous = action;
+      return;
+    }
+    const gap = !previous || previous.untimed ? NaN : action.t - previous.t;
+    previous = action;
     if (action.undo || action.to <= action.from) {
       if (Number.isFinite(gap) && !paused(gap, 60_000)) otherMs += gap;
       return;
@@ -165,6 +212,20 @@ export const observe = (actions: Action[], prefix: Prefix) => {
       ms: Number.isFinite(gap) && !paused(gap, expected) ? gap : undefined,
     });
   });
+
+  // The knitter's own pace, against typical: the middle of their timed
+  // stretches, which one wild stretch can't drag about.
+  const ratios = observations
+    .filter((o) => o.ms !== undefined)
+    .map((o) => o.ms! / 1000 / predict(prefix, typical, o.from, o.to))
+    .sort((a, b) => a - b);
+  const pace = ratios.length >= 5 ? ratios[Math.floor(ratios.length / 2)] : 1;
+  for (const o of observations) {
+    if (o.ms !== undefined && o.ms / 1000 < impossiblyFast * pace * predict(prefix, typical, o.from, o.to)) {
+      o.ms = undefined;
+    }
+  }
+
   const reached = new Int32Array(prefix.last + 1).fill(-1);
   observations.forEach((o, n) => {
     for (let id = Math.max(o.from + 1, 0); id <= Math.min(o.to, prefix.last); id++) reached[id] = n;
