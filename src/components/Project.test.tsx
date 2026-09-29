@@ -72,7 +72,7 @@ it("opens Explore statistics from the progress card once there is time to explor
   try {
     await act(async () => root.render(<App />));
     expect(host.textContent).toContain("knitted");
-    await act(async () => button("Explore statistics")!.click());
+    await act(async () => button("Statistics")!.click());
     expect(window.location.hash).toContain("stats=1");
     const panel = host.querySelector(".stats-panel")!;
     expect(panel.textContent).toMatch(/2\s*sittings/);
@@ -99,6 +99,6 @@ it("offers no statistics while nothing has been timed", async () => {
   try {
     await act(async () => root.render(<App />));
     expect(host.querySelector(".stats-panel")).toBeNull();
-    expect(host.textContent).not.toContain("Explore statistics");
+    expect([...host.querySelectorAll("button")].some(b => b.textContent?.trim() === "Statistics")).toBe(false);
   } finally { await act(async () => root.unmount()); host.remove(); }
 });

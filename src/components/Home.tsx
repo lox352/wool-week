@@ -69,12 +69,19 @@ const ProjectCard: React.FC<{
       >
         {done ? "See it" : counts.worked > 0 ? "Keep knitting" : "Start knitting"}
       </Button>
-      <Button variant="quiet" onClick={onRename}>
-        Rename
-      </Button>
-      <Button variant="quiet" onClick={onDelete}>
-        Delete
-      </Button>
+      {!done && (
+        <Button variant="secondary" onClick={() => navigate(overviewPath(id))}>
+          Overview
+        </Button>
+      )}
+      <span className="project-card-manage">
+        <Button variant="quiet" onClick={onRename}>
+          Rename
+        </Button>
+        <Button variant="quiet" onClick={onDelete}>
+          Delete
+        </Button>
+      </span>
     </div>
   );
   const status = done
@@ -83,11 +90,12 @@ const ProjectCard: React.FC<{
 
   /*
    * The hat's body in this project's own wool, with a line along its foot
-   * for how far through the whole hat the knitting is.
+   * for how far through the whole hat the knitting is. Only its buttons
+   * go anywhere: the card itself is for reading.
    */
   return (
     <li className="project-card">
-      <Link to={overviewPath(id)} className="project-card-link">
+      <div className="project-card-body">
         <span className="project-card-picture">
           <BodyStrip
             stitches={stitches}
@@ -111,7 +119,7 @@ const ProjectCard: React.FC<{
           </span>
           {time && <span className="quiet">{timeLine(time, done)}</span>}
         </span>
-      </Link>
+      </div>
       {actions}
     </li>
   );

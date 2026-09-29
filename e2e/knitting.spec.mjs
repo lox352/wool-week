@@ -106,7 +106,7 @@ test("the chart is its own page, and closing the knitting keeps you on it", asyn
   await expect(position(page)).toContainText("Round 2, stitch 1.");
 
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
-  await bar.getByRole("link", { name: "Overview & colours", exact: true }).click();
+  await bar.getByRole("link", { name: "Overview", exact: true }).click();
   await expect(page).toHaveURL(/\/project\/[^/?]+$/);
   await expect(page.locator(".chart-sheets")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Your wool" })).toBeVisible();
@@ -186,7 +186,7 @@ test("the Birsie Beanny's brim takes your own words, until they are knitted", as
   await expect(page.locator(".brim-lettering-status")).toContainText("hearts between the words");
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
-  await page.getByRole("link", { name: "Overview & colours", exact: true }).click();
+  await page.getByRole("link", { name: "Overview", exact: true }).click();
   await expect(page.getByLabel("Your words")).toHaveValue("HAPPY BIRTHDAY MUM");
   await expect(page.getByRole("img", { name: "The brim, lettered HAPPY BIRTHDAY MUM" })).toBeVisible();
 
@@ -194,7 +194,7 @@ test("the Birsie Beanny's brim takes your own words, until they are knitted", as
   await page.getByRole("link", { name: /^(Start|Keep) knitting$/ }).first().click();
   await workRounds(page, 12);
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
-  await page.getByRole("link", { name: "Overview & colours", exact: true }).click();
+  await page.getByRole("link", { name: "Overview", exact: true }).click();
   await expect(page.getByLabel("Your words")).toHaveCount(0);
   await expect(page.locator(".brim-lettering")).toContainText("The lettering is knitted: HAPPY BIRTHDAY MUM");
 });
