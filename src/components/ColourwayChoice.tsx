@@ -2,7 +2,7 @@ import React, { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import type { Colourway, HatPattern } from "../data/hats/types";
 import { ownBalls, paletteOf, type Overrides, type Palette } from "../knitting/palette";
 import BodyStrip from "./BodyStrip";
-import { bodyRounds, stitchScale } from "./bodyScale";
+import { bodyRounds, stitchScale, usePainting } from "./bodyPicture";
 import type { Body } from "./ColourPreview";
 import Dialog from "./ui/Dialog";
 import "./ColourwayChoice.css";
@@ -13,76 +13,72 @@ const balls = (n: number) => `${n} ${n === 1 ? "yarn" : "yarns"}`;
 const BANNER = 96;
 /** How far the page scrolls while the strip opens out into the banner. */
 const OPEN = 96;
+/** The strip's own edge, inside which the hat is drawn. */
+const EDGE = 1;
 const clamp = (x: number) => Math.min(1, Math.max(0, x));
 const between = (from: number, to: number, at: number) => from + (to - from) * at;
+
+interface Place {
+  /** The strip's place in the card, in the viewport. */
+  left: number;
+  right: number;
+  width: number;
+  height: number;
+  screen: number;
+  /** How far open, from the strip in the card (0) to the banner (1); undefined while in the card. */
+  open?: number;
+  top: number;
+}
 
 /**
  * The colourway's strip, which becomes the banner at the top of the screen
  * once the page scrolls it there, so the hat stays in sight while the wool
  * below is chosen.
  *
- * Reaching the top, it stays, and opens out to the banner, taller and wider
- * together, smoothly, as the page scrolls on. The banner is drawn once, at
- * its full size and crisp, and shown through a window: at first shrunk to
- * match the strip exactly, stitch for stitch, then growing about the strip's
- * middle while the window opens like curtains onto more of the hat on either
- * side. Nothing slides sideways, and nothing is redrawn while it moves. It is
- * pushed off again with the end of `until`, where the choosing ends.
+ * Reaching the top, the strip itself leaves the card and stays, and opens
+ * out to the banner, taller and wider together, smoothly, as the page
+ * scrolls on. It grows about its middle, like curtains opening onto more of
+ * the hat on either side: nothing slides sideways. While it moves it shows
+ * the banner's own picture, scaled to fit, so nothing is redrawn; in the
+ * card and once open, every stitch is whole screen pixels. It is pushed off
+ * again with the end of `until`, where the choosing ends.
  */
 const DockingStrip: React.FC<{ body: Body; palette: Palette; until?: RefObject<Element> }> = ({ body, palette, until }) => {
   const slot = useRef<HTMLDivElement>(null);
-  const window_ = useRef<HTMLDivElement>(null);
-  const banner = useRef<HTMLDivElement>(null);
-  const rows = useMemo(() => bodyRounds(body.rounds).length, [body.rounds]);
+  const [place, setPlace] = useState<Place>();
+  const rounds = useMemo(() => bodyRounds(body.rounds), [body.rounds]);
+  const density = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
+  const cardHeight = (place?.height ?? 0) - 2 * EDGE;
+  const small = stitchScale(cardHeight * density, rounds.length);
+  const large = stitchScale((BANNER - 2 * EDGE) * density, rounds.length);
+  const inCard = usePainting(rounds, body.stitches, palette, small);
+  const banner = usePainting(rounds, body.stitches, palette, large);
 
   useEffect(() => {
     let frame = 0;
-    const place = () => {
+    const measure = () => {
       frame = 0;
       const own = slot.current?.getBoundingClientRect();
-      const strip = slot.current?.firstElementChild?.getBoundingClientRect();
-      const shown = window_.current;
-      const drawn = banner.current;
-      if (!own || !strip || !shown || !drawn) return;
+      if (!own) return;
       const screen = document.documentElement.clientWidth;
-      drawn.style.width = `${screen}px`;
-      if (own.top > 0) {
-        shown.style.visibility = "hidden";
-        return;
-      }
-      const open = clamp(-own.top / OPEN);
-      const density = window.devicePixelRatio || 1;
-
-      // The window: from the strip in the card to the banner across the top.
-      const height = between(own.height, BANNER, open);
+      const docked = own.top <= 0 && own.height > 0;
+      const open = docked ? clamp(-own.top / OPEN) : undefined;
+      const height = between(own.height, BANNER, open ?? 0);
       const end = until?.current?.getBoundingClientRect().bottom ?? Infinity;
-      const top = Math.min(0, end - height);
-      const left = between(own.left, 0, open);
-      Object.assign(shown.style, {
-        visibility: "visible",
-        top: `${top}px`,
-        left: `${left}px`,
-        right: `${between(screen - own.right, 0, open)}px`,
-        height: `${height}px`,
+      setPlace({
+        left: own.left,
+        right: screen - own.right,
+        width: own.width,
+        height: own.height,
+        screen,
+        open,
+        top: Math.min(0, end - height),
       });
-      shown.style.setProperty("--open", String(open));
-
-      // The banner in it: at first the same size as the strip's stitches,
-      // and in the same place, then its own, about the strip's middle.
-      const small = stitchScale(strip.height * density, rows);
-      const large = stitchScale(BANNER * density, rows);
-      const smallTop = Math.round((strip.height * density - rows * small) / 2) / density;
-      const largeTop = Math.round((BANNER * density - rows * large) / 2) / density;
-      const from = small / large;
-      const scale = between(from, 1, open);
-      const middle = between(strip.left + strip.width / 2, screen / 2, open);
-      const down = between(strip.top - own.top + smallTop - from * largeTop, 0, open);
-      drawn.style.transform = `translate(${middle - (scale * screen) / 2 - left}px, ${down}px) scale(${scale})`;
     };
     const later = () => {
-      if (!frame) frame = requestAnimationFrame(place);
+      if (!frame) frame = requestAnimationFrame(measure);
     };
-    place();
+    measure();
     window.addEventListener("scroll", later, { passive: true });
     window.addEventListener("resize", later);
     return () => {
@@ -90,19 +86,57 @@ const DockingStrip: React.FC<{ body: Body; palette: Palette; until?: RefObject<E
       window.removeEventListener("scroll", later);
       window.removeEventListener("resize", later);
     };
-  }, [until, rows]);
+  }, [until]);
+
+  let style: React.CSSProperties & { "--open"?: number } = {};
+  const open = place?.open;
+  if (place && inCard && banner && cardHeight > 0) {
+    // The hat centred, pinned to whole screen pixels.
+    const centre = (width: number, height: number, picture: { width: number; height: number }, scale: number) => ({
+      left: Math.round((width * density - picture.width * scale) / 2) / density,
+      top: Math.round((height * density - picture.height * scale) / 2) / density,
+    });
+    if (open === undefined) {
+      const at = centre(place.width - 2 * EDGE, cardHeight, inCard, 1);
+      style = {
+        backgroundImage: `url(${inCard.url})`,
+        backgroundSize: `${inCard.width / density}px ${inCard.height / density}px`,
+        backgroundPosition: `left ${at.left}px top ${at.top}px`,
+      };
+    } else {
+      // At first the banner's picture shrunk to the card's, stitch for stitch.
+      const scale = between(small / large, 1, open);
+      const left = between(place.left, 0, open);
+      const right = between(place.right, 0, open);
+      const height = between(place.height, BANNER, open);
+      const across = centre(place.screen - left - right - 2 * EDGE, 0, banner, scale).left;
+      const down = between(
+        centre(0, cardHeight, inCard, 1).top,
+        centre(0, BANNER - 2 * EDGE, banner, 1).top,
+        open,
+      );
+      style = {
+        position: "fixed",
+        top: place.top,
+        left,
+        right,
+        height,
+        backgroundImage: `url(${banner.url})`,
+        backgroundSize: `${(banner.width * scale) / density}px ${(banner.height * scale) / density}px`,
+        backgroundPosition: `left ${across}px top ${down}px`,
+        "--open": open,
+      };
+    }
+  }
 
   return (
-    <>
-      <div className="your-colourway-slot" ref={slot}>
-        <BodyStrip {...body} palette={palette} className="your-colourway-strip" centred />
-      </div>
-      <div className="colourway-banner" ref={window_} aria-hidden="true">
-        <div className="colourway-banner-hat" ref={banner}>
-          <BodyStrip {...body} palette={palette} centred />
-        </div>
-      </div>
-    </>
+    <div className="your-colourway-slot" ref={slot}>
+      <div
+        className={`body-strip your-colourway-strip${open !== undefined ? " is-docked" : ""}`}
+        style={style}
+        aria-hidden="true"
+      />
+    </div>
   );
 };
 
