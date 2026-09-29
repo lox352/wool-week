@@ -22,11 +22,28 @@
   font-size: 0.85rem;
 }
 
-.your-colourway-strip {
+/* Keeps the strip's place in the card while it is the banner. */
+.your-colourway-slot {
   height: 4.5rem;
   margin-bottom: 0.45rem;
+}
+
+.your-colourway-strip {
+  height: 100%;
   border: 1px solid rgb(0 0 0 / 0.2);
   border-radius: 2px;
+}
+
+/* At the top of the screen, over the page, gaining a banner's shadow as it widens. */
+.your-colourway-strip.is-docked {
+  z-index: 20;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgb(0 0 0 / calc(0.14 * var(--dock, 0)));
+}
+
+.your-colourway-strip.is-banner {
+  border-width: 0 0 2px;
+  border-color: var(--crimson);
 }
 
 .colourway-starts-title {

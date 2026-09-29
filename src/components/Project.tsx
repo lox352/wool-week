@@ -32,7 +32,6 @@ import { PaceCells, RoundStrips, SittingCells, SpeedsSheet, StatsPanel, StitchTi
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
-import { PreviewBanner } from "./ColourPreview";
 import ColourwayChoice from "./ColourwayChoice";
 import "./Project.css";
 
@@ -330,7 +329,6 @@ const ProjectView: React.FC<{
     setSpeedsOpen(false);
   };
 
-  const stageRef = useRef<HTMLDivElement>(null);
   const choicesRef = useRef<HTMLElement>(null);
   const body = useMemo(() => ({ stitches, rounds }), [stitches, rounds]);
 
@@ -472,7 +470,7 @@ const ProjectView: React.FC<{
   }
 
   const stageEl = (
-        <div className="project-stage" ref={stageRef}>
+        <div className="project-stage">
           <HatModel
             hatId={hat.id}
             sizeId={size.id}
@@ -535,6 +533,7 @@ const ProjectView: React.FC<{
           palette={palette}
           body={body}
           onStartFrom={setColourway}
+          until={choicesRef}
         />
         <WoolList
           colourway={colourway}
@@ -572,7 +571,6 @@ const ProjectView: React.FC<{
               knitted={project.progress >= letteringStarts}
             />
           )}
-      <PreviewBanner body={body} palette={palette} stage={stageRef} choices={choicesRef} />
 
       <NextStep
         title={position.finished ? "All knitted" : counts.worked > 0 ? "Carry on" : "Ready to cast on?"}

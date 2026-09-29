@@ -17,7 +17,6 @@ import HatModel from "./HatModel";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
-import { PreviewBanner } from "./ColourPreview";
 import ColourwayChoice from "./ColourwayChoice";
 import "./Hat.css";
 import { withLettering } from "../knitting/lettering/apply";
@@ -106,7 +105,6 @@ const HatPage: React.FC<{
   }, []);
   const hat = withLettering(printed, brimText);
   const size = hat.sizes.find((s) => s.id === sizeId) ?? hat.sizes[0];
-  const stageRef = useRef<HTMLDivElement>(null);
   const choicesRef = useRef<HTMLElement>(null);
   const { stitches, rounds, roundHeight, index } =
     useHat(hat, size.id);
@@ -151,7 +149,7 @@ const HatPage: React.FC<{
 
   const body = useMemo(() => ({ stitches, rounds }), [stitches, rounds]);
   const stageEl = (
-        <div className="hat-stage" ref={stageRef}>
+        <div className="hat-stage">
           <HatModel
             hatId={hat.id}
             sizeId={size.id}
@@ -198,6 +196,7 @@ const HatPage: React.FC<{
             setColourwayId(id);
             setOwn({});
           }}
+          until={choicesRef}
         />
 
         <h3>Your wool</h3>
@@ -313,7 +312,6 @@ const HatPage: React.FC<{
             />
           )}
           {sizeEl}
-      <PreviewBanner body={body} palette={palette} stage={stageRef} choices={choicesRef} />
 
       <NextStep
         title="Ready to cast on?"
