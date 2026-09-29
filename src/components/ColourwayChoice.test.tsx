@@ -34,7 +34,9 @@ it("starts straight from another colourway while none of the wool is your own", 
   expect(host.querySelector(".your-colourway")?.textContent).toContain(`${vintage.name}, as the pattern gives it`);
   // None of the pattern's is marked as chosen: they are starting points.
   expect(host.querySelectorAll(".colourway-starts .is-chosen")).toHaveLength(0);
-  expect(tile(vintage.name)).toBeUndefined();
+  // The one you're on stays offered, and choosing it again changes nothing.
+  await act(async () => tile(vintage.name).click());
+  expect(onStartFrom).not.toHaveBeenCalled();
   await act(async () => tile(kaleyard.name).click());
   expect(onStartFrom).toHaveBeenCalledWith(kaleyard.id);
 });

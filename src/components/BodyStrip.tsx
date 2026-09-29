@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { SlotId } from "../data/hats/types";
 import { Stitch } from "../types/Stitch";
 import { Palette, yarnFor } from "../knitting/palette";
+import "./ColourPreview.css";
 
 /**
  * The body of the hat as knitted: every round at its widest, stacked, in the
@@ -57,7 +58,8 @@ const BodyStrip: React.FC<{
   /** Fade every stitch but these yarns', to show where they are knitted. */
   highlight?: SlotId[];
   className?: string;
-}> = ({ stitches, rounds, palette, highlight, className }) => {
+  style?: React.CSSProperties;
+}> = ({ stitches, rounds, palette, highlight, className, style }) => {
   const ref = useRef<HTMLDivElement>(null);
   const deviceHeight = useDeviceHeight(ref);
   /** The rounds at the hat's full width, from the first to the last. */
@@ -76,7 +78,12 @@ const BodyStrip: React.FC<{
    * the next repeat along is simply more of the hat - which is what lets a
    * strip wider than the body's own proportions be filled edge to edge.
    */
-  const picture = useMemo(() => {
+  // Whole screen pixels a stitch, as near as they come to the strip's
+  // height; until it has been measured, a pixel a stitch for the browser to
+  // scale. A strip that grows (the colourway banner) repaints only when this
+  // steps, not with every pixel it grows by.
+  const scale = Math.max(1, Math.round(deviceHeight / Math.max(1, body.length)));
+  const painted = useMemo(() => {
     if (body.length === 0 || typeof document === "undefined") return undefined;
     const element = document.createElement("canvas");
     let ctx: CanvasRenderingContext2D | null = null;
@@ -87,9 +94,6 @@ const BodyStrip: React.FC<{
     }
     if (!ctx) return undefined;
     const width = body[0].length;
-    // Whole screen pixels a stitch, as near as they come to the strip's
-    // height; until it has been measured, a pixel a stitch for the browser to scale.
-    const scale = Math.max(1, Math.round(deviceHeight / body.length));
     element.width = width * scale;
     element.height = body.length * scale;
     const lit = highlight && new Set(highlight.map((slot) => palette[slot]));
@@ -103,28 +107,28 @@ const BodyStrip: React.FC<{
         ctx.fillRect((width - 1 - position) * scale, y * scale, scale, scale);
       });
     });
-    const density = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
-    if (deviceHeight <= 0) return { url: element.toDataURL() };
-    // Pinned to whole screen pixels, so nothing is shifted by half of one:
-    // stitch 1 at the right-hand edge, and centred up and down, where it
-    // runs under or over the strip by at most half a stitch each way.
-    const top = Math.round((deviceHeight - element.height) / 2);
-    return {
-      url: element.toDataURL(),
-      size: `${element.width / density}px ${element.height / density}px`,
-      position: `right 0 top ${top / density}px`,
-    };
-  }, [body, stitches, palette, highlight, deviceHeight]);
+    return { url: element.toDataURL(), width: element.width, height: element.height };
+  }, [body, stitches, palette, highlight, scale]);
+
+  let picture: React.CSSProperties | undefined;
+  if (painted) {
+    picture = { backgroundImage: `url(${painted.url})` };
+    if (deviceHeight > 0) {
+      const density = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
+      // Pinned to whole screen pixels, so nothing is shifted by half of one:
+      // stitch 1 at the right-hand edge, and centred up and down, where it
+      // runs under or over the strip by at most half a stitch each way.
+      const top = Math.round((deviceHeight - painted.height) / 2);
+      picture.backgroundSize = `${painted.width / density}px ${painted.height / density}px`;
+      picture.backgroundPosition = `right 0 top ${top / density}px`;
+    }
+  }
 
   return (
     <div
       className={["body-strip", className].filter(Boolean).join(" ")}
       ref={ref}
-      style={
-        picture
-          ? { backgroundImage: `url(${picture.url})`, backgroundSize: picture.size, backgroundPosition: picture.position }
-          : undefined
-      }
+      style={{ ...picture, ...style }}
       aria-hidden="true"
     />
   );
