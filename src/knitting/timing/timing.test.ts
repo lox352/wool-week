@@ -5,8 +5,9 @@ import { updateSettings } from "../../helpers/settings";
 import { actionsOf, isLog, readLog, recordPageEvent, recordProgress, type Action } from "./log";
 import { observe, prefixFor, predict, summarise, typical } from "./model";
 import { duration, range, timeLine } from "./format";
+import { detail } from "./detail";
 
-const { stitches } = buildHat(hatById("sww25-aal-ower-toorie")!, "medium");
+const { stitches, rounds } = buildHat(hatById("sww25-aal-ower-toorie")!, "medium");
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 beforeEach(() => {
@@ -116,5 +117,64 @@ describe("the words", () => {
     const time = { knitted: 3600 * 5.3, sittings: [], days: 1, left: { low: 8 * 3600, mid: 9 * 3600, high: 10 * 3600 } };
     expect(timeLine(time, false)).toBe("5 h 18 min knitted · about 8–10 h to go");
     expect(timeLine(time, true)).toBe("Knitted in 5 h 18 min");
+  });
+});
+
+describe("jumps and undos", () => {
+  /** Steady knitting, with `extra` actions slipped in after reaching `at`, and everything after moved on by `delay`. */
+  const withInterlude = (actions: Action[], at: number, extra: (t: number) => Action[], delay: number) => {
+    const i = actions.findIndex((a) => a.to === at);
+    const inserted = extra(actions[i].t);
+    return [...actions.slice(0, i + 1), ...inserted, ...actions.slice(i + 1).map((a) => ({ ...a, t: a.t + delay }))];
+  };
+
+  it("ignores a jump ahead to show someone, once it is undone", () => {
+    const steady = knit(3000, 1.2);
+    const shown = withInterlude(
+      steady,
+      1600,
+      (t) => [
+        { t: t + 5_000, from: 1600, to: 1900 },
+        { t: t + 40_000, from: 1900, to: 1600, undo: true },
+      ],
+      40_000,
+    );
+    const plain = summarise(steady, stitches, 3000)!;
+    const after = summarise(shown, stitches, 3000)!;
+    expect(after.left!.mid / plain.left!.mid).toBeGreaterThan(0.97);
+    expect(after.left!.mid / plain.left!.mid).toBeLessThan(1.03);
+    expect(after.perMinute! / plain.perMinute!).toBeLessThan(1.03);
+
+    // Straight after the undo, the stitches jumped to aren't knitted.
+    const upToUndo = shown.slice(0, shown.findIndex((a) => a.undo) + 1);
+    const time = detail(upToUndo, stitches, rounds);
+    expect(time.sittingOf[1700]).toBe(-1);
+    expect(Number.isNaN(time.reachedAt[1700])).toBe(true);
+  });
+
+  it("times a run tapped twice and undone from the tap before it", () => {
+    const prefix = prefixFor(stitches);
+    const t0 = Date.UTC(2026, 8, 20, 18);
+    const run = predict(prefix, typical, 80, 88) * 1000;
+    const actions: Action[] = [
+      { t: t0, from: 72, to: 80 },
+      { t: t0 + 600, from: 80, to: 88 },
+      { t: t0 + 3_100, from: 88, to: 80, undo: true },
+      { t: t0 + run, from: 80, to: 88 },
+    ];
+    const { observations } = observe(actions, prefix);
+    expect(observations.map(({ from, to, ms }) => [from, to, ms])).toEqual([[72, 80, undefined], [80, 88, run]]);
+  });
+
+  it("doesn't time a jump ahead that is kept, but still counts its stitches", () => {
+    const steady = knit(1600, 1.2);
+    const last = steady.at(-1)!;
+    const jumped = [...steady, { t: last.t + 5_000, from: 1600, to: 1900 }];
+    const { observations } = observe(jumped, prefixFor(stitches));
+    expect(observations.at(-1)).toEqual({ from: 1600, to: 1900, ms: undefined });
+    const plain = summarise(steady, stitches, 1600)!;
+    const after = summarise(jumped, stitches, 1900)!;
+    expect(after.perMinute! / plain.perMinute!).toBeLessThan(1.03);
+    expect(after.knitted).toBeGreaterThan(plain.knitted);
   });
 });
