@@ -130,7 +130,7 @@
 .stats-speed-list li {
   display: grid;
   grid-template-columns: 2rem 1fr auto;
-  grid-template-areas: "swatch name you" "swatch name typical";
+  grid-template-areas: "swatch name you";
   align-items: center;
   column-gap: 0.7rem;
   padding: 0.45rem 0;
@@ -153,12 +153,6 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
-}
-
-.stats-speed-typical {
-  grid-area: typical;
-  text-align: right;
-  font-size: 0.8rem;
 }
 
 .stats-swatch-yarns {

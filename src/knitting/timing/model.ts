@@ -41,7 +41,12 @@ export const columns = [...operations, "tap"] as const;
 export type Column = (typeof columns)[number];
 export type Costs = Record<Column, number>;
 
-/** Seconds each takes a typical knitter; a tap is the moment spent tapping. */
+/**
+ * Seconds each takes, as a starting guess: estimates, not measured from real
+ * knitters. They judge whether a gap looks like a break, and hold each cost
+ * steady until the knitter's own taps outweigh them. Never shown as a
+ * comparison. A tap is the moment spent tapping.
+ */
 export const typical: Costs = {
   castOn: 5.5,
   knit: 2.2,

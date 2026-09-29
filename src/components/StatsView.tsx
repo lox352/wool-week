@@ -17,7 +17,7 @@ import { stitchKey } from "../knitting/stitch-key";
 import { Swatch, TurnSwatch, NeedlesSwatch } from "../knitting/ChartHelp";
 import type { HatPattern, StitchKeyId } from "../data/hats/types";
 import type { TimeDetail } from "../knitting/timing/detail";
-import { typical, type Column, type TimeSummary } from "../knitting/timing/model";
+import type { Column, TimeSummary } from "../knitting/timing/model";
 import { duration, range } from "../knitting/timing/format";
 import {
   clock,
@@ -229,12 +229,6 @@ const speedRows = (stitches: Stitch[], notes: HatPattern["stitchNotes"], time: T
   return rows;
 };
 
-/** "You knit a stitch in about 2.1 s, which is about typical." */
-const knitSummary = (time: TimeDetail) => {
-  const ratio = time.costs.knit / typical.knit;
-  return ratio < 0.9 ? "quicker than typical" : ratio > 1.1 ? "slower than typical" : "about typical";
-};
-
 /** The knitter's own time for each kind of stitch in this hat, in a sheet like the key. */
 export const SpeedsSheet: React.FC<{
   stitches: Stitch[];
@@ -263,7 +257,7 @@ export const SpeedsSheet: React.FC<{
       <div className="key-sheet-body">
         {time.seen.knit >= enoughOf("knit") && (
           <p className="stats-summary">
-            You knit a stitch in about <strong>{seconds(time.costs.knit)}</strong>, which is {knitSummary(time)}.
+            You knit a stitch in about <strong>{seconds(time.costs.knit)}</strong>.
           </p>
         )}
         <p className="quiet stats-hint">
@@ -279,7 +273,6 @@ export const SpeedsSheet: React.FC<{
                 {r.extra ? "+" : ""}
                 {seconds(time.costs[r.column])}
               </span>
-              <span className="stats-speed-typical quiet">typical {seconds(typical[r.column])}</span>
             </li>
           ))}
         </ul>
