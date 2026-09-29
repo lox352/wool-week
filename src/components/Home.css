@@ -54,7 +54,14 @@
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  align-items: center;
   padding: 0 1rem 1rem;
+}
+
+/* Renaming and deleting go together, and wrap together. */
+.project-card-manage {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .hat-card {
@@ -108,24 +115,13 @@
   gap: 1.25rem;
 }
 
-.project-card-link {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-}
-
-@media (hover: hover) {
-  .project-card-link:hover .project-card-text {
-    background: var(--paper-sunk);
-  }
-}
 
 .project-card-picture {
   position: relative;
   display: block;
 }
 
-.project-card-link .project-card-text {
+.project-card-body .project-card-text {
   padding: 0.85rem 1rem 0.6rem;
 }
 

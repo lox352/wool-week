@@ -89,11 +89,11 @@ const ChartPageFoot: React.FC<{
     {time}
     <div className="chart-foot-actions">
       <Link to={overview} className="btn btn-secondary">
-        Overview &amp; colours
+        Overview
       </Link>
       {onStats && (
         <Button variant="secondary" onClick={onStats}>
-          Explore statistics
+          Statistics
         </Button>
       )}
       <Button variant="primary" size="lg" className="chart-foot-knit" onClick={onKnit}>
