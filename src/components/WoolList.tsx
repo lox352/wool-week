@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Colourway, SlotId } from "../data/hats/types";
 import { ballsOf, inkOn, type Overrides, type Palette } from "../knitting/palette";
-import Button from "./ui/Button";
 import YarnPicker, { type Chosen } from "./YarnPicker";
 import BodyStrip from "./BodyStrip";
 import { type Body } from "./ColourPreview";
@@ -26,7 +25,6 @@ interface WoolListProps {
   sizeId: string;
   overrides: Overrides;
   onChange: (slots: SlotId[], chosen: Chosen | undefined) => void;
-  onRestoreAll: () => void;
   /**
    * The hat's body in the wool being chosen: shown beside each ball with
    * only its yarns lit, and in the picker while a ball is being chosen.
@@ -46,7 +44,6 @@ const WoolList: React.FC<WoolListProps> = ({
   sizeId,
   overrides,
   onChange,
-  onRestoreAll,
   body,
   palette,
 }) => {
@@ -98,10 +95,7 @@ const WoolList: React.FC<WoolListProps> = ({
       {yours && (
         <p className="wool-list-restore">
           Original ball counts do not transfer to substituted wool. Check yarn weight,
-          metres per ball and your swatch; combining colours also combines their yarn requirements.{" "}
-          <Button variant="quiet" onClick={onRestoreAll}>
-            Back to {colourway.name} throughout
-          </Button>
+          metres per ball and your swatch; combining colours also combines their yarn requirements.
         </p>
       )}
 
