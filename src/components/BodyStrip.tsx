@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { SlotId } from "../data/hats/types";
 import { Stitch } from "../types/Stitch";
 import { Palette, yarnFor } from "../knitting/palette";
@@ -11,7 +11,45 @@ import { Palette, yarnFor } from "../knitting/palette";
  * spends most of the hat on, whole, with every yarn in it. Drawn a pixel a
  * stitch and scaled up square, because it is thousands of stitches and is
  * redrawn on every change of wool.
+ *
+ * Scaled up on the canvas itself, not by the browser: each stitch a square
+ * of whole screen pixels, drawn at the strip's own height and the screen's
+ * own density, so the picture is shown pixel for pixel. Left to the browser,
+ * a one-pixel-a-stitch picture is only kept sharp where it honours
+ * `image-rendering: pixelated` for backgrounds; where it doesn't (Safari on
+ * a desktop, notably), it is smoothed into a blur.
  */
+
+/** The height an element is drawn at, in screen pixels; 0 until it is known. */
+const useDeviceHeight = (ref: React.RefObject<HTMLElement>) => {
+  const [height, setHeight] = useState(0);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+    const measure = () => setHeight(element.getBoundingClientRect().height * (window.devicePixelRatio || 1));
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    // Zooming, or moving the window to a screen of another density.
+    let density: MediaQueryList | undefined;
+    const watchDensity = () => {
+      density?.removeEventListener("change", onDensity);
+      density = window.matchMedia?.(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
+      density?.addEventListener("change", onDensity);
+    };
+    const onDensity = () => {
+      measure();
+      watchDensity();
+    };
+    watchDensity();
+    measure();
+    return () => {
+      observer.disconnect();
+      density?.removeEventListener("change", onDensity);
+    };
+  }, [ref]);
+  return height;
+};
+
 const BodyStrip: React.FC<{
   stitches: Stitch[];
   rounds: number[][];
@@ -20,6 +58,8 @@ const BodyStrip: React.FC<{
   highlight?: SlotId[];
   className?: string;
 }> = ({ stitches, rounds, palette, highlight, className }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const deviceHeight = useDeviceHeight(ref);
   /** The rounds at the hat's full width, from the first to the last. */
   const body = useMemo(() => {
     const widest = Math.max(...rounds.map((round) => round.length));
@@ -47,8 +87,11 @@ const BodyStrip: React.FC<{
     }
     if (!ctx) return undefined;
     const width = body[0].length;
-    element.width = width;
-    element.height = body.length;
+    // Whole screen pixels a stitch, as near as they come to the strip's
+    // height; until it has been measured, a pixel a stitch for the browser to scale.
+    const scale = Math.max(1, Math.round(deviceHeight / body.length));
+    element.width = width * scale;
+    element.height = body.length * scale;
     const lit = highlight && new Set(highlight.map((slot) => palette[slot]));
     body.forEach((round, index) => {
       // The newest round at the top, and stitch 1 at the right.
@@ -57,16 +100,31 @@ const BodyStrip: React.FC<{
         const yarn = yarnFor(palette, stitches[id]?.slot ?? "");
         ctx.globalAlpha = lit && !lit.has(yarn) ? 0.14 : 1;
         ctx.fillStyle = yarn.hex;
-        ctx.fillRect(width - 1 - position, y, 1, 1);
+        ctx.fillRect((width - 1 - position) * scale, y * scale, scale, scale);
       });
     });
-    return element.toDataURL();
-  }, [body, stitches, palette, highlight]);
+    const density = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
+    if (deviceHeight <= 0) return { url: element.toDataURL() };
+    // Pinned to whole screen pixels, so nothing is shifted by half of one:
+    // stitch 1 at the right-hand edge, and centred up and down, where it
+    // runs under or over the strip by at most half a stitch each way.
+    const top = Math.round((deviceHeight - element.height) / 2);
+    return {
+      url: element.toDataURL(),
+      size: `${element.width / density}px ${element.height / density}px`,
+      position: `right 0 top ${top / density}px`,
+    };
+  }, [body, stitches, palette, highlight, deviceHeight]);
 
   return (
     <div
       className={["body-strip", className].filter(Boolean).join(" ")}
-      style={picture ? { backgroundImage: `url(${picture})` } : undefined}
+      ref={ref}
+      style={
+        picture
+          ? { backgroundImage: `url(${picture.url})`, backgroundSize: picture.size, backgroundPosition: picture.position }
+          : undefined
+      }
       aria-hidden="true"
     />
   );
