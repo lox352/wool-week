@@ -177,29 +177,46 @@
 }
 
 /* The end of the chart page when you are not knitting. */
-.chart-foot-actions {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  grid-template-areas:
-    "home . overview"
-    "knit knit knit";
-  gap: 0.6rem 0.75rem;
+/* How far through on the left, the way home on the right. */
+.chart-foot-head {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/*
+ * The quiet ways on share a row, each an equal half; knitting, the one most
+ * people want, has a row of its own beneath them.
+ */
+.chart-foot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
   width: 100%;
 }
 
-.chart-foot-actions > :nth-child(1) { grid-area: home; }
-.chart-foot-actions > :nth-child(2) { grid-area: overview; }
-.chart-foot-knit { grid-area: knit; }
+.chart-foot-actions > .btn-secondary {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.chart-foot-knit {
+  flex-basis: 100%;
+}
 
 @media (min-width: 621px) {
   .chart-foot-actions {
-    grid-template-columns: auto auto 1fr;
-    grid-template-areas: "home overview knit";
-    gap: 0.75rem 1.25rem;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .chart-foot-actions > .btn-secondary {
+    flex: 0 0 auto;
   }
   .chart-foot-knit {
-    justify-self: end;
+    flex-basis: auto;
+    margin-left: auto;
     min-width: 16rem;
   }
 }

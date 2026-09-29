@@ -27,7 +27,7 @@ const regionsBelow = (turns: number[], round: number): number =>
  * however short the window.
  */
 const clearance = 5;
-const lift = (showing: number, cell: number) => Math.max(clearance * cell, showing / 4);
+const lift = (showing: number, cell: number, share = 0.25) => Math.max(clearance * cell, showing * share);
 
 /**
  * The largest canvas to ask a browser for, in pixels along either side.
@@ -100,6 +100,12 @@ interface ChartProps {
    * the window, never the height of the page.
    */
   contained?: boolean;
+  /** How far up the window the followed stitch sits, as a share of it. */
+  followAt?: number;
+  /** Drawn over the chart, in its own coordinates. */
+  overlay?: (layout: ChartLayout, cell: number) => React.ReactNode;
+  /** More to say about a tapped stitch. */
+  pickerNote?: (id: number) => React.ReactNode;
 }
 
 /**
@@ -128,6 +134,9 @@ const Chart: React.FC<ChartProps> = ({
   stitchNotes,
   onJump,
   contained = false,
+  overlay,
+  pickerNote,
+  followAt,
 }) => {
   const [picked, setPicked] = useState<number>();
   const makeOneLean = stitchNotes?.m1?.lean;
@@ -306,12 +315,12 @@ const Chart: React.FC<ChartProps> = ({
       scroller.scrollTo({
         left: Math.max(x - scroller.clientWidth / 2 + cell / 2, 0),
         top: contained
-          ? Math.max(y + cell - (scroller.clientHeight - lift(scroller.clientHeight, cell)), 0)
+          ? Math.max(y + cell - (scroller.clientHeight - lift(scroller.clientHeight, cell, followAt)), 0)
           : undefined,
         behavior,
       });
     },
-    [at, layout, contained],
+    [at, layout, contained, followAt],
   );
   useEffect(() => {
     aim(reducedMotion() ? "auto" : "smooth");
@@ -506,8 +515,14 @@ const Chart: React.FC<ChartProps> = ({
               <canvas ref={overlayRef} style={{ width, height }} />
             </>
           )}
+          {overlay && (
+            <svg className="chart-overlay" width={width} height={height} viewBox={`0 0 ${width} ${height}`} shapeRendering="crispEdges" aria-hidden="true">
+              {overlay(layout, cellSize)}
+            </svg>
+          )}
           {picked !== undefined && (
             <StitchPicker
+              note={pickerNote?.(picked)}
               entry={keyEntryAt(stitches, picked, stitchNotes)}
               labels={labels}
               yarn={stitches[picked] && yarnFor(palette, stitches[picked].slot)}

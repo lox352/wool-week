@@ -37,7 +37,9 @@ const StitchPicker: React.FC<{
   labels?: string[];
   /** Whether the stitch is hatched: on the far side of a turn from you. */
   otherFace?: boolean;
-}> = ({ id, stitches, rounds, layout, cell, progress, onJump, onClose, entry, yarn, labels, otherFace }) => {
+  /** Anything more to say about the stitch, below what it is. */
+  note?: React.ReactNode;
+}> = ({ id, stitches, rounds, layout, cell, progress, onJump, onClose, entry, yarn, labels, otherFace, note }) => {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -130,6 +132,7 @@ const StitchPicker: React.FC<{
             </p>
           </div>
         )}
+        {note}
         {!onJump ? null : here ? (
           <p className="stitch-picker-note">This is the next stitch to work.</p>
         ) : (
