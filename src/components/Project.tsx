@@ -28,6 +28,17 @@ import { withLettering } from "../knitting/lettering/apply";
 import { recordProgress } from "../knitting/timing/log";
 import { useKnittingTime, useTimeRecording } from "../knitting/timing/useKnittingTime";
 import { TimeFigures, TimeLine } from "./KnittingTime";
+import {
+  SpeedsSheet,
+  StatsPanel,
+  StitchTime,
+  paceOverlay,
+  roundOverlay,
+  sittingOverlay,
+  statsChoice,
+  useLayer,
+  useTimeDetail,
+} from "./StatsView";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
@@ -53,7 +64,8 @@ const ChartPageFoot: React.FC<{
   overview: string;
   onKnit: () => void;
   time?: React.ReactNode;
-}> = ({ percent, worked, total, round, rounds, finished, overview, onKnit, time }) => (
+  onStats?: () => void;
+}> = ({ percent, worked, total, round, rounds, finished, overview, onKnit, time, onStats }) => (
   <section className="section chart-foot" aria-label="Your progress">
     <div className="chart-foot-figure">
       <em>{finished ? "100%" : percentKnitted(worked, percent)}</em>
@@ -77,6 +89,11 @@ const ChartPageFoot: React.FC<{
       <Link to={overview} className="btn btn-secondary">
         Overview &amp; colours
       </Link>
+      {onStats && (
+        <Button variant="secondary" onClick={onStats}>
+          Explore statistics
+        </Button>
+      )}
       <Button variant="primary" size="lg" className="chart-foot-knit" onClick={onKnit}>
         {finished ? "See the last stitch" : worked > 0 ? "Resume knitting" : "Start knitting"}
       </Button>
@@ -301,6 +318,28 @@ const ProjectView: React.FC<{
   const counts = totals(index, project.progress);
   const position = positionOf(stitches, project.progress, index);
   const time = useKnittingTime(project.id, stitches, project.progress);
+  const [params, setParams] = useSearchParams();
+  const statsOn = view === "chart" && !knitting && params.has("stats") && time !== undefined;
+  const choice = statsChoice(params);
+  const [layer, setLayer] = useLayer(choice.style);
+  const [speedsOpen, setSpeedsOpen] = useState(false);
+  const detailed = useTimeDetail(project.id, stitches, rounds, statsOn ? project.progress : -1);
+  // The round strips sit by the round numbers, at the chart's right-hand edge.
+  useEffect(() => {
+    if (!statsOn || choice.style !== "rounds") return;
+    const id = setTimeout(() => {
+      const scroller = document.querySelector<HTMLElement>(".chart-scroll");
+      if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+    }, 300);
+    return () => clearTimeout(id);
+  }, [statsOn, choice.style]);
+  const setStats = (on: boolean) => {
+    const next = new URLSearchParams(params);
+    if (on) next.set("stats", params.get("stats") || "layers");
+    else next.delete("stats");
+    setParams(next, { replace: true });
+    if (!on) setSpeedsOpen(false);
+  };
 
   const stageRef = useRef<HTMLDivElement>(null);
   const choicesRef = useRef<HTMLElement>(null);
@@ -325,6 +364,58 @@ const ProjectView: React.FC<{
   const title = project.name ?? hat.name;
   const eyebrow = `Shetland Wool Week ${hat.year} · ${size.label} · ${colourway.name}`;
   const knitLabel = counts.worked > 0 ? "Keep knitting" : "Start knitting";
+
+  if (statsOn && detailed) {
+    const overlay =
+      choice.style === "rounds"
+        ? roundOverlay(detailed)
+        : choice.style === "pace" || layer === "pace"
+          ? paceOverlay(detailed)
+          : layer === "sittings"
+            ? sittingOverlay(detailed)
+            : undefined;
+    return (
+      <PageLayout title={title} eyebrow={eyebrow} showTitle={false} className="knit-screen stats-screen">
+        <section className="section chart-page">
+          <Chart
+            contained
+            stitches={stitches}
+            rounds={rounds}
+            palette={palette}
+            progress={project.progress}
+            labels={roundLabels}
+            turns={turns}
+            stitchNotes={hat.stitchNotes}
+            follow
+            followAt={0.85}
+            overlay={overlay}
+            pickerNote={(id) => (
+              <StitchTime time={detailed} id={id} round={rounds.findIndex((ids) => ids.includes(id)) + 1 || undefined} />
+            )}
+          />
+        </section>
+        <StatsPanel
+          style={choice.style}
+          summary={time!}
+          time={detailed}
+          finished={position.finished}
+          layer={layer}
+          onLayer={setLayer}
+          onSpeeds={() => setSpeedsOpen(true)}
+          onClose={() => setStats(false)}
+        />
+        {speedsOpen && (
+          <SpeedsSheet
+            variant={choice.speeds}
+            stitches={stitches}
+            notes={hat.stitchNotes}
+            time={detailed}
+            onClose={() => setSpeedsOpen(false)}
+          />
+        )}
+      </PageLayout>
+    );
+  }
 
   if (view === "chart") {
     return (
@@ -384,6 +475,7 @@ const ProjectView: React.FC<{
             overview={overviewPath(project.id)}
             onKnit={() => setKnitting(true)}
             time={time && <TimeLine time={time} finished={position.finished} className="chart-foot-time" />}
+            onStats={time && (() => setStats(true))}
           />
         )}
         {knitting && keyOpen && (
