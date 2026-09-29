@@ -118,7 +118,11 @@ export const StitchTime: React.FC<{ time: TimeDetail; id: number; round?: number
             <>Came in one tap of {span} stitches, at about {seconds(s)} a stitch.</>
           ) : (
             <>
-              Around here, about {seconds(s)} a stitch: {paceWords[paceStep(s / time.usual)].toLowerCase()} than your usual {seconds(time.usual)}.
+              Around here, about {seconds(s)} a stitch:{" "}
+              {paceStep(s / time.usual) === 3
+                ? `about your usual ${seconds(time.usual)}`
+                : `${paceWords[paceStep(s / time.usual)].toLowerCase()} than your usual ${seconds(time.usual)}`}
+              .
             </>
           )}
         </p>
