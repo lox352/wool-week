@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Stitch, isFabric } from "../types/Stitch";
-import { layOut, mirrorLayout } from "./layout";
+import { layOut, mirrorLayout, type ChartLayout } from "./layout";
 import { Palette, yarnFor } from "./palette";
 import { cellAt, chartSize, drawChart, drawProgress, leftMargin } from "./draw-chart";
 import ChartSvg from "./ChartSvg";
