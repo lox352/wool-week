@@ -176,6 +176,14 @@ export const scenarios = {
   },
   "fling across the body and back": {
     input: "touch",
+    /*
+     * In the lab only, as on the sweater site: now and then, swiped across
+     * the chart on a phone, this browser takes the swipe the box has no
+     * further to go for a swipe back, and the page ends up at the list of
+     * projects, never to come to rest. The suite would fail for that rather
+     * than for how the chart moved. To be found.
+     */
+    labOnly: true,
     setup: (page) => open(page, { choices: aalOwer, progress: 6940 }),
     act: async (page) => {
       for (const dx of [300, 300, 300, -300, -300, -300]) {
