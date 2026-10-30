@@ -154,9 +154,12 @@ export const scenarios = {
     /*
      * The bounce here is only told of, not drawn - this browser can't scroll
      * past an end - so what is on screen does not follow the scroll it tells
-     * of, and the measure of that is no measure of the chart's.
+     * of, and the measure of that is no measure of the chart's. Nor is how far
+     * past the chart's edge the box is told to be while it bounces: that is
+     * the bounce, up to 60 pixels past the end (see the recorder's fling),
+     * less the 24 the box's padding is allowed anyway.
      */
-    known: { jitter: Infinity },
+    known: { jitter: Infinity, past: 36 },
     setup: async (page) => {
       await open(page, { choices: aalOwer, progress: 0, knitting: true });
       // Up and left of the corner, a swipe at a time, the finger lifted slowly.
@@ -315,6 +318,13 @@ export const scenarios = {
   },
   "knit across the turn, the chart turning over": {
     input: "any",
+    /*
+     * Working the turn turns the whole chart over, left for right, to show
+     * the hat from its other face: one scroll the page sets, at once, to
+     * the stitch on the chart laid out afresh (see Chart's aim). That is
+     * the turn; every other round is followed smoothly.
+     */
+    known: { sets: 1 },
     setup: (page) => open(page, { choices: birsie, progress: 7047, knitting: true }),
     act: async (page) => {
       for (let k = 0; k < 4; k++) {
@@ -332,16 +342,23 @@ export const scenarios = {
     input: "any",
     setup: async (page) => {
       await open(page, { choices: islesburgh, progress: 7025, knitting: true });
+      // The box scrolled up, the crown's rounds over the stitch to be worked in view.
       await page.locator(".chart-scroll").evaluate((box) => {
         box.scrollTop -= 300;
       });
       await settled(page, { quiet: 500 });
     },
     act: async (page) => {
-      // Whatever stitch is drawn in the middle of the box, near its top.
+      // Whatever stitch is drawn in the column of the one to be worked, as far up the box as there is one.
       const id = await page.evaluate(() => {
+        const next = document.querySelector(".chart-next").getBoundingClientRect();
         const box = document.querySelector(".chart-scroll").getBoundingClientRect();
-        return window.__chartViews.at(-1).stitchAt(box.left + box.width / 2, box.top + 60);
+        const view = window.__chartViews.at(-1);
+        for (let y = box.top + next.height; y < next.top; y += next.height) {
+          const id = view.stitchAt(next.left + next.width / 2, y);
+          if (id !== undefined) return id;
+        }
+        return undefined;
       });
       await knitUpTo(page, id);
       await page.waitForTimeout(1200);

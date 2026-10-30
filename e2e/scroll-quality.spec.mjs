@@ -83,7 +83,7 @@ test.describe("the chart moves smoothly", () => {
         const listed = JSON.stringify(jumps.list.map(({ writes, ...jump }) => ({ ...jump, writes: writes.map((w) => `${w.what} ${w.from.split(" < ")[1] ?? ""}`) })), null, 1);
         expect(jumps.byKind.slip, `jumps the scroll does not account for: ${listed}`).toBeLessThanOrEqual(limit.slips);
         // Following the knitting, the page scrolls the box itself - smoothly, never at once.
-        expect(jumps.byKind.set, `scrolls the page set that moved what is on screen: ${listed}`).toBeLessThanOrEqual(knits(name) ? 0 : limit.sets);
+        expect(jumps.byKind.set, `scrolls the page set that moved what is on screen: ${listed}`).toBeLessThanOrEqual(knits(name) ? (scenario.known?.sets ?? 0) : limit.sets);
         expect(jumps.byKind.lurch, `lines setting off too fast: ${listed}`).toBeLessThanOrEqual(limit.lurches);
         expect(jitter.p95, "jitter").toBeLessThanOrEqual(limit.jitter);
         expect(scrollbars.gapP95, "scrollbars against the truth").toBeLessThanOrEqual(limit.scrollbars);
