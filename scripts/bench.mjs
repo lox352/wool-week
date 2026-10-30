@@ -11,7 +11,7 @@
  *   npm run bench -- --only derived        one named run
  *   npm run bench -- --render              frame times instead of settling
  *   npm run bench -- --geometry            can this hat settle at all?
- *   npm run bench -- --chart               chart renderers, speed and sharpness
+ *   npm run bench -- --chart               the chart, speed and sharpness
  *   npm run bench -- --set iterations=8 --set ropes=derived --minutes 3
  *
  * A word on reading the numbers. Frame times from this machine are software
@@ -389,9 +389,10 @@ async function geometry() {
  *
  * Both matter and they pull against each other. A chart of ten thousand cells
  * as ten thousand elements is crisp and unusable - six hundred milliseconds a
- * stitch. A canvas is quick but has a size limit, and capping it to stay
- * inside that drew at a third of native resolution on a phone. So the bench
- * reports the two together, and runs whichever renderers are asked for.
+ * stitch. One canvas is quick but has a size limit, and capping it to stay
+ * inside that drew at a third of native resolution on a phone. The chart is
+ * painted on tiles now, each small enough to draw at the screen's own
+ * resolution, so the bench reports the two together for them.
  */
 async function chart(which) {
   const throttle = Number(flag("throttle", 6));
@@ -432,7 +433,7 @@ async function chart(which) {
     }, hat);
 
     const started = Date.now();
-    await page.goto(`${base}#/project/${id}?knitting=1&chart=${name}`, {
+    await page.goto(`${base}#/project/${id}?knitting=1`, {
       waitUntil: "load",
     });
     await page.waitForSelector(".chart-sheets", { timeout: 120_000 });
@@ -472,8 +473,9 @@ async function chart(which) {
         if (going) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
+      const box = document.querySelector(".chart-scroll");
       for (let i = 0; i < 25; i++) {
-        window.scrollBy(0, 60);
+        box.scrollBy(0, -60);
         await new Promise((r) => setTimeout(r, 40));
       }
       going = false;
@@ -485,12 +487,12 @@ async function chart(which) {
     });
 
     /*
-     * Sharpness: device pixels across one cell as actually drawn. A canvas
-     * gets whatever backing store it was given; vectors get the screen.
+     * Sharpness: device pixels across one cell as actually drawn: a tile
+     * gets whatever backing store it was given.
      */
     const detail = await page.evaluate(() => {
       const cellCss = 13;
-      const canvas = document.querySelector(".chart-sheets canvas");
+      const canvas = document.querySelector(".chart-tiles canvas");
       const ratio = canvas
         ? canvas.width / parseFloat(getComputedStyle(canvas).width)
         : window.devicePixelRatio;
@@ -522,7 +524,7 @@ async function chart(which) {
 
 if (has("chart")) {
   const only = flag("only", null);
-  await chart(only ? [only] : ["svg", "canvas"]);
+  await chart(only ? [only] : ["tiles"]);
 } else if (has("geometry")) {
   await geometry();
 } else if (has("render")) {

@@ -28,7 +28,8 @@ import { withLettering } from "../knitting/lettering/apply";
 import { recordProgress } from "../knitting/timing/log";
 import { useKnittingTime, useTimeDetail, useTimeRecording } from "../knitting/timing/useKnittingTime";
 import { TimeFigures, TimeLine } from "./KnittingTime";
-import { PaceCells, RoundStrips, SittingCells, SpeedsSheet, StatsPanel, StitchTime, type Layer } from "./StatsView";
+import { SpeedsSheet, StatsPanel, StitchTime } from "./StatsView";
+import { statsOverlay, type Layer } from "../knitting/timing/overlay";
 import WoolList from "./WoolList";
 import { type Chosen } from "./YarnPicker";
 import NextStep from "./ui/NextStep";
@@ -319,6 +320,7 @@ const ProjectView: React.FC<{
   const exploring = view === "chart" && !knitting && params.get(statsParam) === "1" && time !== undefined;
   const detail = useTimeDetail(exploring ? project.id : undefined, stitches, rounds);
   const [layer, setLayer] = useState<Layer>("pace");
+  const overlay = useMemo(() => (detail ? statsOverlay(detail, layer) : undefined), [detail, layer]);
   const [speedsOpen, setSpeedsOpen] = useState(false);
   const closeSpeeds = useCallback(() => setSpeedsOpen(false), []);
   const setExploring = (on: boolean) => {
@@ -357,7 +359,6 @@ const ProjectView: React.FC<{
       <PageLayout title={title} eyebrow={eyebrow} showTitle={false} className="knit-screen">
         <section className="section chart-page">
           <Chart
-            contained
             stitches={stitches}
             rounds={rounds}
             palette={palette}
@@ -368,13 +369,7 @@ const ProjectView: React.FC<{
             labels={roundLabels}
             turns={turns}
             stitchNotes={hat.stitchNotes}
-            overlay={(layout, cell) => (
-              <>
-                {layer === "pace" && <PaceCells time={detail} layout={layout} cell={cell} />}
-                {layer === "sittings" && <SittingCells time={detail} layout={layout} cell={cell} />}
-                <RoundStrips time={detail} layout={layout} cell={cell} />
-              </>
-            )}
+            overlay={overlay}
             pickerNote={(id) => <StitchTime time={detail} id={id} round={roundOfStitch(rounds, id)} />}
           />
         </section>
@@ -402,7 +397,6 @@ const ProjectView: React.FC<{
       >
         <section className="section chart-page">
           <Chart
-            contained
             stitches={stitches}
             rounds={rounds}
             palette={palette}

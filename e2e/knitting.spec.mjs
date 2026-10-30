@@ -164,7 +164,8 @@ test("the chart keeps its bottom right corner when its window is resized for a m
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
   await page.reload();
   const gaps = () => page.locator(".chart-scroll").evaluate(scroller => ({
-    right: Math.round(scroller.scrollWidth - scroller.clientWidth - scroller.scrollLeft),
+    // Scrolled across from the right, a scroll is how far it is from there, less than nought: see scroll-corner.
+    right: Math.round(-scroller.scrollLeft) || 0,
     bottom: Math.round(scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop),
   }));
   await expect.poll(gaps).toEqual({ right: 0, bottom: 0 });
@@ -205,11 +206,11 @@ test("turning the work is a step of its own, and turns the chart over with it", 
   // Where the first stitch sits across the chart: at the right, as printed,
   // while the brim is worked.
   const firstStitchAtRight = () => page.locator(".chart-next").evaluate((mark) => {
-    const svg = mark.ownerSVGElement.getBoundingClientRect(), box = mark.getBoundingClientRect();
-    return box.left - svg.left > svg.width / 2;
+    const sheet = document.querySelector(".chart-sheets").getBoundingClientRect(), box = mark.getBoundingClientRect();
+    return box.left - sheet.left > sheet.width / 2;
   });
   await expect.poll(firstStitchAtRight).toBe(true);
-  await expect(page.locator(".chart-hatch").first()).toBeAttached();
+  await expect(page.locator('[data-note="hatch"]')).toContainText("Rounds 52 to");
 
   await workRounds(page, 51);
   await expect(page.locator(".knitting-panel")).toContainText("Turn your work inside out");
@@ -220,6 +221,7 @@ test("turning the work is a step of its own, and turns the chart over with it", 
   // Turned over: the body reads as its chart does, stitch 1 at the right,
   // and the brim below, seen from its other face now, is what is hatched.
   await expect.poll(firstStitchAtRight).toBe(true);
+  await expect(page.locator('[data-note="hatch"]')).toContainText("Rounds 1 to 51");
 
   // Undo takes the turn back, and the chart with it.
   await page.getByRole("button", { name: "Undo", exact: true }).click();
@@ -233,7 +235,7 @@ test("changing needles is a step of its own, which the chart and key mark", asyn
   await workRounds(page, 12);
   await expect(page.locator(".knitting-panel")).toContainText(/Change to [\d.]+mm needles/);
   await expect(page.getByRole("button", { name: "End of round", exact: true })).toHaveCount(0);
-  await expect(page.locator(".chart-rule-needles")).toBeAttached();
+  await expect(page.locator('[data-note="needles"]')).toContainText(/changed to [\d.]+mm after round 12/);
 
   await page.getByRole("button", { name: "Changed: carry on" }).click();
   await expect(position(page)).toContainText("Round 13, stitch 1.");
