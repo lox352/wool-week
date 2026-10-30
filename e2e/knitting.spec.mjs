@@ -118,7 +118,27 @@ test("the chart is its own page, and closing the knitting keeps you on it", asyn
   await expect(page.getByRole("heading", { name: "Wool Week Toories", level: 1, exact: true })).toBeVisible();
 });
 
+/**
+ * Where the stitch about to be worked is drawn on screen, by the chart's
+ * view (see TileView.probe): not where the sheet's edge is, which rounds
+ * out of view closing up or opening move, and nothing the knitter can see.
+ * The page must have opted in to the views before it loaded.
+ */
+const nextStitchOnScreen = async (page) => {
+  const id = await page.evaluate(() => window.__chartViews.at(-1).probe().follow);
+  expect(id).toBeGreaterThan(0);
+  return () => page.locator(".chart-sheets").evaluate((sheet, id) => {
+    const box = sheet.getBoundingClientRect();
+    const place = window.__chartViews.at(-1).place(id);
+    return { left: box.left + place.x, top: box.top + place.y };
+  }, id);
+};
+const optInToViews = (page) => page.addInitScript(() => {
+  window.__chartViews = [];
+});
+
 test("knitting fills the screen, says how to work the round's stitches, and closing it leaves the chart still", async ({ page }) => {
+  await optInToViews(page);
   await page.goto("#/hat/sww19-roadside-beanie");
   await page.getByRole("button", { name: "Start knitting this", exact: true }).click();
   // The crown's first decrease round.
@@ -147,13 +167,35 @@ test("knitting fills the screen, says how to work the round's stitches, and clos
   await expect(picker).toContainText("Knit two together");
   await picker.getByRole("button", { name: "Close" }).click();
 
-  const at = () => page.locator(".chart-sheets").evaluate(sheet => {
-    const box = sheet.getBoundingClientRect();
-    return { left: box.left, top: box.top };
-  });
+  const at = await nextStitchOnScreen(page);
   const before = await at();
   await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
   await expect(page.getByRole("region", { name: "Your progress" })).toBeVisible();
+  // At rest, every round and column that is going to close up or open has.
+  await page.waitForTimeout(400);
+  const after = await at();
+  expect(Math.abs(after.top - before.top)).toBeLessThan(2);
+  expect(Math.abs(after.left - before.left)).toBeLessThan(2);
+});
+
+test("closing the knitting part way along a round, mid-chart, leaves the stitches where they were", async ({ page }) => {
+  // The Shwook Hat in its middle size, a third of the way up its pattern, as a knitter's screenshots showed it.
+  await optInToViews(page);
+  await page.goto("");
+  await page.evaluate(() => {
+    const now = new Date().toISOString();
+    const id = "project-1760000000000";
+    localStorage.setItem(id, JSON.stringify({ version: 1, id, hatId: "sww14-shwook-hat", sizeId: "size2", colourwayId: "js-1", progress: 4400, startedAt: now, updatedAt: now }));
+  });
+  await page.goto("#/project/1760000000000/chart?knitting=1");
+  await expect(page.getByRole("button", { name: "End of round", exact: true })).toBeVisible();
+  await page.waitForFunction(() => window.__chartViews?.length > 0);
+  await page.waitForTimeout(800);
+  const at = await nextStitchOnScreen(page);
+  const before = await at();
+  await page.getByRole("button", { name: "Stop knitting", exact: true }).click();
+  await expect(page.getByRole("region", { name: "Your progress" })).toBeVisible();
+  await page.waitForTimeout(400);
   const after = await at();
   expect(Math.abs(after.top - before.top)).toBeLessThan(2);
   expect(Math.abs(after.left - before.left)).toBeLessThan(2);

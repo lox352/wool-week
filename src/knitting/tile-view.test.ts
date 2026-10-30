@@ -4,6 +4,9 @@ import { defaultColours, gutter } from "./chart-painter";
 import { LiveColumns, mapOf } from "./column-window";
 import { TileView, type TileContent, tileSize, along, type Places } from "./tile-view";
 import { testChart } from "./test-chart";
+import { hatById } from "../data/hats";
+import { hatStitches } from "./useHat";
+import { layOut } from "./layout";
 import type { Palette } from "./palette";
 
 const built = testChart();
@@ -47,7 +50,7 @@ const box = (width: number, height: number) => {
 
 // Kept the same between renders, as the chart's memos keep them: a new one is a change to repaint for.
 const hatch: [number, number][] = [];
-const content = (change: Partial<TileContent> = {}): TileContent => ({
+const baseContent = (change: Partial<TileContent> = {}): TileContent => ({
   scene,
   cell: 40,
   palette,
@@ -57,6 +60,7 @@ const content = (change: Partial<TileContent> = {}): TileContent => ({
   margin: 0,
   ...change,
 });
+const content = baseContent;
 
 describe("the chart on tiles", () => {
   beforeEach(() => {
@@ -914,6 +918,139 @@ describe("the chart on tiles, closed up", () => {
       expect(container.querySelector<HTMLElement>(".chart-layer")!.style.transform).toBe("");
       view.destroy();
     });
+  });
+});
+
+describe("the chart on tiles, closed up, in a hat's crown", () => {
+  /*
+   * A hat whose crown's decreases close columns either side of the box at
+   * once, as the rounds in view go up into it and back: where the slide
+   * crept a pixel or two across each time, until where each line counts as
+   * opening and closing was measured along the chart with every line open
+   * (see reach).
+   */
+  const hat = hatStitches(hatById("sww25-aal-ower-toorie")!, "medium");
+  const hatScene = sceneOf(layOut(hat.stitches, hat.rounds, hat.turns), hat.stitches, hat.rounds);
+  const rows = hatScene.layout.rounds;
+  const cell = 40;
+  const topFor = (first: number) => (rows - first - 4) * cell;
+  const idsIn = (row: number) => Array.from(hatScene.index.id.subarray(hatScene.index.start[row], hatScene.index.start[row + 1]));
+  const content = (change: Partial<TileContent> = {}) => baseContent({ scene: hatScene, ...change });
+  let now = 0;
+
+  beforeEach(() => {
+    painted = [];
+    now = 1000;
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(() => context() as unknown as CanvasRenderingContext2D);
+    vi.spyOn(performance, "now").mockImplementation(() => now);
+    vi.stubGlobal("requestAnimationFrame", () => 1);
+    vi.stubGlobal("cancelAnimationFrame", () => {});
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it("scrolled across from the right, puts every column back where it was when the rows in view go and come back", () => {
+    const narrow = 6 * cell;
+    const { scroller, sheet, container, scrollTo } = scrollingBox(narrow, 200);
+    scroller.style.direction = "rtl";
+    Object.defineProperty(sheet, "offsetLeft", { get: () => narrow - (parseFloat(sheet.style.width) || 0) });
+    Object.defineProperty(scroller, "scrollWidth", { get: () => Math.max(narrow, parseFloat(sheet.style.width) || 0) });
+    const view = new TileView(container, scroller, sheet);
+    view.show(content({ collapse: true }));
+    const settle = () => {
+      for (let frame = 0; frame < 15; frame++) {
+        now += 16;
+        view.update();
+      }
+      now += 200;
+      view.update();
+    };
+    const across = (id: number) => sheet.offsetLeft + view.place(id)!.x - scroller.scrollLeft;
+    const showing = () => container.dataset.columnsShowing;
+    let changed = 0;
+    for (let first = 1; first + 6 <= rows; first++) {
+      // Rested on rows `first` up, half way across the chart: well away from either edge.
+      scrollTo(0, topFor(first));
+      settle();
+      scrollTo(-((parseFloat(sheet.style.width) || 0) - narrow) / 2, topFor(first));
+      settle();
+      // The stitch nearest the middle of the box, in a row in view either side of the step.
+      const ids = idsIn(first + 2).filter((id) => view.place(id) !== undefined);
+      const id = ids.reduce((best, one) => (Math.abs(across(one) - narrow / 2) < Math.abs(across(best) - narrow / 2) ? one : best));
+      const was = across(id);
+      const columns = showing();
+      const after: number[] = [];
+      for (let cycle = 0; cycle < 4; cycle++) {
+        scrollTo(scroller.scrollLeft, topFor(first + 1));
+        settle();
+        changed += Number(showing() !== columns);
+        scrollTo(scroller.scrollLeft, topFor(first));
+        settle();
+        after.push(across(id));
+      }
+      // Never further than part of a cell the first time - a column it was in closing in on it from both sides opens on one - and nowhere after.
+      expect(Math.abs(after[0] - was), `rows ${first} up`).toBeLessThan(cell);
+      for (const at of after) expect(at, `rows ${first} up`).toBeCloseTo(after[0], 6);
+    }
+    // Columns did open and close.
+    expect(changed).toBeGreaterThan(0);
+    view.destroy();
+  }, 60_000);
+
+  it("comes back to just where it was after rows in view wander about and return, whatever the way", () => {
+    const narrow = 6 * cell;
+    // A box half way across a chart scrolled from the right, and a finger on it throughout: nothing put right at rest.
+    for (const seed of [1, 2, 3, 4, 5]) {
+      const { scroller, sheet, container, scrollTo, touch } = scrollingBox(narrow, 200);
+      scroller.style.direction = "rtl";
+      Object.defineProperty(sheet, "offsetLeft", { get: () => narrow - (parseFloat(sheet.style.width) || 0) });
+      Object.defineProperty(scroller, "scrollWidth", { get: () => Math.max(narrow, parseFloat(sheet.style.width) || 0) });
+      const view = new TileView(container, scroller, sheet);
+      view.show(content({ collapse: true }));
+      const start = 2 + (seed % 3);
+      scrollTo(0, topFor(start));
+      now += 200;
+      view.update();
+      scrollTo(-((parseFloat(sheet.style.width) || 0) - narrow) / 2, topFor(start));
+      for (let frame = 0; frame < 15; frame++) {
+        now += 16;
+        view.update();
+      }
+      now += 200;
+      view.update();
+      const ids = idsIn(start + 2).filter((id) => view.place(id) !== undefined);
+      const where = () => ids.map((id) => [sheet.offsetLeft + view.place(id)!.x - scroller.scrollLeft, view.place(id)!.y - scroller.scrollTop]);
+      const was = where();
+      // Where the box was then, at rest: the round closed over the box above moved its scroll to keep what it shows still.
+      const home = scroller.scrollTop;
+      touch("touchstart", 1);
+      let random = seed;
+      const next = () => (random = (random * 1103515245 + 12345) % 2147483648) / 2147483648;
+      let first = start;
+      for (let move = 0; move < 40; move++) {
+        first = Math.min(rows - 6, Math.max(1, first + Math.round((next() - 0.5) * 6)));
+        scrollTo(scroller.scrollLeft, topFor(first));
+        // Now and then before the lines have got where they were going.
+        const frames = Math.floor(next() * 12);
+        for (let frame = 0; frame < frames; frame++) {
+          now += 16;
+          view.update();
+        }
+      }
+      scrollTo(scroller.scrollLeft, home);
+      for (let frame = 0; frame < 15; frame++) {
+        now += 16;
+        view.update();
+      }
+      where().forEach(([x, y], k) => {
+        expect(x, `seed ${seed}, stitch ${ids[k]} across`).toBeCloseTo(was[k][0], 6);
+        expect(y, `seed ${seed}, stitch ${ids[k]} down`).toBeCloseTo(was[k][1], 6);
+      });
+      touch("touchend", 0);
+      view.destroy();
+    }
   });
 });
 
