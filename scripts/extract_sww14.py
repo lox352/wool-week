@@ -133,6 +133,21 @@ def crown(page, pix, palette):
     return rows
 
 
+# Cells the leaflet misprints, put right: chart, row and column as the charts
+# number them, and the yarn the cell is knitted in. Chart B prints row 7's
+# column 27 white, Yarn D, in every repeat; but its own table gives round 7
+# only Yarns A and B, and the cell mirrors column 1, which is B, as every
+# other pair in the row does.
+MISPRINTS = [("B", 7, 27, "B")]
+
+
+def correct(charts):
+    for name, row, col, slot in MISPRINTS:
+        cell = charts[name][row - 1][col - 1]
+        assert cell["slot"] != slot, ("no longer misprinted", name, row, col)
+        cell["slot"] = slot
+
+
 def assert_tables(charts):
     # Page 4 names dark/light yarns by row. These checks independently anchor
     # the sampled cell colours to the printed yarn letters.
@@ -142,7 +157,7 @@ def assert_tables(charts):
     allowed_b = [
         {"C", "D"}, {"C", "D"}, {"C", "D"},
         {"B", "E"}, {"B", "E"}, {"B", "E"},
-        {"A", "B", "D"},
+        {"A", "B"},
         {"B", "E"}, {"B", "E"}, {"B", "E"},
         {"C", "D"}, {"C", "D"}, {"C", "D"},
     ]
@@ -179,6 +194,7 @@ def extract(path):
     palette = read_palette(page, pix)
     charts = {name: regular(pix, palette, name) for name in "ABC"}
     charts["D"] = crown(page, pix, palette)
+    correct(charts)
     assert_tables(charts)
 
     assert [len(row) for row in charts["A"]] == [6] * 4

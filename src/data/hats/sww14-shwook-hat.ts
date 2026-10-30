@@ -22,6 +22,11 @@ import charts from "./sww14-shwook-hat.charts.json";
  * D's printed count table twice says 42 (38:48), although the chart and
  * surrounding arithmetic give 42 (48:48); and the generic finishing text says
  * to thread through 8 stitches although Size 1's preceding line leaves 7.
+ *
+ * One misprint is put right instead, as the extractor reads the chart (see
+ * scripts/extract_sww14.py): Chart B prints round 7's column 27 white, Yarn D,
+ * in every repeat, where its own table gives that round only Yarns A and B
+ * and the cell's mirror, column 1, is B. It is knitted in B.
  */
 const chartsOf = (): Chart[] =>
   charts.charts.map((chart) => ({
