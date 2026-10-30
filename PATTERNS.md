@@ -100,7 +100,9 @@ python3 scripts/extract_sww16.py SWW16.pdf \
 
 # SWW14, Shwook Hat - A/B/C are table grids and D is a red-outlined crown
 # staircase. Its A-E key and row-by-row dark/light tables are on the same page;
-# the CDD glyphs survive as PDF text and are read directly.
+# the CDD glyphs survive as PDF text and are read directly. One misprinted
+# cell, Chart B's round 7, column 27, is put right as it is read: see the
+# script's MISPRINTS.
 python3 scripts/extract_sww14.py SWW14.pdf \
     --out src/data/hats/sww14-shwook-hat.charts.json
 ```
@@ -298,6 +300,12 @@ red-outlined staircase, while its seven centred double decreases are read from
 the PDF's actual `/|\\` text glyphs and then checked by stitch consumption:
 16 → 14 → 14 → 12 → ... → 2 per repeat. The written size counts multiply that
 out independently.
+
+The table also catches one misprint. Chart B prints round 7's column 27 white,
+Yarn D, in every repeat, but the table gives round 7 only Yarns A and B, and
+the cell mirrors column 1, which is B, as every other pair in the round does.
+It is knitted in B: the extractor puts it right as it reads the chart, and the
+table check holds round 7 to A and B.
 
 The source itself has three inconsistencies, and they are documented rather
 than silently erased. Its page-1 size table says Size 3 uses a 3.25mm main

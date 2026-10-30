@@ -50,17 +50,26 @@ describe("Shwook Hat reconciles with the 2014 leaflet", () => {
     }
   });
 
-  it("preserves Charts A, B and C cell for cell", () => {
+  // Chart B's round 7 is printed with column 27 white, Yarn D; its table gives the round only A and B, and the cell mirrors column 1, B: a misprint, put right.
+  it("preserves Charts A, B and C cell for cell, but for one misprinted cell", () => {
     const chart = (id: string) => hat.charts.find((candidate) => candidate.id === id)!;
     expect(chart("A").rows.map((row) => row.map((cell) => cell.slot).join("")))
       .toEqual(["BBBCCC","BBCBCB","BCBCBB","CCCBBB"]);
     expect(chart("B").rows.map((row) => row.map((cell) => cell.slot).join("")))
-      .toEqual(["CCDCDCDCCCDCCCCCDCCCDCDCDCCC","CDCDCDCCCCDDCCCDDCCCCDCDCDCC","DCDCDCCCCCDDDCDDDCCCCCDCDCDC","EBEBEEEBBBEEEBEEEBBBEEEBEBEB","BEBEEEEEBBEEBBBEEBBEEEEEBEBE","EBEEEBEEEBEBBEBBEBEEEBEEEBEB","BAAABABAAABBAAABBAAABABAAADA","EBEEEBEEEBEBBEBBEBEEEBEEEBEB","BEBEEEEEBBEEBBBEEBBEEEEEBEBE","EBEBEEEBBBEEEBEEEBBBEEEBEBEB","DCDCDCCCCCDDDCDDDCCCCCDCDCDC","CDCDCDCCCCDDCCCDDCCCCDCDCDCC","CCDCDCDCCCDCCCCCDCCCDCDCDCCC"]);
+      .toEqual(["CCDCDCDCCCDCCCCCDCCCDCDCDCCC","CDCDCDCCCCDDCCCDDCCCCDCDCDCC","DCDCDCCCCCDDDCDDDCCCCCDCDCDC","EBEBEEEBBBEEEBEEEBBBEEEBEBEB","BEBEEEEEBBEEBBBEEBBEEEEEBEBE","EBEEEBEEEBEBBEBBEBEEEBEEEBEB","BAAABABAAABBAAABBAAABABAAABA","EBEEEBEEEBEBBEBBEBEEEBEEEBEB","BEBEEEEEBBEEBBBEEBBEEEEEBEBE","EBEBEEEBBBEEEBEEEBBBEEEBEBEB","DCDCDCCCCCDDDCDDDCCCCCDCDCDC","CDCDCDCCCCDDCCCDDCCCCDCDCDCC","CCDCDCDCCCDCCCCCDCCCDCDCDCCC"]);
     expect(chart("C").rows.map((row) => row.map((cell) => cell.slot).join("")))
       .toEqual(["AABABAAABAAAAABAAABABAAA","ABABAAAABBAAABBAAAABABAA","BABAAAAABBBABBBAAAAABABA","CDCCCDDDCCCDCCCDDDCCCDCD","DCCCCCDDCCDDDCCDDCCCCCDC","CCCDCCCDCDDCDDCDCCCDCCCD","EEDEDEEEDDEEEDDEEEDEDEEE","CCCDCCCDCDDCDDCDCCCDCCCD","DCCCCCDDCCDDDCCDDCCCCCDC","CDCCCDDDCCCDCCCDDDCCCDCD","BABAAAAABBBABBBAAAAABABA","ABABAAAABBAAABBAAAABABAA","AABABAAABAAAAABAAABABAAA"]);
     expect(chart("A").rows.every((row) => row.length === 6)).toBe(true);
     expect(chart("B").rows.every((row) => row.length === 28)).toBe(true);
     expect(chart("C").rows.every((row) => row.length === 24)).toBe(true);
+  });
+
+  it("knits every row of its charts in two yarns at most, as its tables say", () => {
+    for (const chart of hat.charts) {
+      chart.rows.forEach((row, k) => {
+        expect(new Set(row.map((cell) => cell.slot)).size, `chart ${chart.id}, round ${k + 1}`).toBeLessThanOrEqual(2);
+      });
+    }
   });
 
   it("preserves Chart D's staircase and seven centred double decreases", () => {
