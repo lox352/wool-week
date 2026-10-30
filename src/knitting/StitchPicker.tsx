@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { Stitch } from "../types/Stitch";
 import { ChartLayout } from "./layout";
-import { cellAt, chartSize } from "./draw-chart";
 import { progressBefore } from "./jump";
 import Button from "../components/ui/Button";
 import { KeyEntry } from "./stitch-key";
@@ -39,7 +38,11 @@ const StitchPicker: React.FC<{
   otherFace?: boolean;
   /** Anything more to say about the stitch, below what it is. */
   note?: React.ReactNode;
-}> = ({ id, stitches, rounds, layout, cell, progress, onJump, onClose, entry, yarn, labels, otherFace, note }) => {
+  /** Where a stitch is on the chart, as the tiles have the columns and rows now. */
+  place: (id: number) => { x: number; y: number } | undefined;
+  /** And how wide the chart is then. */
+  chartWidth: number;
+}> = ({ id, stitches, rounds, layout, cell, progress, onJump, onClose, entry, yarn, labels, otherFace, note, place, chartWidth }) => {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -51,8 +54,10 @@ const StitchPicker: React.FC<{
   const at = layout.cells.get(id);
   if (!at) return null;
   const target = progressBefore(stitches, rounds, at.round, at.index);
-  const { x, y } = cellAt(layout, at.round, at.column, cell);
-  const { width } = chartSize(layout, cell);
+  const placed = place(id);
+  if (!placed) return null;
+  const { x, y } = placed;
+  const width = chartWidth;
   const explains = entry !== undefined && entry.id !== "k1";
   const needles = stitches[id]?.needles;
   const joinsAfter = stitches[id + 1]?.type === "join";
@@ -79,8 +84,9 @@ const StitchPicker: React.FC<{
         style={{
           left,
           width: bubble,
-          top: below ? y + cell + 8 : undefined,
-          bottom: below ? undefined : layout.rounds * cell - y + 8,
+          // Above, it hangs from the stitch's top: the chart's height changes as its rows close up.
+          top: below ? y + cell + 8 : y - 8,
+          transform: below ? undefined : "translateY(-100%)",
         }}
         onClick={(event) => event.stopPropagation()}
       >

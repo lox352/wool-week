@@ -63,20 +63,63 @@
 .stitch-key .stitch-note {
   font-style: italic;
 }
+
 .chart-help select { max-width: 100%; }
 .chart-yarn-numbers { display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; }
 
+/* The chart scrolls both ways in a window of its own, so zooming it changes what is in the window and never the page. */
 .chart-scroll {
-  overflow-x: auto;
-  overflow-y: hidden;
+  /* What the tiles in view are is measured from here. */
+  position: relative;
+  overflow: auto;
+  overscroll-behavior: contain;
   /* Let a horizontal drag scroll the chart without stealing page scrolling. */
   touch-action: pan-x pan-y;
   -webkit-overflow-scrolling: touch;
+  /*
+   * Scrolled across from the right, where a chart is read from: the browser
+   * then holds that edge still as columns open and close to the left of what
+   * is showing. See scroll-corner.ts.
+   */
+  direction: rtl;
+  /*
+   * A chart shorter than its box - zoomed right out - sits at the bottom of
+   * it, where it is read from, rather than the top: see .chart-sheets.
+   */
 }
 
-/* The chart and the progress over it, stacked. */
+/*
+ * Its scrollbars put away where they are only indicators: on a touch screen,
+ * and while knitting, when the chart scrolls itself to every stitch. Each
+ * of those scrolls brought them up for a moment across the middle of the
+ * screen, where the box ends above the knitting panel - and while the sheet
+ * keeps its size mid-scroll (see TileView), they show the sheet, not the
+ * chart. The round numbers say where you are. Scrolled with a mouse, the
+ * chart keeps them, to drag.
+ */
+@media (pointer: coarse) {
+  .chart-scroll {
+    scrollbar-width: none;
+  }
+
+  .chart-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.knit-screen .chart-scroll {
+  scrollbar-width: none;
+}
+
+.knit-screen .chart-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* The chart and the progress over it, stacked: pushed to the bottom of its box where it is shorter, and from the top as ever where it is taller. */
 .chart-sheets {
   position: relative;
+  direction: ltr;
+
 }
 
 .chart-pickable {
@@ -132,98 +175,38 @@
   color: var(--ink-soft);
 }
 
-.chart-sheets canvas {
-  display: block;
-  /* Cells are flat colour, so never let a browser blur them when scaling. */
-  image-rendering: pixelated;
-}
-
-.chart-sheets canvas + canvas {
+/*
+ * The chart on canvas tiles: each tile placed where its square of the chart
+ * is, and any that hang past the chart's edge cut off, so they never make
+ * the box scroll further than the chart goes.
+ */
+.chart-tiles {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-.chart-svg {
+/* The layer the tiles are on, moved across the sheet to hold a column still while the columns close up or open. */
+.chart-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.chart-tiles canvas {
+  position: absolute;
   display: block;
-  /* The join's arrows reach just past the chart's edges. */
-  overflow: visible;
 }
 
-.chart-join {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  shape-rendering: geometricPrecision;
-}
-
-.chart-rule {
-  fill: none;
-  stroke: rgb(0 0 0 / 0.22);
-  stroke-width: 1;
-}
-
-.chart-rule-heavy {
-  stroke: rgb(0 0 0 / 0.7);
-}
-
-/*
- * Where the work is turned inside out. Not a counting line but the seam
- * between two regions worked on opposite faces, so it is given the accent
- * rather than another weight of grey.
- */
-.chart-rule-turn {
-  stroke: var(--crimson);
-  stroke-width: 2.5;
-}
-
-/*
- * Where the needles are changed: a dashed rule in ink, beside the turn's, on
- * a pale line of its own so that it shows on dark wool as well as light.
- */
-.chart-rule-needles-ground {
-  stroke: #fff;
-  stroke-width: 4;
-}
-
-.chart-rule-needles {
-  stroke: #1d1a17;
-  stroke-width: 2;
-  stroke-dasharray: 5 3;
-  shape-rendering: geometricPrecision;
-}
-
-.chart-mark {
-  fill: none;
-  stroke-width: 1.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.chart-mark-halo {
-  fill: none;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-/* Worked stitches are veiled, so what is left to do is what stands out. */
-.chart-done {
-  fill: var(--paper);
-  opacity: 0.62;
-}
-
+/* The stitch to be worked next, outlined over the tiles. */
 .chart-next {
-  fill: none;
-  stroke: var(--crimson);
-  stroke-width: 2;
-}
-
-.chart-numbers text {
-  font-size: 9px;
-  font-variant-numeric: tabular-nums;
-  fill: var(--ink-faint);
+  position: absolute;
+  z-index: 1;
+  outline: 2px solid var(--crimson);
+  outline-offset: -1px;
+  pointer-events: none;
 }
 
 .chart-caption {
@@ -296,13 +279,9 @@
 }
 
 /*
- * Rounds worked with the other face of the hat towards you: a light hatch,
- * so they read as the other side of the fabric without hiding it.
+ * The key's swatch for the rounds worked with the other face of the hat
+ * towards you, a light hatch, as the tiles paint them.
  */
-.chart-hatch {
-  pointer-events: none;
-}
-
 .chart-hatch-line {
   stroke: var(--ink);
   stroke-width: 1.5;
@@ -335,10 +314,3 @@
   line-height: 1.35;
 }
 
-/* Anything drawn over the chart, such as a heat map: seen, never tapped. */
-.chart-overlay {
-  position: absolute;
-  inset: 0;
-  overflow: visible;
-  pointer-events: none;
-}

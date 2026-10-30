@@ -1,9 +1,6 @@
 import { RefObject, useCallback, useEffect, useLayoutEffect, useRef } from "react";
-
-export const minCell = 8;
-export const maxCell = 40;
-
-const clamp = (cell: number) => Math.min(maxCell, Math.max(minCell, cell));
+import { scrollAcross } from "./scroll-corner";
+import { maxCell, minCell, settleCell } from "./zoom";
 
 interface Gesture {
   startCell: number;
@@ -32,9 +29,19 @@ export function usePinchZoom(
   sheetRef: RefObject<HTMLDivElement>,
   cell: number,
   setCell: (cell: number) => void,
-  /** The chart scrolls both ways in a box of its own, not down the page. */
-  contained = false,
+  /**
+   * Where a point `x` across and `y` down the sheet before a zoom is after
+   * it, to be put back at `screenX`, `screenY` on screen. In proportion,
+   * unless the columns and rows are not: closed up, they are those the box
+   * needs at the new size.
+   */
+  placeAfter?: (x: number, y: number, screenX: number, screenY: number) => { x: number; y: number } | undefined,
+  /** The least cell size the chart zooms out to, as the box is now: see zoom's leastCell. */
+  least: () => number = () => minCell,
 ) {
+  const leastNow = useRef(least);
+  leastNow.current = least;
+  const clamp = (cell: number) => Math.min(maxCell, Math.max(leastNow.current(), cell));
   const gesture = useRef<Gesture>();
   const settle = useRef<{
     ratio: number;
@@ -81,7 +88,7 @@ export function usePinchZoom(
       const g = gesture.current;
       gesture.current = undefined;
       if (!g) return;
-      const next = Math.round(g.cell);
+      const next = settleCell(g.cell, leastNow.current());
       if (next === g.startCell) {
         sheet.style.transform = "";
         return;
@@ -163,42 +170,45 @@ export function usePinchZoom(
      * anchoring), and adding the growth on top of that overshoots. So look
      * where the point has got to, and move it back.
      */
+    const placed = placeAfter?.(done.originX, done.originY, done.screenX, done.screenY);
+    /*
+     * Where the sheet is in the box with its scroll taken back out, read once
+     * it has its new size: scrolled across from its right-hand edge (see
+     * scroll-corner), the sheet's left moves in the box as it grows or
+     * shrinks. A scroll cut back to fit moves the sheet on screen the other
+     * way, and leaves this as it is.
+     */
     const box = sheet.getBoundingClientRect();
-    const left = scroller.scrollLeft + box.left + done.originX * done.ratio - done.screenX;
-    if (contained) {
-      const top = scroller.scrollTop + box.top + done.originY * done.ratio - done.screenY;
-      const place = () => {
-        scroller.scrollLeft = Math.min(Math.max(left, 0), scroller.scrollWidth - scroller.clientWidth);
-        scroller.scrollTop = Math.min(Math.max(top, 0), scroller.scrollHeight - scroller.clientHeight);
-      };
-      /*
-       * An iPhone scrolls a box itself, apart from the page, and while it
-       * thinks a finger is still on it - as it does for a while after a long
-       * pinch - it ignores a scroll set from here and keeps its own. Zoomed
-       * out, that is past the chart's new edge: blank, until the next touch
-       * springs it back. Stopping the box scrolling for a frame makes it let
-       * go of its own, and the scroll set here then stands.
-       */
-      scroller.style.overflow = "hidden";
+    const sheetLeft = scroller.scrollLeft + box.left;
+    const sheetTop = scroller.scrollTop + box.top;
+    const left = sheetLeft + (placed?.x ?? done.originX * done.ratio) - done.screenX;
+    const top = sheetTop + (placed?.y ?? done.originY * done.ratio) - done.screenY;
+    const [lowest, highest] = scrollAcross(scroller);
+    const place = () => {
+      scroller.scrollLeft = Math.min(Math.max(left, lowest), highest);
+      scroller.scrollTop = Math.min(Math.max(top, 0), scroller.scrollHeight - scroller.clientHeight);
+    };
+    /*
+     * An iPhone scrolls a box itself, apart from the page, and while it
+     * thinks a finger is still on it - as it does for a while after a long
+     * pinch - it ignores a scroll set from here and keeps its own. Zoomed
+     * out, that is past the chart's new edge: blank, until the next touch
+     * springs it back. Stopping the box scrolling for a frame makes it let
+     * go of its own, and the scroll set here then stands.
+     */
+    scroller.style.overflow = "hidden";
+    place();
+    requestAnimationFrame(() => {
+      scroller.style.overflow = "";
       place();
-      requestAnimationFrame(() => {
-        scroller.style.overflow = "";
-        place();
-      });
-      return;
-    }
-    scroller.scrollLeft = left;
-    window.scrollBy({
-      top: box.top + done.originY * done.ratio - done.screenY,
-      behavior: "instant",
     });
-  }, [cell, scrollRef, sheetRef, contained]);
+  }, [cell, scrollRef, sheetRef, placeAfter]);
 
   /** Zoom to a cell size about a point on screen, holding that point still. */
   return useCallback(
     (next: number, clientX: number, clientY: number) => {
       const sheet = sheetRef.current;
-      const wanted = Math.round(clamp(next));
+      const wanted = settleCell(next, leastNow.current());
       if (!sheet || wanted === current.current) return;
       const box = sheet.getBoundingClientRect();
       settle.current = {
