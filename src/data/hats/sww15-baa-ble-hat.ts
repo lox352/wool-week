@@ -22,6 +22,15 @@ import charts from "./sww15-baa-ble-hat.charts.json";
  *
  * One chart, worked twice a round, and it does everything: 45 rows taking 120
  * stitches to 10, with the sheep in the middle and the decreases from row 26.
+ *
+ * Two of its snow rows are corrected from the printed chart, which each miss
+ * a single snowflake a repeat: row 19, a flake every third stitch, has none
+ * at stitch 51, and row 24, every fourth, none at stitch 49 - a gap of five
+ * and of seven where every other gap is two and three. Sixty stitches take a
+ * flake every three or four exactly, so the even rows close up round the
+ * repeat with nothing over: a cell missed in the word processor's table, not
+ * a break in the snow. The extractor still reads the page as printed; the
+ * two flakes are put in by hand here (see PATTERNS.md).
  */
 
 const chartsOf = (): Chart[] =>

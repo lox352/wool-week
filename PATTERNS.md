@@ -162,6 +162,14 @@ is shaded 15% grey where its neighbours are 25%; a shade plainly nearer one
 yarn than any other is read as that yarn, with a note, and one that could be
 either is still an error.
 
+The same chart has two cells corrected by hand after extraction, because the
+page has them wrong rather than the reading: row 19's snow, a flake every
+third stitch, misses the one at stitch 51, and row 24's, every fourth, the
+one at stitch 49. Sixty stitches take either spacing exactly, so every other
+gap in those rows is two and three, and these two were five and seven - once
+in every repeat, all the way round the hat. Re-running the extractor puts
+them back as printed; set the two cells to B again after it.
+
 ### Charts printed on a tinted panel
 
 A panel is one big rectangle, and a rectangle read as a run of cells - which
